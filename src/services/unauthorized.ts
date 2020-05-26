@@ -58,7 +58,7 @@ export const getAllProducts = () => {
 	})
 }
 
-export const getProductsByRange = ({ categoryId, start, quantity }: any) => (
+export const getProductsByRange = (categoryId: string, start: number, quantity: number) => (
 	Redis.getInstance.lrangeAsync(`products:${categoryId}`, start, start + quantity)
 )
 

@@ -80,7 +80,7 @@ router.get('/products', (req, res, next) => {
 })
 
 router.get('/products-by-range', (req, res, next) => {
-	getProductsByRange(req.body).then((products) => {
+	getProductsByRange(req.query.categoryId, req.query.start, req.query.quantity).then((products) => {
 		res.json(products)
 	}).catch((reason) => {
 		next(handleError(reason, 'GET /products-by-range'))
