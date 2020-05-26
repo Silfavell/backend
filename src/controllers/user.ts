@@ -27,7 +27,8 @@ import {
 } from '../services/user'
 
 import {
-	comparePasswords
+	comparePasswords,
+	isUserExists
 } from '../validators'
 
 import {
@@ -168,7 +169,9 @@ router.put('/change-password', (req, res, next) => {
 		// @ts-ignore
 		.then(() => comparePasswords(req.user.password, req.body.oldPassword))
 		// @ts-ignore
-		.then(() => changePassword(req.user, req.body.newPassword))
+		.then(() => isUserExists(req.user.phoneNumber))
+		// @ts-ignore
+		.then((user) => changePassword(user, req.body.newPassword))
 		.then(() => {
 			res.json()
 		})
