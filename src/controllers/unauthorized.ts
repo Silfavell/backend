@@ -24,7 +24,8 @@ import {
 	takeOffProductFromCart,
 	changePassword,
 	sendActivationCode,
-	getProductsByRange
+	getProductsByRange,
+	getProductsLength
 } from '../services/unauthorized'
 
 import {
@@ -82,6 +83,15 @@ router.get('/products', (req, res, next) => {
 router.get('/products-by-range', (req, res, next) => {
 	getProductsByRange(req.query.categoryId, req.query.start, req.query.quantity).then((products) => {
 		res.json(products)
+	}).catch((reason) => {
+		next(handleError(reason, 'GET /products-by-range'))
+	})
+})
+
+
+router.get('/products-length/:categoryId', (req, res, next) => {
+	getProductsLength(req.params.categoryId).then((length) => {
+		res.json(length)
 	}).catch((reason) => {
 		next(handleError(reason, 'GET /products-by-range'))
 	})

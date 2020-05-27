@@ -598,6 +598,7 @@ export interface Commands<R> {
      * Get the length of a list.
      */
     llen(key: string, cb?: Callback<number>): R;
+    llenAsync(key: string, cb?: Callback<number>): Promise<any>;
     LLEN(key: string, cb?: Callback<number>): R;
 
     /**

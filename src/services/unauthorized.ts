@@ -58,8 +58,13 @@ export const getAllProducts = () => {
 	})
 }
 
-export const getProductsByRange = (categoryId: string, start: number, quantity: number) => (
-	Redis.getInstance.lrangeAsync(`products:${categoryId}`, start, start + quantity)
+export const getProductsLength = (categoryId: string) => (
+	Redis.getInstance.llenAsync(`products:${categoryId}`)
+)
+
+export const getProductsByRange = (categoryId: string, start: string, quantity: string) => (
+	// eslint-disable-next-line radix
+	Redis.getInstance.lrangeAsync(`products:${categoryId}`, parseInt(start), parseInt(start) + parseInt(quantity))
 )
 
 export const getSingleProduct = (productId: string, user: UserDocument) => { // "5ea7ac324756fd198887099a", "5ea7ac324756fd1988870999", "5ea7ac324756fd198887099b"
