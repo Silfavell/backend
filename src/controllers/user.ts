@@ -77,6 +77,17 @@ router.put('/payment-card', (req, res, next) => {
 		})
 })
 
+router.get('/profile', (req, res, next) => {
+	// @ts-ignore
+	isUserExists(req.user.phoneNumber)
+		.then((user) => {
+			res.json(user)
+		})
+		.catch((reason) => {
+			next(handleError(reason, 'GET /user/profile'))
+		})
+})
+
 router.put('/profile', (req, res, next) => {
 	validateUpdateProfileRequest(req.body)
 		// @ts-ignore
