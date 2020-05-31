@@ -7,6 +7,7 @@ import ServerError from '../errors/ServerError'
 import ErrorMessages from '../errors/ErrorMessages'
 // eslint-disable-next-line no-unused-vars
 import ActivationCodes from '../enums/activation-code-enum'
+import ActivationCode from '../models/ActivationCode'
 
 export const comparePasswords = (oldPassword: string, newPassword: string) => (
 	bcrypt.compare(newPassword, oldPassword).then((validPassword) => {
@@ -58,12 +59,12 @@ export const isUserExists = (phoneNumber: string) => (
 
 /** Returns activation code of phoneNumber from Redis */
 export const getActivationCode = (phoneNumber: string, activationCodeType: ActivationCodes) => (
-	Redis.getInstance.getAsync(`${phoneNumber}:activationCode:${activationCodeType}`).then((activationCode) => {
-		if (!activationCode) {
-			throw new ServerError(ErrorMessages.UNKNOWN_ACTIVATION_CODE, HttpStatusCodes.BAD_REQUEST, null, false)
-		}
-		return activationCode
-	})
+	ActivationCode.findOne({
+		userPhoneNumber: phoneNumber,
+		activationCodeType
+	}).then((res) => (
+		res.activationCode
+	))
 )
 
 /** Tests equality of activationCode from request and from Redis */

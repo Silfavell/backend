@@ -3,13 +3,13 @@ import Iyzipay from 'iyzipay'
 
 import ErrorMessages from '../errors/ErrorMessages'
 import ServerError from '../errors/ServerError'
-import { Redis } from '../startup'
 
 import {
 	User, Order,
 	// eslint-disable-next-line no-unused-vars
-	UserDocument, OrderDocument, ProductDocument
+	UserDocument, OrderDocument, ProductDocument, Product
 } from '../models'
+import Cart from '../models/Cart'
 
 const iyzipay = new Iyzipay({
 	apiKey: 'sandbox-hbjzTU7CZDxarIUKVMhWLvHOIMIb3Z40',
@@ -23,26 +23,45 @@ export const updateUser = (userId: string, userContext: any) => (
 
 export const createCart = (body: { _id: string, quantity: number }[]) => {
 	const productIds = body.map((product) => product._id)
-	return Redis.getInstance.mgetAsync(productIds).then((products: string[]) => (
+
+	Product.find().where('_id').in(productIds).then((products: any[]) => {
 		products.reduce((json, product, index) => {
-			if (!JSON.parse(product)) {
+			if (!product) {
 				throw new ServerError(ErrorMessages.NON_EXISTS_PRODUCT, HttpStatusCodes.BAD_REQUEST, ErrorMessages.NON_EXISTS_PRODUCT, false)
 			}
 			return {
 				...json,
-				[JSON.parse(product)._id.toString()]: {
-					...JSON.parse(product),
+				[product._id.toString()]: {
+					...product,
 					// eslint-disable-next-line security/detect-object-injection
 					quantity: body[index].quantity
 				}
 			}
 		}, {})
-	))
+	})
 }
 
 export const saveCart = (userId: string, cart: ProductDocument[]) => (
+	new Promise((resolve) => {
+		Cart.findOne({ userId }).then((cartObj) => {
+			if (cart) {
+				// eslint-disable-next-line no-param-reassign
+				cartObj.cart = cart
+				cartObj.save().then((res) => {
+					resolve(res)
+				})
+			} else {
+				new Cart({ userId, cart }).save().then((res) => {
+					resolve(res)
+				})
+			}
+		})
+	})
+)
+
+export const getCart = (userId: string) => ( // "5ea7ac324756fd198887099a", "5ea7ac324756fd1988870999", "5ea7ac324756fd198887099b"
 	new Promise((resolve, reject) => {
-		Redis.getInstance.hsetAsync('cart', userId, JSON.stringify(cart)).then(() => {
+		Cart.findOne({ userId }).then((cart) => {
 			resolve(cart)
 		}).catch((reason) => {
 			reject(new Error(reason.message))
@@ -50,19 +69,8 @@ export const saveCart = (userId: string, cart: ProductDocument[]) => (
 	})
 )
 
-export const getCart = (userId: string) => ( // "5ea7ac324756fd198887099a", "5ea7ac324756fd1988870999", "5ea7ac324756fd198887099b"
-	new Promise((resolve, reject) => {
-		// Redis.getInstance.hdel('cart', userId)
-		Redis.getInstance.hgetAsync('cart', userId).then((cart) => {
-			resolve(JSON.parse(cart))
-		}).catch((reason) => {
-			reject(new Error(reason.message))
-		})
-	})
-)
-
 export const clearCart = (userId: string) => (
-	Redis.getInstance.hdelAsync('cart', userId)
+	Cart.deleteOne({ userId })
 )
 
 export const deleteAddress = (userId: string, deletedAddressId: string) => (
@@ -80,7 +88,7 @@ export const checkMakeOrderValues = (user: UserDocument, context: any) => {
 	const selectedAddress = user.addresses.find((address) => address._id.toString() === context.address)
 
 	// @ts-ignore
-	return Redis.getInstance.hgetAsync('cart', user._id.toString()).then((cart) => {
+	return Cart.findOne({ userId: user._id.toString() }).then((cart) => {
 		if (!cart) {
 			throw new ServerError(ErrorMessages.EMPTY_CART, HttpStatusCodes.BAD_REQUEST, null, false)
 			// @ts-ignore
@@ -97,35 +105,9 @@ export const saveOrderToDatabase = (user: UserDocument, cart: any, address: any)
 		customer: user.nameSurname,
 		phoneNumber: user.phoneNumber,
 		address: address.openAddress,
-		products: Object.values(JSON.parse(cart))
+		products: Object.values(cart)
 	}).save()
 )
-
-export const saveOrderToCache = (user: UserDocument, order: OrderDocument) => (
-	new Promise((resolve, reject) => {
-		// stars : 2.2 // Müşteri daha önce memnuniyetsizliğini belirttiyse bi güzellik yapılabilir. :)
-		// price: (23.43 * 5) + (76.36 * 2), // Online ödemelerde manager'ın ücret ile işi yok.
-
-		const multi = Redis.getInstance.multi()
-
-		multi.hset('orders', order._id.toString(), JSON.stringify(order))
-
-		// @ts-ignore
-		multi.hdel('cart', user._id.toString())
-
-		multi.exec((error) => {
-			if (error) {
-				reject(new ServerError(ErrorMessages.UNEXPECTED_ERROR, HttpStatusCodes.INTERNAL_SERVER_ERROR, error.message, true))
-			} else {
-				resolve(order)
-			}
-		})
-	})
-)
-
-export const cacheUser = (user: UserDocument) => (Redis.getInstance.setAsync(user.phoneNumber.toString(), JSON.stringify(user)))
-
-export const getUserFromCache = (phoneNumber: string) => (Redis.getInstance.getAsync(phoneNumber))
 
 export const saveAddressToDatabase = (userId: string, address: any) => (
 	User.findByIdAndUpdate(userId, {
@@ -173,8 +155,7 @@ export const addNewCard = (cardUserKey: string, card: any) => (
 export const addCardToUser = (user: UserDocument, card: any) => {
 	if (!user.cardUserKey) {
 		return createPaymentUserWithCard(user, card)
-			.then((result: any) => updateUser(user._id, { cardUserKey: result.cardUserKey })
-				.then((updatedUser) => cacheUser(updatedUser).then(() => result)))
+			.then((result: any) => updateUser(user._id, { cardUserKey: result.cardUserKey }))
 	}
 	return addNewCard(user.cardUserKey, card)
 }

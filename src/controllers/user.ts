@@ -13,14 +13,12 @@ import {
 	addCardToUser,
 	updateUser,
 	saveCart,
-	saveOrderToCache,
 	deleteAddress,
 	getCart,
 	saveOrderToDatabase,
 	completePayment,
 	checkMakeOrderValues,
 	saveAddressToDatabase,
-	cacheUser,
 	deleteCard,
 	createCart,
 	clearCart
@@ -92,7 +90,6 @@ router.put('/profile', (req, res, next) => {
 	validateUpdateProfileRequest(req.body)
 		// @ts-ignore
 		.then(() => updateUser(req.user._id, req.body))
-		.then((user) => cacheUser(user).then(() => user))
 		.then((user) => {
 			res.json(user)
 		})
@@ -136,7 +133,6 @@ router.post('/address', (req, res, next) => {
 	validateSaveAddressRequest(req.body)
 		// @ts-ignore
 		.then(() => saveAddressToDatabase(req.user._id, req.body))
-		.then((user) => cacheUser(user).then(() => user))
 		.then((user) => {
 			res.json(user)
 		})
@@ -148,7 +144,6 @@ router.post('/address', (req, res, next) => {
 router.delete('/address/:_id', (req, res, next) => {
 	// @ts-ignore
 	deleteAddress(req.user._id, req.params._id)
-		.then((user) => cacheUser(user).then(() => user))
 		.then((user) => {
 			res.json(user)
 		})
@@ -162,11 +157,10 @@ router.post('/order', (req, res, next) => {
 		// @ts-ignore
 		.then(() => checkMakeOrderValues(req.user, req.body))
 		// @ts-ignore
-		.then(({ cart, card, selectedAddress }) => completePayment(req.user, JSON.parse(cart), selectedAddress.openAddress, card).then((result) => ({ cart, selectedAddress, result })))
+		.then(({ cart, card, selectedAddress }) => completePayment(req.user, cart, selectedAddress.openAddress, card).then((result) => ({ cart, selectedAddress, result })))
 		// @ts-ignore
 		.then(({ cart, selectedAddress, result }) => saveOrderToDatabase(req.user, cart, selectedAddress).then((order) => ({ order, result })))
 		// @ts-ignore
-		.then(({ order, result }) => saveOrderToCache(req.user, order).then(() => ({ result, order })))
 		.then((result) => {
 			res.json(result)
 		})

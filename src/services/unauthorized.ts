@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken'
 import HttpStatusCodes from 'http-status-codes'
 import Nexmo from 'nexmo'
 
-import { Redis, Elasticsearch } from '../startup'
+import { Elasticsearch } from '../startup'
 import ServerError from '../errors/ServerError'
 import {
 	User,
@@ -16,7 +16,9 @@ import {
 	// eslint-disable-next-line no-unused-vars
 	AdminDocument,
 	// eslint-disable-next-line no-unused-vars
-	CategoryDocument
+	CategoryDocument,
+	Category,
+	Product
 } from '../models'
 import ErrorMessages from '../errors/ErrorMessages'
 import ActivationCodes from '../enums/activation-code-enum'
@@ -28,6 +30,9 @@ import {
 	isManagerNonExists,
 	isManagerExists
 } from '../validators'
+import ActivationCode from '../models/ActivationCode'
+// eslint-disable-next-line no-unused-vars
+import Cart, { CartDocument } from '../models/Cart'
 
 export const sendSms = (to: string, message: string) => {
 	const smsManager: any = new Nexmo({
@@ -41,49 +46,41 @@ export const sendSms = (to: string, message: string) => {
 }
 
 export const getCategories = () => (
-	Redis.getInstance.getAsync('categories').then((categories) => JSON.parse(categories))
+	Category.find()
 )
 
-export const getAllProducts = () => {
-	const multi = Redis.getInstance.multi()
-
-	return getCategories().then((categories) => {
-		categories.map((category: CategoryDocument) => {
-			multi.lrangeAsync(`products:${category._id}`, 0, -1)
-		})
-
-		return multi.execAsync()
-	}).catch((reason) => {
-		throw new ServerError(ErrorMessages.UNEXPECTED_ERROR, HttpStatusCodes.INTERNAL_SERVER_ERROR, reason.message, true)
-	})
-}
+export const getAllProducts = () => (
+	Product.find()
+)
 
 export const getProductsLength = (categoryId: string) => (
-	Redis.getInstance.llenAsync(`products:${categoryId}`)
+	Product.count({ categoryId })
 )
 
 export const getProductsByRange = (categoryId: string, start: string, quantity: string) => (
-	// eslint-disable-next-line radix
-	Redis.getInstance.lrangeAsync(`products:${categoryId}`, parseInt(start), parseInt(start) + parseInt(quantity))
+	Product.find({
+		categoryId
+		// eslint-disable-next-line radix
+	}).skip(parseInt(start)).limit(parseInt(quantity))
 )
 
 export const getSingleProduct = (productId: string, user: UserDocument) => { // "5ea7ac324756fd198887099a", "5ea7ac324756fd1988870999", "5ea7ac324756fd198887099b"
-	const multi = Redis.getInstance.multi()
+	const product = Product.findById(productId)
 
-	multi.getAsync(productId)
-
-	// @ts-ignore
-	if (user?._id) {
-		// @ts-ignore
-		multi.hget('cart', user._id.toString())
+	if (product) {
+		return Cart.findOne({ userId: user?._id?.toString() }).then((cart) => {
+			if (cart) {
+				return {
+					product,
+					cart
+				}
+			}
+			return {
+				product
+			}
+		})
 	}
-
-	return multi.execAsync().then((results) => {
-		if (results[0]) {
-			return ({ product: results[0], cart: results[1] })
-		}
-		throw new ServerError(ErrorMessages.NON_EXISTS_PRODUCT, HttpStatusCodes.BAD_REQUEST, null, false)
-	})
+	throw new Error(ErrorMessages.NON_EXISTS_PRODUCT)
 }
 
 export const addProductToCart = (product: ProductDocument, cart: any, user: UserDocument) => (
@@ -92,36 +89,26 @@ export const addProductToCart = (product: ProductDocument, cart: any, user: User
 		if (user?._id.toString()) {
 			if (cart) {
 				if (Object.keys(cart).includes(product._id.toString())) {
-					Redis.getInstance.hset(
-						'cart',
-						// @ts-ignore
-						user._id.toString(),
-						JSON.stringify({
-							...cart,
-							[product._id.toString()]: {
-								...product,
-								quantity: (cart[product._id.toString()].quantity ?? 1) + 1
-							}
-						})
-					)
+					Cart.findOneAndUpdate({ userId: user._id.toString() }, {
+						...cart,
+						[product._id.toString()]: {
+							...product,
+							quantity: (cart[product._id.toString()].quantity ?? 1) + 1
+						}
+					})
 
 					resolve({
 						...product,
 						quantity: (cart[product._id.toString()].quantity ?? 1) + 1
 					})
 				} else {
-					Redis.getInstance.hset(
-						'cart',
-						// @ts-ignore
-						user._id.toString(),
-						JSON.stringify({
-							...cart,
-							[product._id.toString()]: {
-								...product,
-								quantity: 1
-							}
-						})
-					)
+					Cart.findOneAndUpdate({ userId: user._id.toString() }, {
+						...cart,
+						[product._id.toString()]: {
+							...product,
+							quantity: 1
+						}
+					})
 
 					resolve({
 						...product,
@@ -129,17 +116,12 @@ export const addProductToCart = (product: ProductDocument, cart: any, user: User
 					})
 				}
 			} else {
-				Redis.getInstance.hset(
-					'cart',
-					// @ts-ignore
-					user._id.toString(),
-					JSON.stringify({
-						[product._id.toString()]: {
-							...product,
-							quantity: 1
-						}
-					})
-				)
+				Cart.findOneAndUpdate({ userId: user._id.toString() }, {
+					[product._id.toString()]: {
+						...product,
+						quantity: 1
+					}
+				})
 
 				resolve({
 					...product,
@@ -158,11 +140,8 @@ export const takeOffProductFromCart = (product: ProductDocument, cart: any, user
 			if (cart) {
 				if (Object.keys(cart).includes(product._id.toString())) {
 					if (cart[product._id.toString()].quantity > 1) {
-						Redis.getInstance.hset(
-							'cart',
-							// @ts-ignore
-							user._id.toString(),
-							JSON.stringify(Object.assign(
+						Cart.findOneAndUpdate({ userId: user._id.toString() },
+							Object.assign(
 								cart,
 								{
 									[product._id.toString()]: {
@@ -173,7 +152,7 @@ export const takeOffProductFromCart = (product: ProductDocument, cart: any, user
 									}
 								}
 							))
-						)
+
 						resolve({
 							...product,
 							...{
@@ -181,19 +160,18 @@ export const takeOffProductFromCart = (product: ProductDocument, cart: any, user
 							}
 						})
 					} else if (cart[product._id.toString()].quantity === 1) {
-						// eslint-disable-next-line no-param-reassign
-						delete cart[product._id.toString()]
-						Redis.getInstance.hset(
-							'cart',
-							// @ts-ignore
-							user._id.toString(),
-							JSON.stringify(cart)
-						)
-						resolve({
-							...product,
-							...{
-								quantity: 0
-							}
+						// eslint-disable-next-line no-shadow
+						Cart.findOne({ userId: user._id.toString() }).then((cart: any) => {
+							// eslint-disable-next-line no-param-reassign
+							delete cart[product._id.toString()]
+							cart.save().then(() => {
+								resolve({
+									...product,
+									...{
+										quantity: 0
+									}
+								})
+							})
 						})
 					} else {
 						reject(new ServerError(ErrorMessages.NON_EXISTS_PRODUCT, HttpStatusCodes.BAD_REQUEST, ErrorMessages.NON_EXISTS_PRODUCT, false))
@@ -251,17 +229,16 @@ export const checkConvenientOfActivationCodeRequest = (phoneNumber: string, acti
 }
 
 export const createActivationCode = (phoneNumber: string, activationCodeType: ActivationCodes) => {
-	const activationCode = parseInt(Math.floor(1000 + Math.random() * 9000).toString(), 10).toString()
+	const activationCode = parseInt(Math.floor(1000 + Math.random() * 9000).toString(), 10)
 	console.log(activationCode)
-
-	// @ts-ignore
-	return Redis.getInstance.setAsync(`${phoneNumber}:activationCode:${activationCodeType}`, activationCode).then(() => {
-		Redis.getInstance.expire(`${phoneNumber}:activationCode:${activationCodeType}`, 60 * 3)
-		return activationCode
-	})
+	return new ActivationCode({
+		userPhoneNumber: phoneNumber,
+		activationCodeType,
+		activationCode
+	}).save().then(() => activationCode)
 }
 
-export const sendActivationCode = (phoneNumber: string, activationCode: string) => (
+export const sendActivationCode = (phoneNumber: string, activationCode: number) => (
 	new Promise((resolve) => {
 		sendSms(`9${phoneNumber.split(' ').join('')}`, `Onay kodu: ${activationCode}`)
 		resolve()
@@ -283,17 +260,21 @@ export const isManagerVerified = (manager: ManagerDocument) => (
 )
 
 export const registerUser = (userContext: any) => (
-	new User(userContext).save().then((user) => {
-		Redis.getInstance.del(`${user.phoneNumber}:activationCode:${ActivationCodes.REGISTER_USER}`)
-		return user
-	})
+	new User(userContext).save().then((user) => (
+		ActivationCode.deleteOne({
+			userPhoneNumber: user.phoneNumber,
+			activationCodeType: ActivationCodes.REGISTER_USER
+		}).then(() => user)
+	))
 )
 
 export const registerManager = (managerContext: any) => (
-	new Manager(managerContext).save().then((manager) => {
-		Redis.getInstance.del(`${managerContext.phoneNumber}:activationCode:${ActivationCodes.REGISTER_MANAGER}`)
-		return manager
-	})
+	new Manager(managerContext).save().then((manager) => (
+		ActivationCode.deleteOne({
+			userPhoneNumber: manager.phoneNumber,
+			activationCodeType: ActivationCodes.REGISTER_MANAGER
+		}).then(() => manager)
+	))
 )
 
 export const createToken = (context: UserDocument | ManagerDocument | AdminDocument): Promise<string> => (
@@ -312,7 +293,10 @@ export const changePassword = (user: UserDocument, newPassword: string) => {
 	// eslint-disable-next-line no-param-reassign
 	user.password = newPassword
 	return user.save().then(() => {
-		Redis.getInstance.del(`${user.phoneNumber}:activationCode:${ActivationCodes.RESET_PASSWORD}`)
+		ActivationCode.findOneAndDelete({
+			userPhoneNumber: user.phoneNumber,
+			activationCodeType: ActivationCodes.RESET_PASSWORD
+		})
 	})
 }
 

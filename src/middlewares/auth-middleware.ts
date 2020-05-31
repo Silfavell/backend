@@ -4,11 +4,10 @@ import jwt from 'jsonwebtoken'
 import HttpStatusCodes from 'http-status-codes'
 
 import Authority from '../enums/authority-enum'
-import { Manager, Admin } from '../models'
+import { Manager, Admin, User } from '../models'
 import { validatePhoneNumber } from '../validators/user-validator'
 
 import ServerError from '../errors/ServerError'
-import { getUserFromCache } from '../services/user'
 
 export const validateAuthority = (authority: Authority) => (req: Request, res: Response, next: NextFunction) => {
 	if (authority === Authority.ANONIM) {
@@ -16,9 +15,9 @@ export const validateAuthority = (authority: Authority) => (req: Request, res: R
 			const decoded: any = jwt.verify(req.headers.authorization, process.env.SECRET)
 
 			if (decoded?.payload?.phoneNumber) {
-				getUserFromCache(decoded.payload.phoneNumber).then((user) => {
+				User.findOne({ phoneNumber: decoded.payload.phoneNumber }).then((user) => {
 					// @ts-ignore
-					req.user = JSON.parse(user)
+					req.user = user
 					next()
 				})
 			} else {
@@ -34,10 +33,10 @@ export const validateAuthority = (authority: Authority) => (req: Request, res: R
 			const decoded: any = jwt.verify(req.headers.authorization, process.env.SECRET)
 			if (decoded) {
 				if (authority === Authority.USER) {
-					getUserFromCache(decoded.payload.phoneNumber).then((user) => {
+					User.findOne({ phoneNumber: decoded.payload.phoneNumber }).then((user) => {
 						if (user) {
 							// @ts-ignore
-							req.user = JSON.parse(user)
+							req.user = user
 							next()
 						} else {
 							res.status(HttpStatusCodes.UNAUTHORIZED).end('Unauthorized')

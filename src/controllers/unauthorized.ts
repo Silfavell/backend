@@ -46,7 +46,6 @@ import {
 } from '../validators/unauthorized-validator'
 
 import ActivationCodes from '../enums/activation-code-enum'
-import { cacheUser } from '../services/user'
 
 const router = Router()
 
@@ -101,10 +100,10 @@ router.get('/product/:_id', (req, res, next) => {
 	// @ts-ignore
 	getSingleProduct(req.params._id, req.user)
 		// @ts-ignore
-		.then(({ product, cart }) => addProductToCart(JSON.parse(product), cart ? JSON.parse(cart) : null, req.user))
-		.then((response) => {
+		.then(({ product, cart }) => addProductToCart(product, cart || null, req.user))
+		.then((response: any) => {
 			res.json(response)
-		}).catch((reason) => {
+		}).catch((reason: any) => {
 			next((handleError(reason, 'GET /product/:_id')))
 		})
 })
@@ -113,11 +112,11 @@ router.delete('/product/:_id', (req, res, next) => {
 	// @ts-ignore
 	getSingleProduct(req.params._id, req.user)
 		// @ts-ignore
-		.then(({ product, cart }) => takeOffProductFromCart(JSON.parse(product), cart ? JSON.parse(cart) : null, req.user))
-		.then((response) => {
+		.then(({ product, cart }) => takeOffProductFromCart(product, cart || null, req.user))
+		.then((response: any) => {
 			res.json(response)
 		})
-		.catch((reason) => {
+		.catch((reason: any) => {
 			next((handleError(reason, 'DELETE /product/:_id')))
 		})
 })
@@ -150,9 +149,8 @@ router.post('/register', (req, res, next) => {
 	validateRegisterRequest(req.body)
 		.then(() => isUserNonExists(req.body.phoneNumber))
 		.then(() => getActivationCode(req.body.phoneNumber, ActivationCodes.REGISTER_USER))
-		.then((activationCode) => compareActivationCode(req.body.activationCode, activationCode))
+		.then((activationCode) => compareActivationCode(req.body.activationCode, activationCode.toString()))
 		.then(() => registerUser(req.body))
-		.then((user) => cacheUser(user).then(() => user))
 		.then((user) => createToken(user).then((token) => ({ user, token })))
 		.then((response) => {
 			res.json(response)
@@ -166,7 +164,7 @@ router.post('/register-manager', (req, res, next) => {
 	validateRegisterManagerRequest(req.body)
 		.then(() => isManagerNonExists(req.body.phoneNumber))
 		.then(() => getActivationCode(req.body.phoneNumber, ActivationCodes.REGISTER_MANAGER))
-		.then((activationCode: string) => compareActivationCode(req.body.activationCode, activationCode))
+		.then((activationCode) => compareActivationCode(req.body.activationCode, activationCode.toString()))
 		.then(() => registerManager({ ...req.body, ...{ verified: false } }))
 		// .then((manager) => createToken(manager).then((token) => ({ manager, token })))
 		.then(() => {
@@ -195,7 +193,6 @@ router.post('/login', (req, res, next) => {
 	validateLoginRequest(req.body)
 		.then(() => isUserExists(req.body.phoneNumber))
 		.then((user) => login(user, req.body.password))
-		.then((user) => cacheUser(user).then(() => user))
 		.then((user) => createToken(user).then((token) => ({ user, token })))
 		.then((response) => {
 			res.json(response)
@@ -209,7 +206,7 @@ router.put('/reset-password', (req, res, next) => {
 	validateResetPasswordRequest(req.body)
 		.then(() => isUserExists(req.body.phoneNumber))
 		.then(() => getActivationCode(req.body.phoneNumber, ActivationCodes.RESET_PASSWORD))
-		.then((activationCode) => compareActivationCode(req.body.activationCode, activationCode))
+		.then((activationCode) => compareActivationCode(req.body.activationCode, activationCode.toString()))
 		.then(() => isUserExists(req.body.phoneNumber))
 		.then((user) => changePassword(user, req.body.newPassword))
 		.then(() => {

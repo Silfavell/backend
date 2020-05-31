@@ -19,12 +19,9 @@ import {
 
 import {
 	saveProductToDatabase,
-	saveProductToCache,
-	deleteProductFromCache,
 	updateProduct,
 	deleteProductFromDatabase,
 	updateCategory,
-	saveCategoryToCache,
 	saveCategoryToDatabase,
 	deleteCategoryFromDatabase,
 	verifyManager,
@@ -74,7 +71,6 @@ router.put('/verify-manager/:_id', (req, res) => {
 router.post('/category', (req, res, next) => {
 	validatePostCategory(req.body)
 		.then(() => saveCategoryToDatabase(req.body))
-		.then((category) => saveCategoryToCache().then(() => category))
 		.then((category) => {
 			res.json(category)
 		})
@@ -85,7 +81,6 @@ router.post('/category', (req, res, next) => {
 
 router.delete('/category/:_id', (req, res, next) => {
 	deleteCategoryFromDatabase(req.params._id)
-		.then((category) => saveCategoryToCache().then(() => category))
 		.then((category) => {
 			res.json(category)
 		})
@@ -97,7 +92,6 @@ router.delete('/category/:_id', (req, res, next) => {
 router.put('/category/:_id', (req, res, next) => {
 	validateUpdateCategory(req.body)
 		.then(() => updateCategory(req.params._id, req.body))
-		.then((category) => saveCategoryToCache().then(() => category))
 		.then((category) => {
 			res.json(category)
 		})
@@ -109,8 +103,7 @@ router.put('/category/:_id', (req, res, next) => {
 router.post('/product', (req, res, next) => {
 	validatePostProduct(req.body)
 		.then(() => saveProductToDatabase(req.body))
-		.then((product) => saveProductToCache(product))
-		.then((product) => indexProduct(product))
+		.then((product: any) => indexProduct(product))
 		.then((product) => {
 			res.json(product)
 		})
@@ -122,7 +115,6 @@ router.post('/product', (req, res, next) => {
 router.put('/product/:_id', (req, res, next) => {
 	validateUpdateProduct(req.body)
 		.then(() => updateProduct(req.params._id, req.body))
-		.then((product) => saveProductToCache(product))
 		.then((product) => {
 			res.json(product)
 		})
@@ -133,7 +125,6 @@ router.put('/product/:_id', (req, res, next) => {
 
 router.delete('/product/:_id', (req, res, next) => {
 	deleteProductFromDatabase(req.params._id)
-		.then((product) => deleteProductFromCache(product))
 		.then(() => {
 			res.json()
 		})
