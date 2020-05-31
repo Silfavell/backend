@@ -7,8 +7,7 @@ export type SubCategoryDocument = Document & {
 
 const subCategorySchema = new Schema({
 	name: {
-		type: String,
-		unique: true
+		type: String
 	}
 })
 
