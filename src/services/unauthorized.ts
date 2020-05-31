@@ -57,6 +57,27 @@ export const getProductsLength = (categoryId: string) => (
 	Product.count({ categoryId })
 )
 
+export const getFilteredProducts = (query: any) => {
+	const x = {}
+
+	// eslint-disable-next-line radix
+	const start = parseInt(query.start)
+	// eslint-disable-next-line radix
+	const quantity = parseInt(query.quantity)
+
+	if (query.brand) {
+		// @ts-ignore
+		x.brand = query.brand
+	}
+
+	if (query.categoryId) {
+		// @ts-ignore
+		x.categoryId = query.categoryId
+	}
+
+	return Product.find(x).skip(start).limit(quantity)
+}
+
 export const getProductsByRange = (categoryId: string, start: string, quantity: string) => (
 	Product.find({
 		categoryId
