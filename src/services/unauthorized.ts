@@ -75,6 +75,11 @@ export const getFilteredProducts = (query: any) => {
 		x.categoryId = query.categoryId
 	}
 
+	if (query.subCategoryId) {
+		// @ts-ignore
+		x.subCategoryId = query.subCategoryId
+	}
+
 	return Product.find(x).skip(start).limit(quantity)
 }
 
