@@ -8,8 +8,19 @@ export const categorySchema = Joi.object({
 	name: Joi.string().required()
 }).required()
 
+export const saveSubCategorySchema = Joi.object({
+	parentCategoryId: Joi.string().required(),
+	name: Joi.string().required()
+}).required()
+
+export const deleteSubCategorySchema = Joi.object({
+	parentCategoryId: Joi.string().required(),
+	_id: Joi.string().required()
+}).required()
+
 export const saveProductSchema = Joi.object({
-	category: Joi.string().required(),
+	categoryId: Joi.string().required(),
+	subCategoryId: Joi.string().required(),
 	brand: Joi.string().required(),
 	name: Joi.string().required(),
 	price: Joi.number().required()

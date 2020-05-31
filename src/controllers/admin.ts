@@ -14,7 +14,9 @@ import {
 	validatePostProduct,
 	validateUpdateProduct,
 	validatePostCategory,
-	validateUpdateCategory
+	validateUpdateCategory,
+	validatePostSubCategory,
+	validateDeleteSubCategory
 } from '../validators/admin-validator'
 
 import {
@@ -25,7 +27,9 @@ import {
 	saveCategoryToDatabase,
 	deleteCategoryFromDatabase,
 	verifyManager,
-	indexProduct
+	indexProduct,
+	saveSubCategoryToDatabase,
+	deleteSubCategoryFromDatabase
 } from '../services/admin'
 
 const router = Router()
@@ -86,6 +90,28 @@ router.delete('/category/:_id', (req, res, next) => {
 		})
 		.catch((reason) => {
 			next(handleError(reason, 'POST /admin/category'))
+		})
+})
+
+router.post('/sub-category', (req, res, next) => {
+	validatePostSubCategory(req.body)
+		.then(() => saveSubCategoryToDatabase(req.body))
+		.then((category: any) => {
+			res.json(category)
+		})
+		.catch((reason: any) => {
+			next(handleError(reason, 'POST /admin/sub-category'))
+		})
+})
+
+router.delete('/sub-category', (req, res, next) => {
+	validateDeleteSubCategory(req.body)
+		.then(() => deleteSubCategoryFromDatabase(req.body))
+		.then((category: any) => {
+			res.json(category)
+		})
+		.catch((reason: any) => {
+			next(handleError(reason, 'POST /admin/sub-category'))
 		})
 })
 

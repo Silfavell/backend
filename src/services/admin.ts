@@ -23,6 +23,26 @@ export const saveCategoryToDatabase = (categoryContext: CategoryDocument) => (
 	new Category(categoryContext).save()
 )
 
+export const saveSubCategoryToDatabase = (body: any) => (
+	Category.findByIdAndUpdate(body.parentCategoryId, {
+		$push: {
+			subCategories: {
+				name: body.name
+			}
+		}
+	}, { new: true })
+)
+
+export const deleteSubCategoryFromDatabase = (body: any) => (
+	Category.findByIdAndUpdate(body.parentCategoryId, {
+		$pull: {
+			subCategories: {
+				_id: body._id
+			}
+		}
+	}, { new: true })
+)
+
 export const deleteCategoryFromDatabase = (categoryId: string) => (
 	Category.findByIdAndDelete(categoryId)
 )

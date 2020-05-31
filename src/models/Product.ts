@@ -10,7 +10,10 @@ export type ProductDocument = Document & {
 }
 
 const productSchema = new Schema({
-	category: {
+	categoryId: {
+		type: String
+	},
+	subCategoryId: {
 		type: String
 	},
 	brand: {

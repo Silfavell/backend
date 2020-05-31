@@ -1,5 +1,6 @@
 // eslint-disable-next-line no-unused-vars
 import mongoose, { Document, Schema } from 'mongoose'
+import SubCategory from './SubCategory'
 
 export type CategoryDocument = Document & {
 	name: string,
@@ -11,6 +12,7 @@ const categorySchema = new Schema({
 		type: String,
 		unique: true
 	},
+	subCategories: [SubCategory.schema],
 	imagePath: {
 		type: Number,
 		default: 0
