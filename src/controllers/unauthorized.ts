@@ -97,8 +97,8 @@ router.get('/products-by-range', (req, res, next) => {
 })
 
 
-router.get('/products-length/:categoryId', (req, res, next) => {
-	getProductsLength(req.params.categoryId).then((length) => {
+router.get('/products-length', (req, res, next) => {
+	getProductsLength(req.query).then((length) => {
 		res.json(length)
 	}).catch((reason) => {
 		next(handleError(reason, 'GET /products-by-range'))

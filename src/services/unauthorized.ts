@@ -53,8 +53,8 @@ export const getAllProducts = () => (
 	Product.find()
 )
 
-export const getProductsLength = (categoryId: string) => (
-	Product.count({ categoryId })
+export const getProductsLength = (query: any) => (
+	Product.count(query)
 )
 
 export const getFilteredProducts = (query: any) => {
