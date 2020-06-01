@@ -65,11 +65,6 @@ export const getFilteredProducts = (query: any) => {
 	// eslint-disable-next-line radix
 	const quantity = parseInt(query.quantity)
 
-	if (query.brand) {
-		// @ts-ignore
-		x.brand = query.brand
-	}
-
 	if (query.categoryId) {
 		// @ts-ignore
 		x.categoryId = query.categoryId
@@ -78,6 +73,15 @@ export const getFilteredProducts = (query: any) => {
 	if (query.subCategoryId) {
 		// @ts-ignore
 		x.subCategoryId = query.subCategoryId
+	}
+
+	if (query.brands) {
+		return Product
+			.where('brand')
+			.in(query.brands.split(','))
+			.find(x)
+			.skip(start)
+			.limit(quantity)
 	}
 
 	return Product.find(x).skip(start).limit(quantity)
