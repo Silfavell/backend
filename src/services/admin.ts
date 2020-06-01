@@ -10,6 +10,7 @@ import {
 	// eslint-disable-next-line no-unused-vars
 	CategoryDocument
 } from '../models'
+import Brand from '../models/Brand'
 
 const replaceProductId = (product: ProductDocument) => (
 	JSON.parse(JSON.stringify(product).split('"_id":').join('"id":')) // TODO ??
@@ -56,16 +57,42 @@ export const saveProductToDatabase = (productContext: ProductDocument) => (
 	new Product(productContext).save()
 )
 
-export const indexProduct = (product: ProductDocument) => (
-	Elasticsearch.getClient
-		.index({
-			index: 'doc',
-			type: 'doc',
-			// refresh: true,
-			body: replaceProductId(product)
-		})
-		.then(() => product)
+export const updateCategoryOfProduct = (product: any) => (
+	Category.findById(product.categoryId).then((category) => {
+		const productCategoryBrand = category.brands.find((brand) => brand.name === product.brand)
+		const productSubCategory = category.subCategories.find((subCategory) => subCategory._id.toString() === product.subCategoryId)
+		const productSubCategoryBrand = productSubCategory.brands.find((brand) => brand.name === product.brand)
+
+		if (productCategoryBrand) {
+			// eslint-disable-next-line no-param-reassign
+			category.brands[category.brands.indexOf(productCategoryBrand)].productQuantity++
+
+			if (productSubCategoryBrand) {
+				productSubCategory.brands[productSubCategory.brands.indexOf(productSubCategoryBrand)].productQuantity++
+			} else {
+				productSubCategory.brands.push(new Brand({ name: product.brand, productQuantity: 1 }))
+			}
+		} else {
+			category.brands.push(new Brand({ name: product.brand, productQuantity: 1 }))
+			productSubCategory.brands.push(new Brand({ name: product.brand, productQuantity: 1 }))
+		}
+
+		return category.save().then(() => product)
+	})
 )
+
+export const indexProduct = (product: ProductDocument) => {
+	return (
+		Elasticsearch.getClient
+			.index({
+				index: 'doc',
+				type: 'doc',
+				// refresh: true,
+				body: replaceProductId(product)
+			})
+			.then(() => product)
+	)
+}
 
 export const updateProduct = (productId: string, productContext: ProductDocument) => (
 	Product.findByIdAndUpdate(productId, productContext, { new: true })

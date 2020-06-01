@@ -1,9 +1,14 @@
 // eslint-disable-next-line no-unused-vars
 import mongoose, { Document, Schema } from 'mongoose'
-import SubCategory from './SubCategory'
+// eslint-disable-next-line no-unused-vars
+import SubCategory, { SubCategoryDocument } from './SubCategory'
+// eslint-disable-next-line no-unused-vars
+import Brand, { BrandDocument } from './Brand'
 
 export type CategoryDocument = Document & {
 	name: string,
+	subCategories: [SubCategoryDocument],
+	brands: [BrandDocument],
 	imagePath: number
 }
 
@@ -13,6 +18,7 @@ const categorySchema = new Schema({
 		unique: true
 	},
 	subCategories: [SubCategory.schema],
+	brands: [Brand.schema],
 	imagePath: {
 		type: Number,
 		default: 0
@@ -30,6 +36,8 @@ categorySchema.pre('save', function (next) {
 			category.imagePath = total.length === 0 ? 1 : total[0].imagePath + 1
 			next()
 		})
+	} else {
+		next()
 	}
 })
 

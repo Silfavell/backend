@@ -2,7 +2,8 @@
 import mongoose, { Document, Schema } from 'mongoose'
 
 export type ProductDocument = Document & {
-	category: string,
+	categoryId: string,
+	subCategoryId: string,
 	brand: string,
 	name: string,
 	price: number,

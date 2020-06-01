@@ -29,7 +29,8 @@ import {
 	verifyManager,
 	indexProduct,
 	saveSubCategoryToDatabase,
-	deleteSubCategoryFromDatabase
+	deleteSubCategoryFromDatabase,
+	updateCategoryOfProduct
 } from '../services/admin'
 
 const router = Router()
@@ -129,6 +130,7 @@ router.put('/category/:_id', (req, res, next) => {
 router.post('/product', (req, res, next) => {
 	validatePostProduct(req.body)
 		.then(() => saveProductToDatabase(req.body))
+		.then((product) => updateCategoryOfProduct(product))
 		.then((product: any) => indexProduct(product))
 		.then((product) => {
 			res.json(product)
