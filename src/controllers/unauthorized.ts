@@ -110,9 +110,9 @@ router.get('/product/:_id', (req, res, next) => {
 	getSingleProduct(req.params._id, req.user)
 		// @ts-ignore
 		.then(({ product, cart }) => addProductToCart(product, cart || null, req.user))
-		.then((response: any) => {
+		.then((response) => {
 			res.json(response)
-		}).catch((reason: any) => {
+		}).catch((reason) => {
 			next((handleError(reason, 'GET /product/:_id')))
 		})
 })

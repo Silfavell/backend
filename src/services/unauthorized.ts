@@ -90,68 +90,55 @@ export const getProductsByRange = (categoryId: string, start: string, quantity: 
 	}).skip(parseInt(start)).limit(parseInt(quantity))
 )
 
-export const getSingleProduct = (productId: string, user: UserDocument) => { // "5ea7ac324756fd198887099a", "5ea7ac324756fd1988870999", "5ea7ac324756fd198887099b"
-	const product = Product.findById(productId)
-
-	if (product) {
-		return Cart.findOne({ userId: user?._id?.toString() }).then((cart) => {
-			if (cart) {
-				return {
-					product,
-					cart
+export const getSingleProduct = (productId: string, user: UserDocument) => (
+	Product.findById(productId).then((product) => {
+		if (product) {
+			return Cart.findOne({ userId: user?._id?.toString() }).then((cart) => {
+				if (cart) {
+					return {
+						product,
+						cart
+					}
 				}
-			}
-			return {
-				product
-			}
-		})
-	}
-	throw new Error(ErrorMessages.NON_EXISTS_PRODUCT)
-}
+				return {
+					product
+				}
+			})
+		}
+		throw new Error(ErrorMessages.NON_EXISTS_PRODUCT)
+	})
+)
 
-export const addProductToCart = (product: ProductDocument, cart: any, user: UserDocument) => (
+export const addProductToCart = (product: any, cartObj: any, user: UserDocument) => (
 	new Promise((resolve) => {
 		// @ts-ignore
 		if (user?._id.toString()) {
-			if (cart) {
-				if (Object.keys(cart).includes(product._id.toString())) {
+			if (cartObj && cartObj.cart) {
+				if (Object.keys(cartObj.cart).includes(product._id.toString())) {
 					Cart.findOneAndUpdate({ userId: user._id.toString() }, {
-						...cart,
-						[product._id.toString()]: {
-							...product,
-							quantity: (cart[product._id.toString()].quantity ?? 1) + 1
-						}
-					})
-
-					resolve({
-						...product,
-						quantity: (cart[product._id.toString()].quantity ?? 1) + 1
+						...cartObj.cart,
+						[product._id.toString()]: Object.assign(product._doc, {
+							quantity: (cartObj.cart[product._id.toString()].quantity ?? 1) + 1
+						})
+					}).then(() => {
+						resolve(Object.assign(product._doc, { quantity: (cartObj.cart[product._id.toString()].quantity ?? 1) + 1 }))
 					})
 				} else {
 					Cart.findOneAndUpdate({ userId: user._id.toString() }, {
-						...cart,
-						[product._id.toString()]: {
-							...product,
-							quantity: 1
-						}
-					})
-
-					resolve({
-						...product,
-						quantity: 1
+						...cartObj.cart,
+						[product._id.toString()]: Object.assign(product._doc, { quantity: 1 })
+					}).then(() => {
+						resolve(Object.assign(product._doc, { quantity: 1 }))
 					})
 				}
 			} else {
-				Cart.findOneAndUpdate({ userId: user._id.toString() }, {
-					[product._id.toString()]: {
-						...product,
-						quantity: 1
+				new Cart({
+					userId: user._id.toString(),
+					cart: {
+						[product._id.toString()]: Object.assign(product._doc, { quantity: 1 })
 					}
-				})
-
-				resolve({
-					...product,
-					quantity: 1
+				}).save().then(() => {
+					resolve(Object.assign(product._doc, { quantity: 1 }))
 				})
 			}
 		} else {
@@ -160,7 +147,7 @@ export const addProductToCart = (product: ProductDocument, cart: any, user: User
 	})
 )
 
-export const takeOffProductFromCart = (product: ProductDocument, cart: any, user: UserDocument) => (
+export const takeOffProductFromCart = (product: any, cart: any, user: UserDocument) => (
 	new Promise((resolve, reject) => {
 		if (user?._id.toString()) {
 			if (cart) {
@@ -170,33 +157,22 @@ export const takeOffProductFromCart = (product: ProductDocument, cart: any, user
 							Object.assign(
 								cart,
 								{
-									[product._id.toString()]: {
-										...product,
-										...{
-											quantity: (cart[product._id.toString()].quantity) - 1
-										}
-									}
+									[product._id.toString()]: Object.assign(product._doc, { quantity: (cart[product._id.toString()].quantity) - 1 })
 								}
 							))
 
-						resolve({
-							...product,
-							...{
+						resolve(
+							Object.assign(product._doc, {
 								quantity: (cart[product._id.toString()].quantity)
-							}
-						})
+							})
+						)
 					} else if (cart[product._id.toString()].quantity === 1) {
 						// eslint-disable-next-line no-shadow
 						Cart.findOne({ userId: user._id.toString() }).then((cart: any) => {
 							// eslint-disable-next-line no-param-reassign
 							delete cart[product._id.toString()]
 							cart.save().then(() => {
-								resolve({
-									...product,
-									...{
-										quantity: 0
-									}
-								})
+								resolve(Object.assign(product._doc, { quantity: 0 }))
 							})
 						})
 					} else {

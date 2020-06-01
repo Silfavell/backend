@@ -81,18 +81,16 @@ export const updateCategoryOfProduct = (product: any) => (
 	})
 )
 
-export const indexProduct = (product: ProductDocument) => {
-	return (
-		Elasticsearch.getClient
-			.index({
-				index: 'doc',
-				type: 'doc',
-				// refresh: true,
-				body: replaceProductId(product)
-			})
-			.then(() => product)
-	)
-}
+export const indexProduct = (product: ProductDocument) => (
+	Elasticsearch.getClient
+		.index({
+			index: 'doc',
+			type: 'doc',
+			// refresh: true,
+			body: replaceProductId(product)
+		})
+		.then(() => product)
+)
 
 export const updateProduct = (productId: string, productContext: ProductDocument) => (
 	Product.findByIdAndUpdate(productId, productContext, { new: true })
