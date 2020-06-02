@@ -9,6 +9,8 @@ class ErrorMessages {
 
     static NON_EXISTS_PRODUCT = 'Ürün bulunamadı'
 
+    static NON_EXISTS_PRODUCT_IN_CART = 'Ürün sepette bulunamadı'
+
     static WRONG_PASSWORD = 'Hatalı şifre'
 
     static EMPTY_CART = 'Lütfen sepetinize ürün ekleyiniz'

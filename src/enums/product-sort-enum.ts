@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 
 enum ProductSort {
-    DONT_KNOW,
+    CLASSIC,
     BEST_SELLER,
     NEWEST,
     MIN_PRICE,

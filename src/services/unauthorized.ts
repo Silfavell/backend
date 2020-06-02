@@ -33,6 +33,7 @@ import {
 import ActivationCode from '../models/ActivationCode'
 // eslint-disable-next-line no-unused-vars
 import Cart, { CartDocument } from '../models/Cart'
+import ProductSort from '../enums/product-sort-enum'
 
 export const sendSms = (to: string, message: string) => {
 	const smsManager: any = new Nexmo({
@@ -54,6 +55,9 @@ export const getAllProducts = () => (
 )
 
 export const getProductsLength = (query: any) => {
+	// eslint-disable-next-line no-param-reassign
+	delete query.sortType
+
 	if (query.brands) {
 		const brandList = query.brands.split(',')
 		// eslint-disable-next-line no-param-reassign
@@ -82,6 +86,10 @@ export const getFilteredProducts = (query: any) => {
 	if (query.subCategoryId) {
 		// @ts-ignore
 		x.subCategoryId = query.subCategoryId
+	}
+
+	if (query.sortType !== ProductSort.CLASSIC) {
+
 	}
 
 	if (query.brands) {
@@ -129,17 +137,21 @@ export const addProductToCart = (product: any, cartObj: any, user: UserDocument)
 			if (cartObj && cartObj.cart) {
 				if (Object.keys(cartObj.cart).includes(product._id.toString())) {
 					Cart.findOneAndUpdate({ userId: user._id.toString() }, {
-						...cartObj.cart,
-						[product._id.toString()]: Object.assign(product._doc, {
-							quantity: (cartObj.cart[product._id.toString()].quantity ?? 1) + 1
-						})
+						cart: {
+							...cartObj.cart,
+							[product._id.toString()]: Object.assign(product._doc, {
+								quantity: (cartObj.cart[product._id.toString()].quantity ?? 1) + 1
+							})
+						}
 					}).then(() => {
 						resolve(Object.assign(product._doc, { quantity: (cartObj.cart[product._id.toString()].quantity ?? 1) + 1 }))
 					})
 				} else {
 					Cart.findOneAndUpdate({ userId: user._id.toString() }, {
-						...cartObj.cart,
-						[product._id.toString()]: Object.assign(product._doc, { quantity: 1 })
+						cart: {
+							...cartObj.cart,
+							[product._id.toString()]: Object.assign(product._doc, { quantity: 1 })
+						}
 					}).then(() => {
 						resolve(Object.assign(product._doc, { quantity: 1 }))
 					})
@@ -160,31 +172,32 @@ export const addProductToCart = (product: any, cartObj: any, user: UserDocument)
 	})
 )
 
-export const takeOffProductFromCart = (product: any, cart: any, user: UserDocument) => (
+export const takeOffProductFromCart = (product: any, cartObj: any, user: UserDocument) => (
 	new Promise((resolve, reject) => {
 		if (user?._id.toString()) {
-			if (cart) {
-				if (Object.keys(cart).includes(product._id.toString())) {
-					if (cart[product._id.toString()].quantity > 1) {
+			if (cartObj && cartObj.cart) {
+				if (Object.keys(cartObj.cart).includes(product._id.toString())) {
+					if (cartObj.cart[product._id.toString()].quantity > 1) {
 						Cart.findOneAndUpdate({ userId: user._id.toString() },
-							Object.assign(
-								cart,
-								{
-									[product._id.toString()]: Object.assign(product._doc, { quantity: (cart[product._id.toString()].quantity) - 1 })
-								}
-							))
-
-						resolve(
-							Object.assign(product._doc, {
-								quantity: (cart[product._id.toString()].quantity)
+							{
+								cart: Object.assign(
+									cartObj.cart,
+									{
+										[product._id.toString()]: Object.assign(product._doc, { quantity: (cartObj.cart[product._id.toString()].quantity) - 1 })
+									}
+								)
 							})
-						)
-					} else if (cart[product._id.toString()].quantity === 1) {
+							.then(() => {
+								resolve(Object.assign(product._doc, { quantity: (cartObj.cart[product._id.toString()].quantity) }))
+							})
+					} else if (cartObj.cart[product._id.toString()].quantity === 1) {
 						// eslint-disable-next-line no-shadow
-						Cart.findOne({ userId: user._id.toString() }).then((cart: any) => {
+						Cart.findOne({ userId: user._id.toString() }).then((cartObj2: any) => {
 							// eslint-disable-next-line no-param-reassign
-							delete cart[product._id.toString()]
-							cart.save().then(() => {
+							delete cartObj2.cart[product._id.toString()]
+							cartObj2.update({
+								cart: cartObj2.cart
+							}).then(() => {
 								resolve(Object.assign(product._doc, { quantity: 0 }))
 							})
 						})
@@ -192,10 +205,10 @@ export const takeOffProductFromCart = (product: any, cart: any, user: UserDocume
 						reject(new ServerError(ErrorMessages.NON_EXISTS_PRODUCT, HttpStatusCodes.BAD_REQUEST, ErrorMessages.NON_EXISTS_PRODUCT, false))
 					}
 				} else {
-					reject(new ServerError(ErrorMessages.NON_EXISTS_PRODUCT, HttpStatusCodes.BAD_REQUEST, ErrorMessages.NON_EXISTS_PRODUCT, false))
+					reject(new ServerError(ErrorMessages.NON_EXISTS_PRODUCT_IN_CART, HttpStatusCodes.BAD_REQUEST, ErrorMessages.NON_EXISTS_PRODUCT_IN_CART, false))
 				}
 			} else {
-				reject(new ServerError(ErrorMessages.NON_EXISTS_PRODUCT, HttpStatusCodes.BAD_REQUEST, ErrorMessages.NON_EXISTS_PRODUCT, false))
+				reject(new ServerError(ErrorMessages.EMPTY_CART, HttpStatusCodes.BAD_REQUEST, ErrorMessages.EMPTY_CART, false))
 			}
 		} else {
 			resolve(product)
