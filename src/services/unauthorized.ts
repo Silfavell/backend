@@ -71,7 +71,7 @@ export const getProductsLength = (query: any) => {
 }
 
 export const getFilteredProducts = (query: any) => {
-	const x = {}
+	const criteria = {}
 
 	// eslint-disable-next-line radix
 	const start = parseInt(query.start)
@@ -80,35 +80,44 @@ export const getFilteredProducts = (query: any) => {
 
 	if (query.categoryId) {
 		// @ts-ignore
-		x.categoryId = query.categoryId
+		criteria.categoryId = query.categoryId
 	}
 
 	if (query.subCategoryId) {
 		// @ts-ignore
-		x.subCategoryId = query.subCategoryId
+		criteria.subCategoryId = query.subCategoryId
 	}
 
-	if (query.sortType !== ProductSort.CLASSIC) {
+	let product = Product.find(criteria).skip(start).limit(quantity)
 
+	// eslint-disable-next-line radix
+	if (parseInt(query.sortType) !== ProductSort.CLASSIC) {
+		// eslint-disable-next-line radix
+		switch (parseInt(query.sortType)) {
+			case ProductSort.MIN_PRICE: {
+				product = product.sort({ price: 1 })
+				break
+			}
+
+			case ProductSort.MAX_PRICE: {
+				product = product.sort({ price: -1 })
+				break
+			}
+
+			default: break
+		}
 	}
 
 	if (query.brands) {
-		return Product
-			.where('brand')
-			.in(query.brands.split(','))
-			.find(x)
-			.skip(start)
-			.limit(quantity)
+		product = product.where('brand').in(query.brands.split(','))
 	}
 
-	return Product.find(x).skip(start).limit(quantity)
+	return product
 }
 
 export const getProductsByRange = (categoryId: string, start: string, quantity: string) => (
-	Product.find({
-		categoryId
-		// eslint-disable-next-line radix
-	}).skip(parseInt(start)).limit(parseInt(quantity))
+	// eslint-disable-next-line radix
+	Product.find({ categoryId }).skip(parseInt(start)).limit(parseInt(quantity))
 )
 
 export const getSingleProduct = (productId: string, user: UserDocument) => (
