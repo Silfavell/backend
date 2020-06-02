@@ -53,9 +53,18 @@ export const getAllProducts = () => (
 	Product.find()
 )
 
-export const getProductsLength = (query: any) => (
-	Product.count(query)
-)
+export const getProductsLength = (query: any) => {
+	if (query.brands) {
+		const brandList = query.brands.split(',')
+		// eslint-disable-next-line no-param-reassign
+		delete query.brands
+		return Product
+			.where('brand')
+			.in(brandList)
+			.countDocuments(query)
+	}
+	return Product.countDocuments(query)
+}
 
 export const getFilteredProducts = (query: any) => {
 	const x = {}
