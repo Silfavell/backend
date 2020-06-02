@@ -161,6 +161,7 @@ router.post('/order', (req, res, next) => {
 		// @ts-ignore
 		.then(({ cart, selectedAddress, result }) => saveOrderToDatabase(req.user, cart, selectedAddress).then((order) => ({ order, result })))
 		// @ts-ignore
+		.then((result) => clearCart(req.user._id.toString()).then(() => result))
 		.then((result) => {
 			res.json(result)
 		})
