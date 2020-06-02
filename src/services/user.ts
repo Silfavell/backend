@@ -100,7 +100,7 @@ export const checkMakeOrderValues = (user: UserDocument, context: any) => {
 	})
 }
 
-export const saveOrderToDatabase = (user: UserDocument, cart: any, address: any) => (
+export const saveOrderToDatabase = (user: UserDocument, { cart }: any, address: any) => (
 	new Order({
 		customer: user.nameSurname,
 		phoneNumber: user.phoneNumber,
@@ -213,7 +213,7 @@ export const createPaymentWithRegisteredCard = (user: UserDocument, price: numbe
 				cardToken
 			},
 			buyer: {
-				id: user._id,
+				id: user._id.toString(),
 				name: user.nameSurname,
 				surname: user.nameSurname,
 				gsmNumber: user.phoneNumber,
@@ -256,7 +256,7 @@ export const createPaymentWithRegisteredCard = (user: UserDocument, price: numbe
 )
 
 
-export const completePayment = (user: UserDocument, cart: any, address: string, cardToken: string) => (
+export const completePayment = (user: UserDocument, { cart }: any, address: string, cardToken: string) => (
 	createPaymentWithRegisteredCard(
 		user,
 		// @ts-ignore
@@ -267,7 +267,11 @@ export const completePayment = (user: UserDocument, cart: any, address: string, 
 			price,
 			quantity
 		}) => ({
-			id: _id, name, price: (price * quantity).toFixed(2).toString(), category1: 'product', itemType: Iyzipay.BASKET_ITEM_TYPE.PHYSICAL
+			id: _id.toString(),
+			name,
+			price: (price * quantity).toFixed(2).toString(),
+			category1: 'product',
+			itemType: Iyzipay.BASKET_ITEM_TYPE.PHYSICAL
 		})),
 		address,
 		cardToken
