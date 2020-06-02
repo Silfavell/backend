@@ -57,6 +57,10 @@ export const getAllProducts = () => (
 export const getProductsLength = (query: any) => {
 	// eslint-disable-next-line no-param-reassign
 	delete query.sortType
+	// eslint-disable-next-line no-param-reassign
+	delete query.start
+	// eslint-disable-next-line no-param-reassign
+	delete query.quantity
 
 	if (query.brands) {
 		const brandList = query.brands.split(',')
