@@ -24,21 +24,18 @@ export const updateUser = (userId: string, userContext: any) => (
 export const createCart = (body: { _id: string, quantity: number }[]) => {
 	const productIds = body.map((product) => product._id)
 
-	Product.find().where('_id').in(productIds).then((products: any[]) => {
+	return Product.find().where('_id').in(productIds).then((products: any[]) => (
 		products.reduce((json, product, index) => {
 			if (!product) {
 				throw new ServerError(ErrorMessages.NON_EXISTS_PRODUCT, HttpStatusCodes.BAD_REQUEST, ErrorMessages.NON_EXISTS_PRODUCT, false)
 			}
-			return {
-				...json,
-				[product._id.toString()]: {
-					...product,
-					// eslint-disable-next-line security/detect-object-injection
-					quantity: body[index].quantity
-				}
-			}
+
+			return Object.assign(json, {
+				// eslint-disable-next-line security/detect-object-injection
+				[product._id.toString()]: Object.assign(product._doc, { quantity: body[index].quantity })
+			})
 		}, {})
-	})
+	))
 }
 
 export const saveCart = (userId: string, cart: ProductDocument[]) => (
@@ -46,8 +43,9 @@ export const saveCart = (userId: string, cart: ProductDocument[]) => (
 		Cart.findOne({ userId }).then((cartObj) => {
 			if (cart) {
 				// eslint-disable-next-line no-param-reassign
-				cartObj.cart = cart
-				cartObj.save().then((res) => {
+				cartObj.update({
+					cart
+				}).then((res) => {
 					resolve(res)
 				})
 			} else {
