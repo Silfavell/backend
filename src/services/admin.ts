@@ -58,11 +58,10 @@ export const saveProductToDatabase = (productContext: ProductDocument) => (
 )
 
 export const updateCategoryOfProduct = (product: any) => (
-	Category.findById(product.categoryId).then((category) => {
+	Category.findById(product.categoryId.toString()).then((category) => {
 		const productCategoryBrand = category.brands.find((brand) => brand.name === product.brand)
-		const productSubCategory = category.subCategories.find((subCategory) => subCategory._id.toString() === product.subCategoryId)
+		const productSubCategory = category.subCategories.find((subCategory) => subCategory._id.toString() === product.subCategoryId.toString())
 		const productSubCategoryBrand = productSubCategory.brands.find((brand) => brand.name === product.brand)
-
 		if (productCategoryBrand) {
 			// eslint-disable-next-line no-param-reassign
 			category.brands[category.brands.indexOf(productCategoryBrand)].productQuantity++

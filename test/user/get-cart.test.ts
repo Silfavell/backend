@@ -5,12 +5,6 @@ import app from '../../src/app'
 // eslint-disable-next-line no-unused-vars
 import { ProductDocument } from '../../src/models'
 
-const cartProductIds = [// TODO serverda buradaki değerler değiştirilecek
-	'5ea7ac324756fd198887099a',
-	'5ea7ac324756fd1988870999',
-	'5ea7ac324756fd198887099b'
-]
-
 export default () => describe('GET /user/cart', () => {
 	it('correct', (done) => (
 		request(app)
@@ -22,9 +16,14 @@ export default () => describe('GET /user/cart', () => {
 					done(response.body.error)
 				}
 
+				const cartProductIds = [
+					JSON.parse(process.env.product)._id,
+					JSON.parse(process.env.product2)._id
+				]
+
 				expect(Object.values(response.body)).to.be.an('array')
 				expect(
-					Object.values(response.body).every((product: ProductDocument) => (
+					Object.values(response.body.cart).every((product: ProductDocument) => (
 						cartProductIds.includes(product._id)
 					))
 				).to.equal(true)

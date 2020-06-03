@@ -21,6 +21,19 @@ export const updateUser = (userId: string, userContext: any) => (
 	User.findByIdAndUpdate(userId, userContext, { new: true })
 )
 
+export const validateSaveCartProducts = (body: any) => (
+	new Promise((resolve, reject) => {
+		const productIds = body.map((product: any) => product._id)
+		const regex = new RegExp('^[0-9a-fA-F]{24}$')
+
+		if (productIds.every((productId: any) => regex.test(productId))) {
+			resolve()
+		}
+
+		reject(new ServerError(ErrorMessages.NON_EXISTS_PRODUCT, HttpStatusCodes.BAD_REQUEST, ErrorMessages.NON_EXISTS_PRODUCT, false))
+	})
+)
+
 export const createCart = (body: { _id: string, quantity: number }[]) => {
 	const productIds = body.map((product) => product._id)
 
@@ -41,7 +54,7 @@ export const createCart = (body: { _id: string, quantity: number }[]) => {
 export const saveCart = (userId: string, cart: ProductDocument[]) => (
 	new Promise((resolve) => {
 		Cart.findOne({ userId }).then((cartObj) => {
-			if (cart) {
+			if (cartObj && cart) {
 				// eslint-disable-next-line no-param-reassign
 				cartObj.update({
 					cart
@@ -98,14 +111,16 @@ export const checkMakeOrderValues = (user: UserDocument, context: any) => {
 	})
 }
 
-export const saveOrderToDatabase = (user: UserDocument, { cart }: any, address: any) => (
-	new Order({
-		customer: user.nameSurname,
-		phoneNumber: user.phoneNumber,
-		address: address.openAddress,
-		products: Object.values(cart)
-	}).save()
-)
+export const saveOrderToDatabase = (user: UserDocument, { cart }: any, address: any) => {
+	return (
+		new Order({
+			customer: user.nameSurname,
+			phoneNumber: user.phoneNumber,
+			address: address.openAddress,
+			products: Object.values(cart)
+		}).save()
+	)
+}
 
 export const saveAddressToDatabase = (userId: string, address: any) => (
 	User.findByIdAndUpdate(userId, {
@@ -153,7 +168,7 @@ export const addNewCard = (cardUserKey: string, card: any) => (
 export const addCardToUser = (user: UserDocument, card: any) => {
 	if (!user.cardUserKey) {
 		return createPaymentUserWithCard(user, card)
-			.then((result: any) => updateUser(user._id, { cardUserKey: result.cardUserKey }))
+			.then((result: any) => updateUser(user._id, { cardUserKey: result.cardUserKey }).then(() => result))
 	}
 	return addNewCard(user.cardUserKey, card)
 }

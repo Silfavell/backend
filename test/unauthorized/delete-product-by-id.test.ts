@@ -15,9 +15,9 @@ export default () => describe('DELETE /product/:_id', () => {
 			})
 	})
 
-	it('delete ', (done) => {
+	it('correct', (done) => {
 		request(app)
-			.delete('/product/5ea7ac324756fd198887099b')
+			.delete(`/product/${JSON.parse(process.env.product)._id}`)
 			.expect(200)
 			.end((error, response) => {
 				if (response.body.error) {

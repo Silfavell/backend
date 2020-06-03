@@ -21,7 +21,8 @@ import {
 	saveAddressToDatabase,
 	deleteCard,
 	createCart,
-	clearCart
+	clearCart,
+	validateSaveCartProducts
 } from '../services/user'
 
 import {
@@ -71,7 +72,7 @@ router.put('/payment-card', (req, res, next) => {
 		.then((result) => {
 			res.json(result)
 		}).catch((reason) => {
-			next(handleError(reason, 'POST /user/payment-card'))
+			next(handleError(reason, 'PUT /user/payment-card'))
 		})
 })
 
@@ -99,7 +100,10 @@ router.put('/profile', (req, res, next) => {
 })
 
 router.post('/cart', (req, res, next) => {
+	// @ts-ignore
 	validateSaveCartRequest(req.body)
+		// @ts-ignore
+		.then(() => validateSaveCartProducts(req.body))
 		.then(() => createCart(req.body))
 		// @ts-ignore
 		.then((cart) => saveCart(req.user._id.toString(), cart))

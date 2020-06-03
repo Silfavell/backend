@@ -32,7 +32,7 @@ import {
 } from '../validators'
 import ActivationCode from '../models/ActivationCode'
 // eslint-disable-next-line no-unused-vars
-import Cart, { CartDocument } from '../models/Cart'
+import Cart from '../models/Cart'
 import ProductSort from '../enums/product-sort-enum'
 
 export const sendSms = (to: string, message: string) => {
@@ -50,8 +50,8 @@ export const getCategories = () => (
 	Category.find()
 )
 
-export const getProductsWithCategories = () => {
-	return Category.aggregate([
+export const getProductsWithCategories = () => (
+	Category.aggregate([
 		{
 			$project: {
 				_id: {
@@ -69,7 +69,7 @@ export const getProductsWithCategories = () => {
 			}
 		}
 	])
-}
+)
 
 export const getProductsLength = (query: any) => {
 	// eslint-disable-next-line no-param-reassign
@@ -141,6 +141,17 @@ export const getProductsByRange = (categoryId: string, start: string, quantity: 
 	Product.find({ categoryId }).skip(parseInt(start)).limit(parseInt(quantity))
 )
 
+export const validateGetSingleProduct = (productId: string) => (
+	new Promise((resolve, reject) => {
+		const test = new RegExp('^[0-9a-fA-F]{24}$').test(productId)
+
+		if (test) {
+			resolve()
+		}
+		reject(new ServerError(ErrorMessages.NON_EXISTS_PRODUCT, HttpStatusCodes.BAD_REQUEST, ErrorMessages.NON_EXISTS_PRODUCT, false))
+	})
+)
+
 export const getSingleProduct = (productId: string, user: UserDocument) => (
 	Product.findById(productId).then((product) => {
 		if (product) {
@@ -156,7 +167,7 @@ export const getSingleProduct = (productId: string, user: UserDocument) => (
 				}
 			})
 		}
-		throw new Error(ErrorMessages.NON_EXISTS_PRODUCT)
+		throw new ServerError(ErrorMessages.NON_EXISTS_PRODUCT, HttpStatusCodes.BAD_REQUEST, ErrorMessages.NON_EXISTS_PRODUCT, false)
 	})
 )
 
@@ -288,7 +299,7 @@ export const checkConvenientOfActivationCodeRequest = (phoneNumber: string, acti
 
 export const createActivationCode = (phoneNumber: string, activationCodeType: ActivationCodes) => {
 	const activationCode = parseInt(Math.floor(1000 + Math.random() * 9000).toString(), 10)
-	console.log(activationCode)
+	console.log(activationCode, activationCodeType)
 	return new ActivationCode({
 		userPhoneNumber: phoneNumber,
 		activationCodeType,
@@ -350,12 +361,12 @@ export const createToken = (context: UserDocument | ManagerDocument | AdminDocum
 export const changePassword = (user: UserDocument, newPassword: string) => {
 	// eslint-disable-next-line no-param-reassign
 	user.password = newPassword
-	return user.save().then(() => {
-		ActivationCode.findOneAndDelete({
+	return user.save().then(() => (
+		ActivationCode.deleteOne({
 			userPhoneNumber: user.phoneNumber,
 			activationCodeType: ActivationCodes.RESET_PASSWORD
 		})
-	})
+	))
 }
 
 export const handleError = (error: any, path: string): Error => {
@@ -363,7 +374,7 @@ export const handleError = (error: any, path: string): Error => {
 		return error
 	}
 	if (error.isJoi) {
-		return new ServerError(error.message, HttpStatusCodes.BAD_REQUEST, path, true)
+		return new ServerError(error.message, HttpStatusCodes.BAD_REQUEST, path, false)
 	}
 	return new ServerError(error.message, HttpStatusCodes.INTERNAL_SERVER_ERROR, path, true)
 }

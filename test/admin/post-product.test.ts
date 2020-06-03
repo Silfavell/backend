@@ -3,19 +3,18 @@ import { expect } from 'chai'
 
 import app from '../../src/app'
 
-const product = {
-	brand: 'Test Marka',
-	category: 1,
-	name: 'Test Product',
-	price: 9
-}
-
 export default () => describe('POST /admin/product', () => {
 	it('correct', (done) => (
 		request(app)
 			.post('/admin/product')
 			.set({ Authorization: process.env.adminToken })
-			.send(product)
+			.send({
+				brand: 'Test Marka',
+				categoryId: JSON.parse(process.env.testCategory)._id,
+				subCategoryId: JSON.parse(process.env.testSubCategory)._id,
+				name: 'Test Product',
+				price: 9
+			})
 			.expect(200)
 			.end((error, response) => {
 				if (response.body.error) {

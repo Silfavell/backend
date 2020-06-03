@@ -12,23 +12,29 @@ export type ProductDocument = Document & {
 
 const productSchema = new Schema({
 	categoryId: {
-		type: String
+		type: String,
+		required: true
 	},
 	subCategoryId: {
-		type: String
+		type: String,
+		required: true
 	},
 	brand: {
-		type: String
+		type: String,
+		required: true
 	},
 	name: {
-		type: String
+		type: String,
+		required: true
 	},
 	price: {
-		type: Number
+		type: Number,
+		required: true
 	},
 	image: {
 		type: Number,
-		default: 0
+		default: 0,
+		required: true
 	}
 })
 

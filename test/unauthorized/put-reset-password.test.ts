@@ -14,6 +14,7 @@ export default () => describe('PUT /reset-password', () => {
 
 		rl.question('Enter reset activation code \n'.repeat(10), (answer) => {
 			if (answer.substring(0, 4).length > 3) {
+				// eslint-disable-next-line radix
 				resetActivationCode = answer.substring(0, 4)
 				rl.close()
 				done()

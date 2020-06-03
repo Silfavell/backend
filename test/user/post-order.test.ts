@@ -5,21 +5,6 @@ import app from '../../src/app'
 import ErrorMessages from '../../src/errors/ErrorMessages'
 import { isTextContainsAllKeys } from '../tools'
 
-const cart = [// TODO serverda buradaki değerler değiştirilecek
-	{
-		_id: '5ea7ac324756fd198887099a',
-		quantity: 2
-	},
-	{
-		_id: '5ea7ac324756fd1988870999',
-		quantity: 2
-	},
-	{
-		_id: '5ea7ac324756fd198887099b',
-		quantity: 2
-	}
-]
-
 export default () => describe('POST /order', () => {
 	it('without address', (done) => (
 		request(app)
@@ -85,7 +70,16 @@ export default () => describe('POST /order', () => {
 		request(app)
 			.post('/user/cart')
 			.set({ Authorization: process.env.token })
-			.send(cart)
+			.send([
+				{
+					_id: JSON.parse(process.env.product)._id,
+					quantity: 3
+				},
+				{
+					_id: JSON.parse(process.env.product2)._id,
+					quantity: 5
+				}
+			])
 			.expect(200)
 	))
 
@@ -104,7 +98,7 @@ export default () => describe('POST /order', () => {
 			})
 	))
 
-	it('make order 1', () => (
+	it('make order 1', (done) => (
 		request(app)
 			.post('/user/order')
 			.set({ Authorization: process.env.token })
@@ -113,13 +107,30 @@ export default () => describe('POST /order', () => {
 				card: process.env.cardToken
 			})
 			.expect(200)
+			.end((error, response) => {
+				if (response.body.error) {
+					done(response.body.error)
+				}
+
+				process.env.cancelOrder = JSON.stringify(response.body.order)
+				done()
+			})
 	))
 
 	it('POST /cart to make succesfully order 2', () => (
 		request(app)
 			.post('/user/cart')
 			.set({ Authorization: process.env.token })
-			.send(cart)
+			.send([
+				{
+					_id: JSON.parse(process.env.product)._id,
+					quantity: 3
+				},
+				{
+					_id: JSON.parse(process.env.product2)._id,
+					quantity: 5
+				}
+			])
 			.expect(200)
 	))
 

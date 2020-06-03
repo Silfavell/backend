@@ -26,7 +26,8 @@ import {
 	sendActivationCode,
 	getProductsByRange,
 	getProductsLength,
-	getFilteredProducts
+	getFilteredProducts,
+	validateGetSingleProduct
 } from '../services/unauthorized'
 
 import {
@@ -107,19 +108,24 @@ router.get('/products-length', (req, res, next) => {
 
 router.get('/product/:_id', (req, res, next) => {
 	// @ts-ignore
-	getSingleProduct(req.params._id, req.user)
+	validateGetSingleProduct(req.params._id)
+		// @ts-ignore
+		.then(() => getSingleProduct(req.params._id, req.user))
 		// @ts-ignore
 		.then(({ product, cart }) => addProductToCart(product, cart || null, req.user))
 		.then((response) => {
 			res.json(response)
-		}).catch((reason) => {
+		})
+		.catch((reason) => {
 			next((handleError(reason, 'GET /product/:_id')))
 		})
 })
 
 router.delete('/product/:_id', (req, res, next) => {
 	// @ts-ignore
-	getSingleProduct(req.params._id, req.user)
+	validateGetSingleProduct(req.params._id)
+		// @ts-ignore
+		.then(() => getSingleProduct(req.params._id, req.user))
 		// @ts-ignore
 		.then(({ product, cart }) => takeOffProductFromCart(product, cart || null, req.user))
 		.then((response: any) => {
@@ -155,6 +161,7 @@ router.post('/send-activation-code', (req, res, next) => {
 
 router.post('/register', (req, res, next) => {
 	// isUserNonExists(req.body.user.phoneNumber)
+	console.log('/register')
 	validateRegisterRequest(req.body)
 		.then(() => isUserNonExists(req.body.phoneNumber))
 		.then(() => getActivationCode(req.body.phoneNumber, ActivationCodes.REGISTER_USER))

@@ -14,6 +14,7 @@ export default () => describe('POST /register', () => {
 
 		rl.question('Enter activation code \n'.repeat(10), (answer) => {
 			if (answer.substring(0, 4).length > 3) {
+				// eslint-disable-next-line radix
 				activationCode = answer.substring(0, 4)
 				rl.close()
 				done()

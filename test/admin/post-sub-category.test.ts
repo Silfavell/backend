@@ -5,26 +5,28 @@ import app from '../../src/app'
 // eslint-disable-next-line no-unused-vars
 import { CategoryDocument } from '../../src/models'
 
-export default () => describe('DELETE /admin/category/:_id', () => {
+export default () => describe('POST /admin/sub-category', () => {
 	it('correct', (done) => (
 		request(app)
-			.delete(`/admin/category/${JSON.parse(process.env.testCategory)._id}`)
+			.post('/admin/sub-category')
 			.set({ Authorization: process.env.adminToken })
 			.send({
-				name: 'testCategoryUpdated'
+				parentCategoryId: JSON.parse(process.env.testCategory)._id,
+				name: 'testSubCategory'
 			})
 			.expect(200)
 			.end((error, response) => {
-				if (response.body.error) {
-					done(response.body.error)
+				if (error) {
+					done(error)
 				}
-
-				expect(response.body.name).to.equal('testCategoryUpdated')
+				expect(response.body.subCategories[0].name).to.equal('testSubCategory')
+				process.env.testSubCategory = JSON.stringify(response.body.subCategories[0])
 				done()
 			})
 	))
 
-	it('should categories not contain testCategoryUpdated', (done) => (
+	/*
+	it('should categories contain testCategory', (done) => (
 		request(app)
 			.get('/categories')
 			.set({ Authorization: process.env.adminToken })
@@ -34,8 +36,9 @@ export default () => describe('DELETE /admin/category/:_id', () => {
 					done(response.body.error)
 				}
 
-				expect(Object.values(response.body).some(((category: CategoryDocument) => category.name === 'testCategoryUpdated'))).to.equal(false)
+				expect(Object.values(response.body).some(((category: CategoryDocument) => category.name === 'testCategory'))).to.equal(true)
 				done()
 			})
 	))
+	*/
 })

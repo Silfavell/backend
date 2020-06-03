@@ -1,7 +1,6 @@
 import bcrypt from 'bcrypt'
 import HttpStatusCodes from 'http-status-codes'
 
-import { Redis } from '../startup'
 import { User, Manager } from '../models'
 import ServerError from '../errors/ServerError'
 import ErrorMessages from '../errors/ErrorMessages'

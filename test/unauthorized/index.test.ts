@@ -10,11 +10,12 @@ import putResetPasswordTests from './put-reset-password.test'
 import postRegisterManagerTests from './post-register-manager.test'
 import postLoginManagerTests from './post-login-manager.test'
 
-import getProductsTests from './get-products.test'
+import getProductsWithCategoriesTests from './get-products-with-categories.test'
 import getCategoriesTests from './get-categories.test'
 import getProductByIdTests from './get-product-by-id.test'
 import getProductByIdWithTokenTests from './get-product-by-id-with-token.test'
 import deleteProductByIdTests from './delete-product-by-id.test'
+import deleteProductByIdWithTokenTest from './delete-product-by-id-with-token.test'
 
 export default () => describe('Unauthorized', () => {
 	postSendActivationCodeTests()
@@ -49,11 +50,11 @@ export default () => describe('Unauthorized', () => {
 
 	postRegisterManagerTests()
 
-	getProductsTests()
+	getProductsWithCategoriesTests()
 	getCategoriesTests()
 	getProductByIdTests()
 	deleteProductByIdTests()
 	getProductByIdWithTokenTests()
-	deleteProductByIdTests()
+	deleteProductByIdWithTokenTest()
 	postLoginManagerTests()
 })

@@ -4,21 +4,6 @@ import { expect } from 'chai'
 import app from '../../src/app'
 import ErrorMessages from '../../src/errors/ErrorMessages'
 
-const cart = [// TODO serverda buradaki değerler değiştirilecek
-	{
-		_id: '5ea7ac324756fd198887099a',
-		quantity: 2
-	},
-	{
-		_id: '5ea7ac324756fd1988870999',
-		quantity: 2
-	},
-	{
-		_id: '5ea7ac324756fd198887099b',
-		quantity: 2
-	}
-]
-
 const unknownProduct = {
 	_id: '12345',
 	quantity: 2
@@ -29,8 +14,18 @@ export default () => describe('POST /user/cart', () => {
 		request(app)
 			.post('/user/cart')
 			.set({ Authorization: process.env.token })
-			.send([...cart, unknownProduct])
-			.expect(200)
+			.send([
+				{
+					_id: JSON.parse(process.env.product)._id,
+					quantity: 6
+				},
+				{
+					_id: JSON.parse(process.env.product2)._id,
+					quantity: 4
+				},
+				unknownProduct
+			])
+			.expect(400)
 			.end((error, response) => {
 				expect(response.body.error).to.equal(ErrorMessages.NON_EXISTS_PRODUCT)
 				done()
@@ -41,17 +36,37 @@ export default () => describe('POST /user/cart', () => {
 		request(app)
 			.post('/user/cart')
 			.set({ Authorization: process.env.token })
-			.send(cart)
+			.send([
+				{
+					_id: JSON.parse(process.env.product)._id,
+					quantity: 6
+				},
+				{
+					_id: JSON.parse(process.env.product2)._id,
+					quantity: 4
+				}
+			])
 			.expect(200)
 			.end((error, response) => {
 				if (response.body.error) {
 					done(response.body.error)
 				}
 
-				expect(Object.values(response.body).length).to.equal(cart.length)
+				expect(Object.values(response.body.cart).length).to.equal(2)
 				// @ts-ignore
 				// eslint-disable-next-line security/detect-object-injection
-				expect(cart.every((product, index) => product._id === Object.values(response.body)[index]._id)).to.equal(true)
+				expect([
+					{
+						_id: JSON.parse(process.env.product)._id,
+						quantity: 6
+					},
+					{
+						_id: JSON.parse(process.env.product2)._id,
+						quantity: 4
+					}
+					// @ts-ignore
+					// eslint-disable-next-line security/detect-object-injection
+				].every((product, index) => product._id === Object.values(response.body.cart)[index]._id)).to.equal(true)
 				done()
 			})
 	))

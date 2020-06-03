@@ -15,13 +15,15 @@ export type CategoryDocument = Document & {
 const categorySchema = new Schema({
 	name: {
 		type: String,
+		required: true,
 		unique: true
 	},
 	subCategories: [SubCategory.schema],
 	brands: [Brand.schema],
 	imagePath: {
 		type: Number,
-		default: 0
+		default: 0,
+		required: true
 	}
 })
 

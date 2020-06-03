@@ -6,7 +6,7 @@ import app from '../../src/app'
 export default () => describe('GET /product/:_id with token', () => {
 	it('get first product firs time', (done) => {
 		request(app)
-			.get('/product/5ea7ac324756fd1988870999')
+			.get(`/product/${JSON.parse(process.env.product)._id}`)
 			.set({ Authorization: process.env.token })
 			.expect(200)
 			.end((error, response) => {
@@ -21,7 +21,7 @@ export default () => describe('GET /product/:_id with token', () => {
 
 	it('get first product second time - should return with quantity', (done) => {
 		request(app)
-			.get('/product/5ea7ac324756fd1988870999')
+			.get(`/product/${JSON.parse(process.env.product)._id}`)
 			.set({ Authorization: process.env.token })
 			.expect(200)
 			.end((error, response) => {
@@ -35,9 +35,9 @@ export default () => describe('GET /product/:_id with token', () => {
 			})
 	})
 
-	it('get first product first time - should return with quantity', (done) => {
+	it('get second product first time - should return with quantity', (done) => {
 		request(app)
-			.get('/product/5ea7ac324756fd198887099b')
+			.get(`/product/${JSON.parse(process.env.product2)._id}`)
 			.set({ Authorization: process.env.token })
 			.expect(200)
 			.end((error, response) => {
@@ -52,7 +52,7 @@ export default () => describe('GET /product/:_id with token', () => {
 
 	it('get second product second time - should return with quantity', (done) => {
 		request(app)
-			.get('/product/5ea7ac324756fd198887099b')
+			.get(`/product/${JSON.parse(process.env.product2)._id}`)
 			.set({ Authorization: process.env.token })
 			.expect(200)
 			.end((error, response) => {
@@ -68,7 +68,7 @@ export default () => describe('GET /product/:_id with token', () => {
 
 	it('get second product third time - should return with quantity', (done) => {
 		request(app)
-			.get('/product/5ea7ac324756fd198887099b')
+			.get(`/product/${JSON.parse(process.env.product2)._id}`)
 			.set({ Authorization: process.env.token })
 			.expect(200)
 			.end((error, response) => {
