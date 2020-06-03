@@ -50,9 +50,26 @@ export const getCategories = () => (
 	Category.find()
 )
 
-export const getAllProducts = () => (
-	Product.find()
-)
+export const getProductsWithCategories = () => {
+	return Category.aggregate([
+		{
+			$project: {
+				_id: {
+					$toString: '$_id'
+				},
+				name: 1
+			}
+		},
+		{
+			$lookup: {
+				from: Product.collection.name,
+				localField: '_id',
+				foreignField: 'categoryId',
+				as: 'products'
+			}
+		}
+	])
+}
 
 export const getProductsLength = (query: any) => {
 	// eslint-disable-next-line no-param-reassign

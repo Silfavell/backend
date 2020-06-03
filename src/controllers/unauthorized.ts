@@ -14,7 +14,7 @@ import {
 	login,
 	search,
 	getSingleProduct,
-	getAllProducts,
+	getProductsWithCategories,
 	getCategories,
 	addProductToCart,
 	isManagerVerified,
@@ -72,11 +72,11 @@ router.get('/categories', (req, res, next) => {
 	})
 })
 
-router.get('/products', (req, res, next) => {
-	getAllProducts().then((products) => {
+router.get('/products-with-categories', (req, res, next) => {
+	getProductsWithCategories().then((products) => {
 		res.json(products)
 	}).catch((reason) => {
-		next(handleError(reason, 'GET /products'))
+		next(handleError(reason, 'GET /products-with-categories'))
 	})
 })
 
