@@ -94,11 +94,6 @@ export const getProductsLength = (query: any) => {
 export const getFilteredProducts = (query: any) => {
 	const criteria = {}
 
-	// eslint-disable-next-line radix
-	const start = parseInt(query.start)
-	// eslint-disable-next-line radix
-	const quantity = parseInt(query.quantity)
-
 	if (query.categoryId) {
 		// @ts-ignore
 		criteria.categoryId = query.categoryId
@@ -109,7 +104,19 @@ export const getFilteredProducts = (query: any) => {
 		criteria.subCategoryId = query.subCategoryId
 	}
 
-	let product = Product.find(criteria).skip(start).limit(quantity)
+	let product = Product.find(criteria)
+
+	if (query.start) {
+		// eslint-disable-next-line radix
+		const start = parseInt(query.start)
+		product.skip(start)
+	}
+
+	if (query.quantity) {
+		// eslint-disable-next-line radix
+		const quantity = parseInt(query.quantity)
+		product.limit(quantity)
+	}
 
 	// eslint-disable-next-line radix
 	if (parseInt(query.sortType) !== ProductSort.CLASSIC) {
@@ -131,6 +138,10 @@ export const getFilteredProducts = (query: any) => {
 
 	if (query.brands) {
 		product = product.where('brand').in(query.brands.split(','))
+	}
+
+	if (query.productIds) {
+		product = product.where('_id').in(query.productIds.split(','))
 	}
 
 	return product
