@@ -111,16 +111,14 @@ export const checkMakeOrderValues = (user: UserDocument, context: any) => {
 	})
 }
 
-export const saveOrderToDatabase = (user: UserDocument, { cart }: any, address: any) => {
-	return (
-		new Order({
-			customer: user.nameSurname,
-			phoneNumber: user.phoneNumber,
-			address: address.openAddress,
-			products: Object.values(cart)
-		}).save()
-	)
-}
+export const saveOrderToDatabase = (user: UserDocument, { cart }: any, address: any) => (
+	new Order({
+		customer: user.nameSurname,
+		phoneNumber: user.phoneNumber,
+		address: address.openAddress,
+		products: Object.values(cart)
+	}).save()
+)
 
 export const saveAddressToDatabase = (userId: string, address: any) => (
 	User.findByIdAndUpdate(userId, {
