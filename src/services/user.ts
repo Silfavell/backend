@@ -70,7 +70,7 @@ export const saveCart = (userId: string, cart: ProductDocument[]) => (
 	})
 )
 
-export const getCart = (userId: string) => ( // "5ea7ac324756fd198887099a", "5ea7ac324756fd1988870999", "5ea7ac324756fd198887099b"
+export const getCart = (userId: string) => (
 	new Promise((resolve, reject) => {
 		Cart.findOne({ userId }).then((cart) => {
 			resolve(cart)
@@ -129,7 +129,47 @@ export const saveAddressToDatabase = (userId: string, address: any) => (
 )
 
 export const getFavoriteProductsFromDatabase = (userId: string) => (
-	User.findById(userId, { _id: 0, favoriteProducts: 1 })
+	User.aggregate([
+		{
+			$match: {
+				_id: userId
+			}
+		},
+		{
+			$project: {
+				favoriteProducts: 1
+			}
+		},
+		{
+			$unwind: '$favoriteProducts'
+		},
+		{
+			$project: {
+				favoriteProducts: {
+					$toObjectId: '$favoriteProducts'
+				}
+			}
+		},
+		{
+			$lookup: {
+				from: Product.collection.name,
+				localField: 'favoriteProducts',
+				foreignField: '_id',
+				as: 'favoriteProducts'
+			}
+		},
+		{
+			$unwind: '$favoriteProducts'
+		},
+		{
+			$group: {
+				_id: '$_id',
+				favoriteProducts: {
+					$push: '$favoriteProducts'
+				}
+			}
+		}
+	])
 )
 
 export const saveFavoriteProductToDatabase = (userId: string, { productId }: any) => (

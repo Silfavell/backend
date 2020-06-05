@@ -17,7 +17,7 @@ export default () => describe('GET /user/favorite-products', () => {
 					done(response.body.error)
 				}
 
-				expect(response.body.favoriteProducts.includes(JSON.parse(process.env.product)._id)).to.equal(true)
+				expect(response.body.favoriteProducts.map((favoriteProduct) => favoriteProduct._id).includes(JSON.parse(process.env.product)._id)).to.equal(true)
 				done()
 			})
 	))

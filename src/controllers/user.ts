@@ -153,7 +153,7 @@ router.get('/favorite-products', (req, res, next) => {
 	// @ts-ignore
 	getFavoriteProductsFromDatabase(req.user._id)
 		.then((favoriteProducts) => {
-			res.json(favoriteProducts)
+			res.json(favoriteProducts[0])
 		})
 		.catch((reason) => {
 			next(handleError(reason, 'GET /user/favorite-products'))
