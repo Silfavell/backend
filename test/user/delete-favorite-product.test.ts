@@ -4,7 +4,7 @@ import { expect } from 'chai'
 import app from '../../src/app'
 
 export default () => describe('DELETE /user/favorite-product', () => {
-	it('with no body', () => (
+	it('without id', () => (
 		request(app)
 			.post('/user/favorite-product')
 			.set({ Authorization: process.env.token })
@@ -13,11 +13,8 @@ export default () => describe('DELETE /user/favorite-product', () => {
 
 	it('correct', (done) => (
 		request(app)
-			.delete('/user/favorite-product')
+			.delete(`/user/favorite-product/${JSON.parse(process.env.product)._id}`)
 			.set({ Authorization: process.env.token })
-			.send({
-				productId: JSON.parse(process.env.product)._id
-			})
 			.expect(200)
 			.end((error, response) => {
 				if (response.body.error) {

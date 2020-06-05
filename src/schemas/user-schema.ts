@@ -33,7 +33,7 @@ export const saveAddressSchema = Joi.object({
 })
 
 export const favoriteProductSchema = Joi.object({
-	productId: Joi.string().required()
+	_id: Joi.string().required()
 })
 
 export const changePasswordSchema = Joi.object({

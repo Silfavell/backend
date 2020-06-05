@@ -16,7 +16,7 @@ export default () => describe('POST /user/favorite-product', () => {
 			.post('/user/favorite-product')
 			.set({ Authorization: process.env.token })
 			.send({
-				productId: JSON.parse(process.env.product)._id
+				_id: JSON.parse(process.env.product)._id
 			})
 			.expect(200)
 			.end((error, response) => {
@@ -34,7 +34,7 @@ export default () => describe('POST /user/favorite-product', () => {
 			.post('/user/favorite-product')
 			.set({ Authorization: process.env.token })
 			.send({
-				productId: JSON.parse(process.env.product)._id
+				_id: JSON.parse(process.env.product)._id
 			})
 			.expect(200)
 			.end((error, response) => {

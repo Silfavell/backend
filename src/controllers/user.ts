@@ -172,10 +172,10 @@ router.post('/favorite-product', (req, res, next) => {
 		})
 })
 
-router.delete('/favorite-product', (req, res, next) => {
-	validateFavoriteProductRequest(req.body)
+router.delete('/favorite-product/:_id', (req, res, next) => {
+	validateFavoriteProductRequest(req.params)
 		// @ts-ignore
-		.then(() => removeFavoriteProductFromDatabase(req.user._id, req.body))
+		.then(() => removeFavoriteProductFromDatabase(req.user._id, req.params._id))
 		.then((user) => {
 			res.json(user)
 		})

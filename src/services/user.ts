@@ -172,18 +172,18 @@ export const getFavoriteProductsFromDatabase = (userId: string) => (
 	])
 )
 
-export const saveFavoriteProductToDatabase = (userId: string, { productId }: any) => (
+export const saveFavoriteProductToDatabase = (userId: string, { _id }: any) => (
 	User.findByIdAndUpdate(userId, {
 		$addToSet: {
-			favoriteProducts: productId
+			favoriteProducts: _id
 		}
 	}, { new: true })
 )
 
-export const removeFavoriteProductFromDatabase = (userId: string, { productId }: any) => (
+export const removeFavoriteProductFromDatabase = (userId: string, _id: string) => (
 	User.findByIdAndUpdate(userId, {
 		$pull: {
-			favoriteProducts: productId
+			favoriteProducts: _id
 		}
 	}, { new: true })
 )

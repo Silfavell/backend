@@ -9,7 +9,7 @@ export default () => describe('GET /user/favorite-products', () => {
 			.get('/user/favorite-products')
 			.set({ Authorization: process.env.token })
 			.send({
-				productId: JSON.parse(process.env.product)._id
+				_id: JSON.parse(process.env.product)._id
 			})
 			.expect(200)
 			.end((error, response) => {
