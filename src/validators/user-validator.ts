@@ -8,7 +8,8 @@ import {
 	phoneSchema,
 	makeOrderSchema,
 	postPaymentCardSchema,
-	deletePaymentCardSchema
+	deletePaymentCardSchema,
+	favoriteProductSchema
 } from '../schemas/user-schema'
 
 // eslint-disable-next-line no-unused-vars
@@ -33,6 +34,10 @@ export const validateSaveCartRequest = (cart: any) => (
 
 export const validateSaveAddressRequest = (context: any) => (
 	saveAddressSchema.validateAsync(context)
+)
+
+export const validateFavoriteProductRequest = (context: any) => (
+	favoriteProductSchema.validateAsync(context)
 )
 
 export const validateChangePasswordRequest = (context: any) => (

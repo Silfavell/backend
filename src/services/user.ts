@@ -128,6 +128,22 @@ export const saveAddressToDatabase = (userId: string, address: any) => (
 	}, { new: true })
 )
 
+export const saveFavoriteProductToDatabase = (userId: string, { productId }: any) => (
+	User.findByIdAndUpdate(userId, {
+		$addToSet: {
+			favoriteProducts: productId
+		}
+	}, { new: true })
+)
+
+export const removeFavoriteProductFromDatabase = (userId: string, { productId }: any) => (
+	User.findByIdAndUpdate(userId, {
+		$pull: {
+			favoriteProducts: productId
+		}
+	}, { new: true })
+)
+
 export const createPaymentUserWithCard = (user: UserDocument, card: any) => (
 	new Promise((resolve, reject) => {
 		iyzipay.card.create({

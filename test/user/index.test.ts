@@ -8,10 +8,14 @@ import deleteAddressTests from './delete-address.test'
 import postPaymentCardTests from './post-payment-card.test'
 import getListCardsTests from './get-list-cards.test'
 import deleteCardTests from './delete-card.test'
+import postFavoriteProductTests from './post-favorite-product.test'
+import deleteFavoriteProductTests from './delete-favorite-product.test'
 
 export default () => describe('user', () => {
 	getCartBeforePostCartTests()
 	postAddressTests()
+	postFavoriteProductTests()
+	deleteFavoriteProductTests()
 	postPaymentCardTests()
 	deleteCardTests()
 	getListCardsTests()

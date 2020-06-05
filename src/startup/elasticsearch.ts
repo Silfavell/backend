@@ -27,8 +27,6 @@ class ElasticSearch {
 				number_of_shards: 4,
 				number_of_replicas: 3
 			}
-		}).catch((reason) => {
-			console.log(reason)
 		})
 	)
 

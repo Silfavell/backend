@@ -33,11 +33,14 @@ const userSchema = new Schema({
 		required: true
 	},
 	addresses: [Address.schema],
+	favoriteProducts: [{
+		type: String,
+		required: true
+	}],
 	cardUserKey: {
 		type: String,
 		default: null
 	}
-	// cart: {}
 }, {
 	timestamps: true
 })

@@ -16,6 +16,8 @@ import {
 	deleteAddress,
 	getCart,
 	saveOrderToDatabase,
+	saveFavoriteProductToDatabase,
+	removeFavoriteProductFromDatabase,
 	completePayment,
 	checkMakeOrderValues,
 	saveAddressToDatabase,
@@ -37,7 +39,8 @@ import {
 	validateChangePasswordRequest,
 	validateMakeOrderRequest,
 	validatePostPaymentCardRequest,
-	validateDeletePaymentCardRequest
+	validateDeletePaymentCardRequest,
+	validateFavoriteProductRequest
 } from '../validators/user-validator'
 
 const router = Router()
@@ -142,6 +145,31 @@ router.post('/address', (req, res, next) => {
 		})
 		.catch((reason) => {
 			next(handleError(reason, 'POST /user/address'))
+		})
+})
+
+
+router.post('/favorite-product', (req, res, next) => {
+	validateFavoriteProductRequest(req.body)
+		// @ts-ignore
+		.then(() => saveFavoriteProductToDatabase(req.user._id, req.body))
+		.then((user) => {
+			res.json(user)
+		})
+		.catch((reason) => {
+			next(handleError(reason, 'POST /user/favorite-product'))
+		})
+})
+
+router.delete('/favorite-product', (req, res, next) => {
+	validateFavoriteProductRequest(req.body)
+		// @ts-ignore
+		.then(() => removeFavoriteProductFromDatabase(req.user._id, req.body))
+		.then((user) => {
+			res.json(user)
+		})
+		.catch((reason) => {
+			next(handleError(reason, 'DELETE /user/favorite-product'))
 		})
 })
 

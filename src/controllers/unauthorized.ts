@@ -161,7 +161,6 @@ router.post('/send-activation-code', (req, res, next) => {
 
 router.post('/register', (req, res, next) => {
 	// isUserNonExists(req.body.user.phoneNumber)
-	console.log('/register')
 	validateRegisterRequest(req.body)
 		.then(() => isUserNonExists(req.body.phoneNumber))
 		.then(() => getActivationCode(req.body.phoneNumber, ActivationCodes.REGISTER_USER))
