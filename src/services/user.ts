@@ -128,6 +128,10 @@ export const saveAddressToDatabase = (userId: string, address: any) => (
 	}, { new: true })
 )
 
+export const getFavoriteProductsFromDatabase = (userId: string) => (
+	User.findById(userId, { _id: 0, favoriteProducts: 1 })
+)
+
 export const saveFavoriteProductToDatabase = (userId: string, { productId }: any) => (
 	User.findByIdAndUpdate(userId, {
 		$addToSet: {

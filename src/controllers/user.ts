@@ -16,6 +16,7 @@ import {
 	deleteAddress,
 	getCart,
 	saveOrderToDatabase,
+	getFavoriteProductsFromDatabase,
 	saveFavoriteProductToDatabase,
 	removeFavoriteProductFromDatabase,
 	completePayment,
@@ -148,6 +149,16 @@ router.post('/address', (req, res, next) => {
 		})
 })
 
+router.get('/favorite-products', (req, res, next) => {
+	// @ts-ignore
+	getFavoriteProductsFromDatabase(req.user._id)
+		.then((favoriteProducts) => {
+			res.json(favoriteProducts)
+		})
+		.catch((reason) => {
+			next(handleError(reason, 'GET /user/favorite-products'))
+		})
+})
 
 router.post('/favorite-product', (req, res, next) => {
 	validateFavoriteProductRequest(req.body)

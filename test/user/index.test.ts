@@ -10,11 +10,13 @@ import getListCardsTests from './get-list-cards.test'
 import deleteCardTests from './delete-card.test'
 import postFavoriteProductTests from './post-favorite-product.test'
 import deleteFavoriteProductTests from './delete-favorite-product.test'
+import getFavoriteProductsTests from './get-favorite-products.test'
 
 export default () => describe('user', () => {
 	getCartBeforePostCartTests()
 	postAddressTests()
 	postFavoriteProductTests()
+	getFavoriteProductsTests()
 	deleteFavoriteProductTests()
 	postPaymentCardTests()
 	deleteCardTests()
