@@ -146,7 +146,7 @@ router.post('/product', (req, res, next) => {
 	validatePostProduct(req.body)
 		.then(() => saveProductToDatabase(req.body))
 		.then((product) => updateCategoryOfProduct(product))
-		.then((product: any) => indexProduct(product))
+		.then((product: any) => indexProduct(product).then(() => product))
 		.then((product) => {
 			res.json(product)
 		})

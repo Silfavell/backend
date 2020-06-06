@@ -88,7 +88,6 @@ export const indexProduct = (product: ProductDocument) => (
 			// refresh: true,
 			body: replaceProductId(product)
 		})
-		.then(() => product)
 )
 
 export const updateProduct = (productId: string, productContext: ProductDocument) => (
