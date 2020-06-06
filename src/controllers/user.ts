@@ -124,7 +124,7 @@ router.delete('/cart', (req, res, next) => {
 	clearCart(req.user._id.toString()).then(() => {
 		res.json()
 	}).catch((reason) => {
-		next(handleError(reason, 'GET /user/cart'))
+		next(handleError(reason, 'DELETE /user/cart'))
 	})
 })
 
@@ -180,7 +180,7 @@ router.delete('/favorite-product/:_id', (req, res, next) => {
 			res.json(user)
 		})
 		.catch((reason) => {
-			next(handleError(reason, 'DELETE /user/favorite-product'))
+			next(handleError(reason, 'DELETE /user/favorite-product/:_id'))
 		})
 })
 
@@ -191,7 +191,7 @@ router.delete('/address/:_id', (req, res, next) => {
 			res.json(user)
 		})
 		.catch((reason) => {
-			next(handleError(reason, 'DELETE /user/address/:id'))
+			next(handleError(reason, 'DELETE /user/address/:_id'))
 		})
 })
 

@@ -47,30 +47,45 @@ router.get('/error-log', (req, res) => {
 	res.download(file)
 })
 
-router.post('/save', (req, res) => {
+router.post('/save', (req, res, next) => {
 	new Admin(req.body).save()
 		.then((admin) => createToken(admin))
 		.then((token) => {
 			res.end(token)
 		})
+		.catch((reason) => {
+			next(handleError(reason, 'POST /admin/save'))
+		})
 })
 
-router.get('/manager-requests', (req, res) => {
-	Manager.find({ verified: false }).then((managers) => {
-		res.json(managers)
-	})
+router.get('/manager-requests', (req, res, next) => {
+	Manager.find({ verified: false })
+		.then((managers) => {
+			res.json(managers)
+		})
+		.catch((reason) => {
+			next(handleError(reason, 'GET /admin/manager-requests'))
+		})
 })
 
-router.get('/managers', (req, res) => {
-	Manager.find().then((managers) => {
-		res.json(managers)
-	})
+router.get('/managers', (req, res, next) => {
+	Manager.find()
+		.then((managers) => {
+			res.json(managers)
+		})
+		.catch((reason) => {
+			next(handleError(reason, 'GET /admin/managers'))
+		})
 })
 
-router.put('/verify-manager/:_id', (req, res) => {
-	verifyManager(req.params._id).then((manager) => {
-		res.json(manager)
-	})
+router.put('/verify-manager/:_id', (req, res, next) => {
+	verifyManager(req.params._id)
+		.then((manager) => {
+			res.json(manager)
+		})
+		.catch((reason) => {
+			next(handleError(reason, 'PUT /admin/verify-manager/:_id'))
+		})
 })
 
 router.post('/category', (req, res, next) => {
@@ -90,7 +105,7 @@ router.delete('/category/:_id', (req, res, next) => {
 			res.json(category)
 		})
 		.catch((reason) => {
-			next(handleError(reason, 'POST /admin/category'))
+			next(handleError(reason, 'DELETE /admin/category'))
 		})
 })
 
@@ -112,7 +127,7 @@ router.delete('/sub-category', (req, res, next) => {
 			res.json(category)
 		})
 		.catch((reason: any) => {
-			next(handleError(reason, 'POST /admin/sub-category'))
+			next(handleError(reason, 'DELETE /admin/sub-category'))
 		})
 })
 

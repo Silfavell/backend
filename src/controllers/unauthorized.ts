@@ -85,7 +85,7 @@ router.get('/products-filter', (req, res, next) => {
 	getFilteredProducts(req.query).then((products) => {
 		res.json(products)
 	}).catch((reason) => {
-		next(handleError(reason, 'GET /products-by-range'))
+		next(handleError(reason, 'GET /products-filter'))
 	})
 })
 
@@ -102,7 +102,7 @@ router.get('/products-length', (req, res, next) => {
 	getProductsLength(req.query).then((length) => {
 		res.json(length)
 	}).catch((reason) => {
-		next(handleError(reason, 'GET /products-by-range'))
+		next(handleError(reason, 'GET /products-length'))
 	})
 })
 

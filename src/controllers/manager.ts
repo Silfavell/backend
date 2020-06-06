@@ -38,7 +38,7 @@ router.put('/orders/cancel/:_id', (req, res, next) => {
 			res.json(order)
 		})
 		.catch((reason) => {
-			next(handleError(reason, 'PUT /orders/confirm/:_id'))
+			next(handleError(reason, 'PUT /manager/orders/confirm/:_id'))
 		})
 })
 
@@ -50,7 +50,7 @@ router.put('/orders/confirm/:_id', (req, res, next) => {
 			res.json(order)
 		})
 		.catch((reason) => {
-			next(handleError(reason, 'PUT /orders/confirm/:_id'))
+			next(handleError(reason, 'PUT /manager/orders/confirm/:_id'))
 		})
 })
 
