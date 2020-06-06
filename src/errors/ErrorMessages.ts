@@ -23,6 +23,8 @@ class ErrorMessages {
 
     static UNKNOWN_ACTIVATION_CODE = 'Aktivasyon kodu bulunamadı'
 
+    static UNKNOWN_OBJECT_ID = 'UNKNOWN_OBJECT_ID'
+
 
     static MANAGER_ALREADY_EXISTS = 'Telefon numarasına ait yönetici var'
 

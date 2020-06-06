@@ -27,7 +27,7 @@ export default () => describe('POST /user/cart', () => {
 			])
 			.expect(400)
 			.end((error, response) => {
-				expect(response.body.error).to.equal(ErrorMessages.NON_EXISTS_PRODUCT)
+				expect(response.body.error).to.equal(ErrorMessages.UNKNOWN_OBJECT_ID)
 				done()
 			})
 	))

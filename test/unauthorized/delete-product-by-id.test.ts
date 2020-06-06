@@ -10,7 +10,7 @@ export default () => describe('DELETE /product/:_id', () => {
 			.delete('/product/12356')
 			.expect(400)
 			.end((error, response) => {
-				expect(response.body.error).to.equal(ErrorMessages.NON_EXISTS_PRODUCT)
+				expect(response.body.error).to.equal(ErrorMessages.UNKNOWN_OBJECT_ID)
 				done()
 			})
 	})

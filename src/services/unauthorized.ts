@@ -152,14 +152,14 @@ export const getProductsByRange = (categoryId: string, start: string, quantity: 
 	Product.find({ categoryId }).skip(parseInt(start)).limit(parseInt(quantity))
 )
 
-export const validateGetSingleProduct = (productId: string) => (
+export const validateObjectId = (productId: string) => (
 	new Promise((resolve, reject) => {
 		const test = new RegExp('^[0-9a-fA-F]{24}$').test(productId)
 
 		if (test) {
 			resolve()
 		}
-		reject(new ServerError(ErrorMessages.NON_EXISTS_PRODUCT, HttpStatusCodes.BAD_REQUEST, ErrorMessages.NON_EXISTS_PRODUCT, false))
+		reject(new ServerError(ErrorMessages.UNKNOWN_OBJECT_ID, HttpStatusCodes.BAD_REQUEST, ErrorMessages.UNKNOWN_OBJECT_ID, false))
 	})
 )
 

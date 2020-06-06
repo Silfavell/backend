@@ -27,7 +27,7 @@ import {
 	getProductsByRange,
 	getProductsLength,
 	getFilteredProducts,
-	validateGetSingleProduct
+	validateObjectId
 } from '../services/unauthorized'
 
 import {
@@ -108,7 +108,7 @@ router.get('/products-length', (req, res, next) => {
 
 router.get('/product/:_id', (req, res, next) => {
 	// @ts-ignore
-	validateGetSingleProduct(req.params._id)
+	validateObjectId(req.params._id)
 		// @ts-ignore
 		.then(() => getSingleProduct(req.params._id, req.user))
 		// @ts-ignore
@@ -123,7 +123,7 @@ router.get('/product/:_id', (req, res, next) => {
 
 router.delete('/product/:_id', (req, res, next) => {
 	// @ts-ignore
-	validateGetSingleProduct(req.params._id)
+	validateObjectId(req.params._id)
 		// @ts-ignore
 		.then(() => getSingleProduct(req.params._id, req.user))
 		// @ts-ignore
