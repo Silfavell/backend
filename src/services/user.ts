@@ -128,6 +128,10 @@ export const saveAddressToDatabase = (userId: string, address: any) => (
 	}, { new: true })
 )
 
+export const getOrders = (phoneNumber: string) => (
+	Order.find({ phoneNumber })
+)
+
 export const getFavoriteProductsFromDatabase = (userId: string) => (
 	User.aggregate([
 		{

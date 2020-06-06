@@ -16,6 +16,7 @@ import {
 	deleteAddress,
 	getCart,
 	saveOrderToDatabase,
+	getOrders,
 	getFavoriteProductsFromDatabase,
 	saveFavoriteProductToDatabase,
 	removeFavoriteProductFromDatabase,
@@ -146,6 +147,17 @@ router.post('/address', (req, res, next) => {
 		})
 		.catch((reason) => {
 			next(handleError(reason, 'POST /user/address'))
+		})
+})
+
+router.get('/orders', (req, res, next) => {
+	// @ts-ignore
+	getOrders(req.user.phoneNumber)
+		.then((orders) => {
+			res.json(orders)
+		})
+		.catch((reason) => {
+			next(handleError(reason, 'GET /user/favorite-products'))
 		})
 })
 

@@ -12,6 +12,7 @@ import {
 	Category,
 	Order
 } from '../src/models'
+import ActivationCode from '../src/models/ActivationCode'
 
 describe('sequentially run tests', () => {
 	beforeAll((done) => {
@@ -43,7 +44,8 @@ describe('sequentially run tests', () => {
 			Admin.deleteOne({ phoneNumber: '555 555 55 55' }),
 			Category.deleteOne({ name: 'testCategory' }),
 			Category.deleteOne({ name: 'testCategoryUpdated' }),
-			Order.deleteMany({ customer: 'testUser' })
+			Order.deleteMany({ customer: 'testUser' }),
+			ActivationCode.deleteMany({ userPhoneNumber: '0555 555 55 55' }),
 		]).then(() => {
 			done()
 		})
