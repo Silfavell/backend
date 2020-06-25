@@ -24,7 +24,7 @@ export default () => describe('POST /user/favorite-product', () => {
 					done(response.body.error)
 				}
 
-				expect(response.body.favoriteProducts.includes(JSON.parse(process.env.product)._id)).to.equal(true)
+				expect(response.body.includes(JSON.parse(process.env.product)._id)).to.equal(true)
 				done()
 			})
 	))
@@ -42,7 +42,7 @@ export default () => describe('POST /user/favorite-product', () => {
 					done(response.body.error)
 				}
 
-				expect(response.body.favoriteProducts.filter((favoriteProduct) => favoriteProduct === JSON.parse(process.env.product)._id).length).to.equal(1)
+				expect(response.body.filter((favoriteProduct) => favoriteProduct === JSON.parse(process.env.product)._id).length).to.equal(1)
 				done()
 			})
 	))

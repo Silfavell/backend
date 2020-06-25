@@ -176,8 +176,8 @@ router.post('/favorite-product', (req, res, next) => {
 	validateFavoriteProductRequest(req.body)
 		// @ts-ignore
 		.then(() => saveFavoriteProductToDatabase(req.user._id, req.body))
-		.then((user) => {
-			res.json(user)
+		.then(({ favoriteProducts }) => {
+			res.json(favoriteProducts)
 		})
 		.catch((reason) => {
 			next(handleError(reason, 'POST /user/favorite-product'))
@@ -188,8 +188,8 @@ router.delete('/favorite-product/:_id', (req, res, next) => {
 	validateFavoriteProductRequest(req.params)
 		// @ts-ignore
 		.then(() => removeFavoriteProductFromDatabase(req.user._id, req.params._id))
-		.then((user) => {
-			res.json(user)
+		.then(({ favoriteProducts }) => {
+			res.json(favoriteProducts)
 		})
 		.catch((reason) => {
 			next(handleError(reason, 'DELETE /user/favorite-product/:_id'))

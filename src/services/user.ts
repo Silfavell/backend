@@ -181,7 +181,10 @@ export const saveFavoriteProductToDatabase = (userId: string, { _id }: any) => (
 		$addToSet: {
 			favoriteProducts: _id
 		}
-	}, { new: true })
+	}, {
+		new: true,
+		fields: { favoriteProducts: 1 }
+	})
 )
 
 export const removeFavoriteProductFromDatabase = (userId: string, _id: string) => (
@@ -189,7 +192,10 @@ export const removeFavoriteProductFromDatabase = (userId: string, _id: string) =
 		$pull: {
 			favoriteProducts: _id
 		}
-	}, { new: true })
+	}, {
+		new: true,
+		fields: { favoriteProducts: 1 }
+	})
 )
 
 export const createPaymentUserWithCard = (user: UserDocument, card: any) => (

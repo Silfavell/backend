@@ -21,7 +21,7 @@ export default () => describe('DELETE /user/favorite-product', () => {
 					done(response.body.error)
 				}
 
-				expect(response.body.favoriteProducts.includes(JSON.parse(process.env.product)._id)).to.equal(false)
+				expect(response.body.includes(JSON.parse(process.env.product)._id)).to.equal(false)
 				done()
 			})
 	))

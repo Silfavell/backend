@@ -10,6 +10,7 @@ export type UserDocument = Document & {
 	nameSurname: string,
 	email: string,
 	password: string,
+	favoriteProducts: string[],
 	addresses: AddressDocument[],
 	cardUserKey: string
 }
