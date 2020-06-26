@@ -63,7 +63,8 @@ export const getProductsWithCategories = () => (
 				},
 				subCategoryId: {
 					$toString: '$subCategories._id'
-				}
+				},
+				subCategoryBrands: '$subCategories.brands'
 			}
 		},
 		{
@@ -91,6 +92,7 @@ export const getProductsWithCategories = () => (
 					$push: {
 						name: '$subCategoryName',
 						_id: '$subCategoryId',
+						brands: '$subCategoryBrands',
 						products: '$products'
 					}
 				}
