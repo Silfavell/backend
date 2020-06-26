@@ -53,19 +53,47 @@ export const getCategories = () => (
 export const getProductsWithCategories = () => (
 	Category.aggregate([
 		{
+			$unwind: '$subCategories'
+		},
+		{
 			$project: {
-				_id: {
-					$toString: '$_id'
+				name: 1,
+				subCategoryName: {
+					$toString: '$subCategories.name'
 				},
-				name: 1
+				subCategoryId: {
+					$toString: '$subCategories._id'
+				}
 			}
 		},
 		{
 			$lookup: {
 				from: Product.collection.name,
-				localField: '_id',
-				foreignField: 'categoryId',
+				localField: 'subCategoryId',
+				foreignField: 'subCategoryId',
 				as: 'products'
+			}
+		},
+		{
+			$project: {
+				products: {
+					categoryId: 0,
+					subCategoryId: 0,
+					__v: 0
+				}
+			}
+		},
+		{
+			$group: {
+				_id: '$_id',
+				name: { $first: '$name' },
+				subCategories: {
+					$push: {
+						name: '$subCategoryName',
+						_id: '$subCategoryId',
+						products: '$products'
+					}
+				}
 			}
 		}
 	])
