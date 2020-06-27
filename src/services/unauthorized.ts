@@ -59,6 +59,7 @@ export const getProductsWithCategories = () => (
 		{
 			$project: {
 				name: 1,
+				brands: 1,
 				subCategoryName: {
 					$toString: '$subCategories.name'
 				},
@@ -94,11 +95,11 @@ export const getProductsWithCategories = () => (
 			$group: {
 				_id: '$_id',
 				name: { $first: '$name' },
+				brands: { $first: '$brands' },
 				subCategories: {
 					$push: {
 						name: '$subCategoryName',
 						_id: '$subCategoryId',
-						brands: '$subCategoryBrands',
 						products: '$products'
 					}
 				}
@@ -159,7 +160,7 @@ export const getFilteredProductsWithCategories = (query: any) => {
 			case ProductSort.MIN_PRICE: {
 				pipeline.push({
 					// @ts-ignore
-					$sort: { price: -1 }
+					$sort: { price: 1 }
 				})
 				break
 			}
@@ -167,7 +168,7 @@ export const getFilteredProductsWithCategories = (query: any) => {
 			case ProductSort.MAX_PRICE: {
 				pipeline.push({
 					// @ts-ignore
-					$sort: { price: 1 }
+					$sort: { price: -1 }
 				})
 				break
 			}
@@ -189,7 +190,6 @@ export const getFilteredProductsWithCategories = (query: any) => {
 				subCategoryId: {
 					$toString: '$subCategories._id'
 				},
-				subCategoryBrands: '$subCategories.brands'
 			}
 		},
 		{
@@ -224,7 +224,6 @@ export const getFilteredProductsWithCategories = (query: any) => {
 					$push: {
 						name: '$subCategoryName',
 						_id: '$subCategoryId',
-						brands: '$subCategoryBrands',
 						products: '$products'
 					}
 				}

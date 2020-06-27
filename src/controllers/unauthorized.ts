@@ -94,7 +94,7 @@ router.get('/products-filter', (req, res, next) => {
 // FOR MOBILE
 router.get('/products-filter-with-categories', (req, res, next) => {
 	getFilteredProductsWithCategories(req.query).then((products) => {
-		res.json(products)
+		res.json(products[0])
 	}).catch((reason) => {
 		next(handleError(reason, 'GET /products-filter-with-categories'))
 	})
