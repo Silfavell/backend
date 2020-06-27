@@ -27,6 +27,7 @@ import {
 	getProductsByRange,
 	getProductsLength,
 	getFilteredProducts,
+	getFilteredProductsWithCategories,
 	validateObjectId
 } from '../services/unauthorized'
 
@@ -81,11 +82,21 @@ router.get('/products-with-categories', (req, res, next) => {
 	})
 })
 
+// FOR WEB
 router.get('/products-filter', (req, res, next) => {
 	getFilteredProducts(req.query).then((products) => {
 		res.json(products)
 	}).catch((reason) => {
 		next(handleError(reason, 'GET /products-filter'))
+	})
+})
+
+// FOR MOBILE
+router.get('/products-filter-with-categories', (req, res, next) => {
+	getFilteredProductsWithCategories(req.query).then((products) => {
+		res.json(products)
+	}).catch((reason) => {
+		next(handleError(reason, 'GET /products-filter-with-categories'))
 	})
 })
 

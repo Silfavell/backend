@@ -1,3 +1,4 @@
+import mongoose from 'mongoose'
 import jwt from 'jsonwebtoken'
 import HttpStatusCodes from 'http-status-codes'
 import Nexmo from 'nexmo'
@@ -85,6 +86,11 @@ export const getProductsWithCategories = () => (
 			}
 		},
 		{
+			$match: {
+				'products.0': { $exists: true }
+			}
+		},
+		{
 			$group: {
 				_id: '$_id',
 				name: { $first: '$name' },
@@ -121,44 +127,48 @@ export const getProductsLength = (query: any) => {
 	return Product.countDocuments(query)
 }
 
-export const getFilteredProducts = (query: any) => {
-	const criteria = {}
+export const getFilteredProductsWithCategories = (query: any) => {
+	const match = [
+		{
+			$eq: ['$categoryId', query.categoryId]
+		},
+		{
+			$eq: ['$subCategoryId', '$$subCategoryId']
+		}
+	]
 
-	if (query.categoryId) {
-		// @ts-ignore
-		criteria.categoryId = query.categoryId
+	if (query.brands) {
+		match.push({
+			// @ts-ignore
+			$in: ['$brand', query.brands.split(',')]
+		})
 	}
 
-	if (query.subCategoryId) {
-		// @ts-ignore
-		criteria.subCategoryId = query.subCategoryId
-	}
+	const pipeline = [
+		{
+			$match: {
+				$expr: {
+					$and: match
+				}
+			}
+		}
+	]
 
-	let product = Product.find(criteria)
-
-	if (query.start) {
-		// eslint-disable-next-line radix
-		const start = parseInt(query.start)
-		product.skip(start)
-	}
-
-	if (query.quantity) {
-		// eslint-disable-next-line radix
-		const quantity = parseInt(query.quantity)
-		product.limit(quantity)
-	}
-
-	// eslint-disable-next-line radix
-	if (parseInt(query.sortType) !== ProductSort.CLASSIC) {
-		// eslint-disable-next-line radix
+	if (query.sortType) {
 		switch (parseInt(query.sortType)) {
 			case ProductSort.MIN_PRICE: {
-				product = product.sort({ price: 1 })
+				pipeline.push({
+					// @ts-ignore
+					$sort: { price: -1 }
+				})
 				break
 			}
 
 			case ProductSort.MAX_PRICE: {
-				product = product.sort({ price: -1 })
+				pipeline.push({
+					// @ts-ignore
+					$sort: { price: 1 }
+				})
 				break
 			}
 
@@ -166,15 +176,140 @@ export const getFilteredProducts = (query: any) => {
 		}
 	}
 
+	return Category.aggregate([
+		{
+			$unwind: '$subCategories'
+		},
+		{
+			$project: {
+				name: 1,
+				subCategoryName: {
+					$toString: '$subCategories.name'
+				},
+				subCategoryId: {
+					$toString: '$subCategories._id'
+				},
+				subCategoryBrands: '$subCategories.brands'
+			}
+		},
+		{
+			$lookup: {
+				from: Product.collection.name,
+				//	localField: 'subCategoryId',
+				//	foreignField: 'subCategoryId',
+				let: { subCategoryId: '$subCategoryId' },
+				as: 'products',
+				pipeline
+			}
+		},
+		{
+			$project: {
+				products: {
+					categoryId: 0,
+					subCategoryId: 0,
+					__v: 0
+				}
+			}
+		},
+		{
+			$match: {
+				'products.0': { $exists: true }
+			}
+		},
+		{
+			$group: {
+				_id: '$_id',
+				name: { $first: '$name' },
+				subCategories: {
+					$push: {
+						name: '$subCategoryName',
+						_id: '$subCategoryId',
+						brands: '$subCategoryBrands',
+						products: '$products'
+					}
+				}
+			}
+		}
+	])
+}
+
+export const getFilteredProducts = (query: any) => {
+	const stages = []
+
+	if (query.categoryId) {
+		stages.push({
+			$match: {
+				categoryId: query.categoryId
+			}
+		})
+	}
+
+	if (query.subCategoryId) {
+		stages.push({
+			$match: {
+				subCategoryId: query.subCategoryId
+			}
+		})
+	}
+
 	if (query.brands) {
-		product = product.where('brand').in(query.brands.split(','))
+		stages.push({
+			$match: {
+				brand: {
+					$in: query.brands.split(',')
+				}
+			}
+		})
 	}
 
 	if (query.productIds) {
-		product = product.where('_id').in(query.productIds.split(','))
+		stages.push({
+			$match: {
+				_id: {
+					$in: query.productIds.split(',').map((productId: any) => mongoose.Types.ObjectId(productId))
+				}
+			}
+		})
 	}
 
-	return product
+	if (query.start) {
+		stages.push({
+			$skip: query.start
+		})
+	}
+
+	if (query.quantity) {
+		stages.push({
+			$limit: query.quantity
+		})
+	}
+
+	if (query.sortType) {
+		switch (parseInt(query.sortType)) {
+			case ProductSort.MIN_PRICE: {
+				stages.push({
+					$sort: {
+						price: -1
+					}
+				})
+				break
+			}
+
+			case ProductSort.MAX_PRICE: {
+				stages.push({
+					$sort: {
+						price: 1
+					}
+				})
+				break
+			}
+
+			default: break
+		}
+	}
+
+
+	return Product.aggregate(stages)
 }
 
 export const getProductsByRange = (categoryId: string, start: string, quantity: string) => (
