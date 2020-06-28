@@ -60,6 +60,7 @@ export const getProductsWithCategories = () => (
 			$project: {
 				name: 1,
 				brands: 1,
+				imagePath: 1,
 				subCategoryName: {
 					$toString: '$subCategories.name'
 				},
@@ -95,6 +96,7 @@ export const getProductsWithCategories = () => (
 			$group: {
 				_id: '$_id',
 				name: { $first: '$name' },
+				imagePath: { $first: '$imagePath' },
 				brands: { $first: '$brands' },
 				subCategories: {
 					$push: {
@@ -103,6 +105,11 @@ export const getProductsWithCategories = () => (
 						products: '$products'
 					}
 				}
+			}
+		},
+		{
+			$sort: {
+				imagePath: 1
 			}
 		}
 	])
