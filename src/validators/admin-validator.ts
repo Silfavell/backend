@@ -21,4 +21,4 @@ export const validateUpdateCategory = (category: CategoryDocument) => categorySc
 
 export const validatePostProduct = (product: ProductDocument) => saveProductSchema.validateAsync(product)
 
-export const validateUpdateProduct = (product: ProductDocument) => (updateProductSchema.validateAsync(product)
+export const validateUpdateProduct = (product: ProductDocument) => updateProductSchema.validateAsync(product)
