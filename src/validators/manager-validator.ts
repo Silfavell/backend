@@ -3,10 +3,6 @@ import {
 	cancelOrderSchema
 } from '../schemas/manager-schema'
 
-export const validateConfirmOrder = (context: any) => (
-	confirmOrderSchema.validateAsync(context)
-)
+export const validateConfirmOrder = (body: any) => confirmOrderSchema.validateAsync(body)
 
-export const validateCancelOrder = (context: any) => (
-	cancelOrderSchema.validateAsync(context)
-)
+export const validateCancelOrder = (body: any) => cancelOrderSchema.validateAsync(body)

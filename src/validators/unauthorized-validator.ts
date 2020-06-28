@@ -1,4 +1,5 @@
 import {
+	productsFilterWithCategoriesSchema,
 	sendActivationCodeSchema,
 	registerSchema,
 	registerManagerSchema,
@@ -6,22 +7,14 @@ import {
 	resetPasswordSchema
 } from '../schemas/unauthorized-schema'
 
-export const validateSendActivationCodeRequest = (context: any) => (
-	sendActivationCodeSchema.validateAsync(context)
-)
+export const validateGetProductsFilterWithCategoriesRequest = (body: any) => productsFilterWithCategoriesSchema.validateAsync(body)
 
-export const validateRegisterRequest = (context: any) => (
-	registerSchema.validateAsync(context)
-)
+export const validateSendActivationCodeRequest = (body: any) => sendActivationCodeSchema.validateAsync(body)
 
-export const validateRegisterManagerRequest = (context: any) => (
-	registerManagerSchema.validateAsync(context)
-)
+export const validateRegisterRequest = (body: any) => registerSchema.validateAsync(body)
 
-export const validateLoginRequest = (context: any) => (
-	loginSchema.validateAsync(context)
-)
+export const validateRegisterManagerRequest = (body: any) => registerManagerSchema.validateAsync(body)
 
-export const validateResetPasswordRequest = (context: any) => (
-	resetPasswordSchema.validateAsync(context)
-)
+export const validateLoginRequest = (body: any) => loginSchema.validateAsync(body)
+
+export const validateResetPasswordRequest = (body: any) => resetPasswordSchema.validateAsync(body)

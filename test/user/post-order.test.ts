@@ -5,7 +5,7 @@ import app from '../../src/app'
 import ErrorMessages from '../../src/errors/ErrorMessages'
 import { isTextContainsAllKeys } from '../tools'
 
-export default () => describe('POST /order', () => {
+export default () => describe('POST /user/order', () => {
 	it('without address', (done) => (
 		request(app)
 			.post('/user/order')
@@ -40,7 +40,7 @@ export default () => describe('POST /order', () => {
 			})
 	))
 
-	it('with manually created cart (Products added to cart one by one in unauthorized get product by id with token)', () => (
+	it('with manually created cart (Products added to cart one by one in unauthorized get product by id with token)', (done) => (
 		request(app)
 			.post('/user/order')
 			.set({ Authorization: process.env.token })

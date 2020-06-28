@@ -14,8 +14,8 @@ export default () => describe('GET /products-with-categories', () => {
 				}
 
 				expect(response.body).to.be.an('array')
-				process.env.product = JSON.stringify(response.body[0].products[0])
-				process.env.product2 = JSON.stringify(response.body[0].products[1])
+				process.env.product = JSON.stringify(response.body[0].subCategories[0].products[0])
+				process.env.product2 = JSON.stringify(response.body[0].subCategories[0].products[1])
 				done()
 			})
 	})

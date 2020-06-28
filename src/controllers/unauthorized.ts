@@ -45,7 +45,8 @@ import {
 	validateRegisterRequest,
 	validateRegisterManagerRequest,
 	validateLoginRequest,
-	validateResetPasswordRequest
+	validateResetPasswordRequest,
+	validateGetProductsFilterWithCategoriesRequest
 } from '../validators/unauthorized-validator'
 
 import ActivationCodes from '../enums/activation-code-enum'
@@ -93,11 +94,14 @@ router.get('/products-filter', (req, res, next) => {
 
 // FOR MOBILE
 router.get('/products-filter-with-categories', (req, res, next) => {
-	getFilteredProductsWithCategories(req.query).then((products) => {
-		res.json(products[0])
-	}).catch((reason) => {
-		next(handleError(reason, 'GET /products-filter-with-categories'))
-	})
+	validateObjectId(req.query.categoryId)
+		.then(() => validateGetProductsFilterWithCategoriesRequest(req.query))
+		.then(() => getFilteredProductsWithCategories(req.query))
+		.then((products) => {
+			res.json(products[0])
+		}).catch((reason) => {
+			next(handleError(reason, 'GET /products-filter-with-categories'))
+		})
 })
 
 router.get('/products-by-range', (req, res, next) => {

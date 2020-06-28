@@ -4,6 +4,11 @@ import JoiPhoneNumber from 'joi-phone-number'
 
 const Joi = JoiBase.extend(JoiPhoneNumber)
 
+export const productsFilterWithCategoriesSchema = Joi.object({
+	categoryId: Joi.string().length(24).required(),
+	brands: Joi.string().allow(null)
+})
+
 export const sendActivationCodeSchema = Joi.object({
 	phoneNumber: Joi.string().phoneNumber({ defaultCountry: 'TR', format: 'national', strict: true }).required(),
 	activationCodeType: Joi.number().min(0).max(3).required()
