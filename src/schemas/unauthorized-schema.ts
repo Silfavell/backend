@@ -6,7 +6,8 @@ const Joi = JoiBase.extend(JoiPhoneNumber)
 
 export const productsFilterWithCategoriesSchema = Joi.object({
 	categoryId: Joi.string().length(24).required(),
-	brands: Joi.string().allow(null)
+	brands: Joi.string().allow('', null),
+	sortType: Joi.string().allow('', null)
 })
 
 export const sendActivationCodeSchema = Joi.object({
