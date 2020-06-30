@@ -21,7 +21,7 @@ export const deleteSubCategorySchema = Joi.object({
 const colorSchema = Joi.object({
 	name: Joi.string().required(),
 	code: Joi.string().required() // TODO VALIDATE COLOR CODE
-}).required()
+})
 
 export const saveProductSchema = Joi.object({
 	categoryId: Joi.string().required(),
