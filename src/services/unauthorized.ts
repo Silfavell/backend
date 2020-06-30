@@ -81,7 +81,6 @@ export const getProductsWithCategories = () => (
 		{
 			$project: {
 				products: {
-					categoryId: 0,
 					subCategoryId: 0,
 					__v: 0
 				}
@@ -191,6 +190,7 @@ export const getFilteredProductsWithCategories = (query: any) => {
 		{
 			$project: {
 				name: 1,
+				imagePath: 1,
 				subCategoryName: {
 					$toString: '$subCategories.name'
 				},
@@ -212,7 +212,6 @@ export const getFilteredProductsWithCategories = (query: any) => {
 		{
 			$project: {
 				products: {
-					categoryId: 0,
 					subCategoryId: 0,
 					__v: 0
 				}
@@ -227,6 +226,7 @@ export const getFilteredProductsWithCategories = (query: any) => {
 			$group: {
 				_id: '$_id',
 				name: { $first: '$name' },
+				imagePath: { $first: '$imagePath' },
 				subCategories: {
 					$push: {
 						name: '$subCategoryName',
@@ -280,13 +280,13 @@ export const getFilteredProducts = (query: any) => {
 
 	if (query.start) {
 		stages.push({
-			$skip: query.start
+			$skip: parseInt(query.start)
 		})
 	}
 
 	if (query.quantity) {
 		stages.push({
-			$limit: query.quantity
+			$limit: parseInt(query.quantity)
 		})
 	}
 
@@ -350,8 +350,27 @@ export const getSingleProduct = (productId: string, user: UserDocument) => (
 				}
 			})
 		}
+
 		throw new ServerError(ErrorMessages.NON_EXISTS_PRODUCT, HttpStatusCodes.BAD_REQUEST, ErrorMessages.NON_EXISTS_PRODUCT, false)
 	})
+)
+
+export const getProductAndWithColorGroup = (productId: string) => (
+	 Product.aggregate([
+		{
+			$match: {
+				_id: mongoose.Types.ObjectId(productId)
+			}
+		},
+		{
+			$lookup: {
+				from: Product.collection.name,
+				localField: 'colorGroup',
+				foreignField: 'colorGroup',
+				as: 'group'
+			}
+		}
+	])
 )
 
 export const addProductToCart = (product: any, cartObj: any, user: UserDocument) => (
@@ -482,7 +501,7 @@ export const checkConvenientOfActivationCodeRequest = (phoneNumber: string, acti
 
 export const createActivationCode = (phoneNumber: string, activationCodeType: ActivationCodes) => {
 	const activationCode = parseInt(Math.floor(1000 + Math.random() * 9000).toString(), 10)
-	console.log(activationCode, activationCodeType)
+	console.log(activationCode, activationCodeType) // TODO
 
 	return ActivationCode.findOneAndDelete({
 		userPhoneNumber: phoneNumber,

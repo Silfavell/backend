@@ -7,7 +7,13 @@ export type ProductDocument = Document & {
 	brand: string,
 	name: string,
 	price: number,
-	image: number
+	image: number,
+	imageCount: number,
+	color: {
+		name: string,
+		code: string
+	},
+	colorGroup: Schema.Types.ObjectId
 }
 
 const productSchema = new Schema({
@@ -35,6 +41,24 @@ const productSchema = new Schema({
 		type: Number,
 		default: 0,
 		required: true
+	},
+	imageCount: {
+		type: Number,
+		default: 0,
+		required: true
+	},
+	color: {
+		name: {
+			type: String
+		},
+		code: {
+			type: String
+		}
+	},
+	colorGroup: {
+		type: Schema.Types.ObjectId,
+		required: true,
+		default: mongoose.Types.ObjectId()
 	}
 })
 

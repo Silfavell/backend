@@ -14,6 +14,7 @@ import {
 	login,
 	search,
 	getSingleProduct,
+	getProductAndWithColorGroup,
 	getProductsWithCategories,
 	getCategories,
 	addProductToCart,
@@ -121,7 +122,7 @@ router.get('/products-length', (req, res, next) => {
 	})
 })
 
-router.get('/product/:_id', (req, res, next) => {
+router.get('/add-product/:_id', (req, res, next) => {
 	// @ts-ignore
 	validateObjectId(req.params._id)
 		// @ts-ignore
@@ -132,11 +133,24 @@ router.get('/product/:_id', (req, res, next) => {
 			res.json(response)
 		})
 		.catch((reason) => {
+			next((handleError(reason, 'GET /add-product/:_id')))
+		})
+})
+
+router.get('/product/:_id', (req, res, next) => {
+	// @ts-ignore
+	validateObjectId(req.params._id)
+		// @ts-ignore
+		.then(() => getProductAndWithColorGroup(req.params._id, req.user))
+		.then((response) => {
+			res.json(response[0])
+		})
+		.catch((reason) => {
 			next((handleError(reason, 'GET /product/:_id')))
 		})
 })
 
-router.delete('/product/:_id', (req, res, next) => {
+router.delete('/deduct-product/:_id', (req, res, next) => {
 	// @ts-ignore
 	validateObjectId(req.params._id)
 		// @ts-ignore
