@@ -20,7 +20,7 @@ export const deleteSubCategorySchema = Joi.object({
 
 const colorSchema = Joi.object({
 	name: Joi.string().required(),
-	code: Joi.string().required() // TODO VALIDATE COLOR CODE
+	code: Joi.string().regex(/^#[A-Fa-f0-9]{6}$/).required()
 })
 
 export const saveProductSchema = Joi.object({
@@ -31,7 +31,7 @@ export const saveProductSchema = Joi.object({
 	price: Joi.number().required(),
 	imageCount: Joi.number().default(0).allow(null),
 	colorGroup: Joi.string().allow(null),
-	color: colorSchema.allow(null) // TODO VALIDATE COLOR CODE
+	color: colorSchema.allow(null)
 }).required()
 
 export const updateProductSchema = Joi.object({
@@ -42,5 +42,5 @@ export const updateProductSchema = Joi.object({
 	price: Joi.number().allow(null),
 	imageCount: Joi.number().default(0).allow(null),
 	colorGroup: Joi.string().allow(null),
-	color: colorSchema.allow(null) // TODO VALIDATE COLOR CODE
+	color: colorSchema.allow(null)
 }).required()
