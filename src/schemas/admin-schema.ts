@@ -28,19 +28,18 @@ export const saveProductSchema = Joi.object({
 	subCategoryId: Joi.string().required(),
 	brand: Joi.string().required(),
 	name: Joi.string().required(),
-	price: Joi.number().required(),
-	imageCount: Joi.number().default(0).allow(null),
+	price: Joi.number().min(0).required(),
+	imageCount: Joi.number().min(0).default(0).allow(null),
 	colorGroup: Joi.string().allow(null),
 	color: colorSchema.allow(null)
-}).required()
+}).with('colorGroup', ['color']).required()
 
 export const updateProductSchema = Joi.object({
-	image: Joi.number().allow(null),
 	category: Joi.string().allow(null),
 	brand: Joi.string().allow(null),
 	name: Joi.string().allow(null),
-	price: Joi.number().allow(null),
-	imageCount: Joi.number().default(0).allow(null),
+	price: Joi.number().min(0).allow(null),
+	imageCount: Joi.number().min(0).default(0).allow(null),
 	colorGroup: Joi.string().allow(null),
 	color: colorSchema.allow(null)
-}).required()
+}).with('colorGroup', ['color']).required()
