@@ -17,7 +17,7 @@ export default () => describe('GET /product/:_id', () => {
 
 	it('correct', (done) => {
 		request(app)
-			.get(`/product/${JSON.parse(process.env.product)._id}`)
+			.get(`/add-product/${JSON.parse(process.env.product)._id}`)
 			.expect(200)
 			.end((error, response) => {
 				if (response.body.error) {

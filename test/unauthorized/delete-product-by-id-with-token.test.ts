@@ -6,7 +6,7 @@ import app from '../../src/app'
 export default () => describe('DELETE /product/:_id with token', () => {
 	it('correct', (done) => {
 		request(app)
-			.delete(`/product/${JSON.parse(process.env.product2)._id}`)
+			.delete(`/deduct-product/${JSON.parse(process.env.product2)._id}`)
 			.set({ Authorization: process.env.token })
 			.expect(200)
 			.end((error, response) => {
