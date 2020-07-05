@@ -41,3 +41,7 @@ export const resetPasswordSchema = Joi.object({
 	newPassword: Joi.string().min(4).required(),
 	activationCode: Joi.number().min(1000).max(9999).required()
 })
+
+export const setProductSchema = Joi.object({
+	quantity: Joi.number().min(0).required()
+})

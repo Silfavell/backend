@@ -48,7 +48,8 @@ import {
 	validateRegisterManagerRequest,
 	validateLoginRequest,
 	validateResetPasswordRequest,
-	validateGetProductsFilterWithCategoriesRequest
+	validateGetProductsFilterWithCategoriesRequest,
+	validateSetProductRequest
 } from '../validators/unauthorized-validator'
 
 import ActivationCodes from '../enums/activation-code-enum'
@@ -141,6 +142,7 @@ router.put('/add-product/:_id', (req, res, next) => {
 router.put('/set-product/:_id', (req, res, next) => {
 	// @ts-ignore
 	validateObjectId(req.params._id)
+		.then(() => validateSetProductRequest(req.body))
 		// @ts-ignore
 		.then(() => getSingleProduct(req.params._id, req.user))
 		// @ts-ignore

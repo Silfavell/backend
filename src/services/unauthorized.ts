@@ -419,33 +419,21 @@ export const setProductToCart = (product: any, cartObj: any, user: UserDocument,
 	new Promise((resolve) => {
 		// @ts-ignore
 		if (user?._id.toString()) {
-			if (cartObj && cartObj.cart) {
-				if (Object.keys(cartObj.cart).includes(product._id.toString())) {
-					Cart.findOneAndUpdate({ userId: user._id.toString() }, {
-						cart: {
-							...cartObj.cart,
-							[product._id.toString()]: Object.assign(product._doc, { quantity })
-						}
-					}).then(() => {
-						resolve(Object.assign(product._doc, { quantity }))
+			if (quantity === 0) {
+				Cart.findOne({ userId: user._id.toString() }).then((cartObj: any) => {
+					// eslint-disable-next-line no-param-reassign
+					delete cartObj.cart[product._id.toString()]
+					cartObj.update({ cart: cartObj.cart }).then(() => {
+						resolve(product)
 					})
-				} else {
-					Cart.findOneAndUpdate({ userId: user._id.toString() }, {
-						cart: {
-							...cartObj.cart,
-							[product._id.toString()]: Object.assign(product._doc, { quantity })
-						}
-					}).then(() => {
-						resolve(Object.assign(product._doc, { quantity }))
-					})
-				}
+				})
 			} else {
-				new Cart({
-					userId: user._id.toString(),
+				Cart.findOneAndUpdate({ userId: user._id.toString() }, {
 					cart: {
+						...cartObj.cart,
 						[product._id.toString()]: Object.assign(product._doc, { quantity })
 					}
-				}).save().then(() => {
+				}).then(() => {
 					resolve(Object.assign(product._doc, { quantity }))
 				})
 			}
