@@ -29,7 +29,8 @@ import {
 	getProductsLength,
 	getFilteredProducts,
 	getFilteredProductsWithCategories,
-	validateObjectId
+	validateObjectId,
+	setProductToCart
 } from '../services/unauthorized'
 
 import {
@@ -122,18 +123,33 @@ router.get('/products-length', (req, res, next) => {
 	})
 })
 
-router.get('/add-product/:_id', (req, res, next) => {
+router.put('/add-product/:_id', (req, res, next) => {
 	// @ts-ignore
 	validateObjectId(req.params._id)
 		// @ts-ignore
 		.then(() => getSingleProduct(req.params._id, req.user))
 		// @ts-ignore
-		.then(({ product, cart }) => addProductToCart(product, cart || null, req.user))
+		.then(({ product, cart }) => addProductToCart(product, cart || null, req.user, req.body.quantity))
 		.then((response) => {
 			res.json(response)
 		})
 		.catch((reason) => {
-			next((handleError(reason, 'GET /add-product/:_id')))
+			next((handleError(reason, 'PUT /add-product/:_id')))
+		})
+})
+
+router.put('/set-product/:_id', (req, res, next) => {
+	// @ts-ignore
+	validateObjectId(req.params._id)
+		// @ts-ignore
+		.then(() => getSingleProduct(req.params._id, req.user))
+		// @ts-ignore
+		.then(({ product, cart }) => setProductToCart(product, cart || null, req.user, req.body.quantity))
+		.then((response) => {
+			res.json(response)
+		})
+		.catch((reason) => {
+			next((handleError(reason, 'PUT /set-product/:_id')))
 		})
 })
 
@@ -150,18 +166,18 @@ router.get('/product/:_id', (req, res, next) => {
 		})
 })
 
-router.delete('/deduct-product/:_id', (req, res, next) => {
+router.put('/deduct-product/:_id', (req, res, next) => {
 	// @ts-ignore
 	validateObjectId(req.params._id)
 		// @ts-ignore
 		.then(() => getSingleProduct(req.params._id, req.user))
 		// @ts-ignore
-		.then(({ product, cart }) => takeOffProductFromCart(product, cart || null, req.user))
+		.then(({ product, cart }) => takeOffProductFromCart(product, cart || null, req.user, req.body.quantity))
 		.then((response: any) => {
 			res.json(response)
 		})
 		.catch((reason: any) => {
-			next((handleError(reason, 'DELETE /product/:_id')))
+			next((handleError(reason, 'PUT /deduct-product/:_id')))
 		})
 })
 

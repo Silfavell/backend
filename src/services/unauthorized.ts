@@ -356,7 +356,7 @@ export const getSingleProduct = (productId: string, user: UserDocument) => (
 )
 
 export const getProductAndWithColorGroup = (productId: string) => (
-	 Product.aggregate([
+	Product.aggregate([
 		{
 			$match: {
 				_id: mongoose.Types.ObjectId(productId)
@@ -373,7 +373,7 @@ export const getProductAndWithColorGroup = (productId: string) => (
 	])
 )
 
-export const addProductToCart = (product: any, cartObj: any, user: UserDocument) => (
+export const addProductToCart = (product: any, cartObj: any, user: UserDocument, quantity: number) => (
 	new Promise((resolve) => {
 		// @ts-ignore
 		if (user?._id.toString()) {
@@ -383,30 +383,30 @@ export const addProductToCart = (product: any, cartObj: any, user: UserDocument)
 						cart: {
 							...cartObj.cart,
 							[product._id.toString()]: Object.assign(product._doc, {
-								quantity: (cartObj.cart[product._id.toString()].quantity ?? 1) + 1
+								quantity: cartObj.cart[product._id.toString()].quantity + quantity
 							})
 						}
 					}).then(() => {
-						resolve(Object.assign(product._doc, { quantity: (cartObj.cart[product._id.toString()].quantity ?? 1) + 1 }))
+						resolve(Object.assign(product._doc, { quantity: cartObj.cart[product._id.toString()].quantity + quantity }))
 					})
 				} else {
 					Cart.findOneAndUpdate({ userId: user._id.toString() }, {
 						cart: {
 							...cartObj.cart,
-							[product._id.toString()]: Object.assign(product._doc, { quantity: 1 })
+							[product._id.toString()]: Object.assign(product._doc, { quantity })
 						}
 					}).then(() => {
-						resolve(Object.assign(product._doc, { quantity: 1 }))
+						resolve(Object.assign(product._doc, { quantity }))
 					})
 				}
 			} else {
 				new Cart({
 					userId: user._id.toString(),
 					cart: {
-						[product._id.toString()]: Object.assign(product._doc, { quantity: 1 })
+						[product._id.toString()]: Object.assign(product._doc, { quantity })
 					}
 				}).save().then(() => {
-					resolve(Object.assign(product._doc, { quantity: 1 }))
+					resolve(Object.assign(product._doc, { quantity }))
 				})
 			}
 		} else {
@@ -415,25 +415,65 @@ export const addProductToCart = (product: any, cartObj: any, user: UserDocument)
 	})
 )
 
-export const takeOffProductFromCart = (product: any, cartObj: any, user: UserDocument) => (
+export const setProductToCart = (product: any, cartObj: any, user: UserDocument, quantity: number) => (
+	new Promise((resolve) => {
+		// @ts-ignore
+		if (user?._id.toString()) {
+			if (cartObj && cartObj.cart) {
+				if (Object.keys(cartObj.cart).includes(product._id.toString())) {
+					Cart.findOneAndUpdate({ userId: user._id.toString() }, {
+						cart: {
+							...cartObj.cart,
+							[product._id.toString()]: Object.assign(product._doc, { quantity })
+						}
+					}).then(() => {
+						resolve(Object.assign(product._doc, { quantity }))
+					})
+				} else {
+					Cart.findOneAndUpdate({ userId: user._id.toString() }, {
+						cart: {
+							...cartObj.cart,
+							[product._id.toString()]: Object.assign(product._doc, { quantity })
+						}
+					}).then(() => {
+						resolve(Object.assign(product._doc, { quantity }))
+					})
+				}
+			} else {
+				new Cart({
+					userId: user._id.toString(),
+					cart: {
+						[product._id.toString()]: Object.assign(product._doc, { quantity })
+					}
+				}).save().then(() => {
+					resolve(Object.assign(product._doc, { quantity }))
+				})
+			}
+		} else {
+			resolve(product)
+		}
+	})
+)
+
+export const takeOffProductFromCart = (product: any, cartObj: any, user: UserDocument, quantity: number) => (
 	new Promise((resolve, reject) => {
 		if (user?._id.toString()) {
 			if (cartObj && cartObj.cart) {
 				if (Object.keys(cartObj.cart).includes(product._id.toString())) {
-					if (cartObj.cart[product._id.toString()].quantity > 1) {
-						Cart.findOneAndUpdate({ userId: user._id.toString() },
-							{
-								cart: Object.assign(
-									cartObj.cart,
-									{
-										[product._id.toString()]: Object.assign(product._doc, { quantity: (cartObj.cart[product._id.toString()].quantity) - 1 })
-									}
-								)
-							})
-							.then(() => {
-								resolve(Object.assign(product._doc, { quantity: (cartObj.cart[product._id.toString()].quantity) }))
-							})
-					} else if (cartObj.cart[product._id.toString()].quantity === 1) {
+					if (cartObj.cart[product._id.toString()].quantity > quantity) {
+						Cart.findOneAndUpdate({ userId: user._id.toString() }, {
+							cart: Object.assign(
+								cartObj.cart,
+								{
+									[product._id.toString()]: Object.assign(product._doc, {
+										quantity: cartObj.cart[product._id.toString()].quantity - quantity
+									})
+								}
+							)
+						}).then(() => {
+							resolve(Object.assign(product._doc, { quantity: cartObj.cart[product._id.toString()].quantity }))
+						})
+					} else {
 						// eslint-disable-next-line no-shadow
 						Cart.findOne({ userId: user._id.toString() }).then((cartObj2: any) => {
 							// eslint-disable-next-line no-param-reassign
@@ -444,8 +484,6 @@ export const takeOffProductFromCart = (product: any, cartObj: any, user: UserDoc
 								resolve(Object.assign(product._doc, { quantity: 0 }))
 							})
 						})
-					} else {
-						reject(new ServerError(ErrorMessages.NON_EXISTS_PRODUCT, HttpStatusCodes.BAD_REQUEST, ErrorMessages.NON_EXISTS_PRODUCT, false))
 					}
 				} else {
 					reject(new ServerError(ErrorMessages.NON_EXISTS_PRODUCT_IN_CART, HttpStatusCodes.BAD_REQUEST, ErrorMessages.NON_EXISTS_PRODUCT_IN_CART, false))
@@ -467,12 +505,6 @@ export const search = (name: string) => (
 			query: {
 				bool: {
 					must: [
-						// {
-						// 	geo_distance: {
-						// 		distance: '1km',
-						// 		'geometry.location': location
-						// 	}
-						// },
 						{
 							match_phrase_prefix: {
 								name
