@@ -23,6 +23,8 @@ class ErrorMessages {
 
     static UNKNOWN_ACTIVATION_CODE = 'Aktivasyon kodu bulunamadı'
 
+    static INVALID_PHONE_NUMBER = 'Geçersiz telefon numarası'
+
     static UNKNOWN_OBJECT_ID = 'UNKNOWN_OBJECT_ID'
 
 

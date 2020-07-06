@@ -8,6 +8,7 @@ import { Manager, Admin, User } from '../models'
 import { validatePhoneNumber } from '../validators/user-validator'
 
 import ServerError from '../errors/ServerError'
+import ErrorMessages from '../errors/ErrorMessages'
 
 export const validateAuthority = (authority: Authority) => (req: Request, res: Response, next: NextFunction) => {
 	if (authority === Authority.ANONIM) {
@@ -86,6 +87,6 @@ export const validatePhone = () => (req: Request, res: Response, next: NextFunct
 		}
 		next()
 	} else {
-		next(new ServerError('Phone number is invalid.', HttpStatusCodes.BAD_REQUEST, 'Phone number is invalid.', false))
+		next(new ServerError(ErrorMessages.INVALID_PHONE_NUMBER, HttpStatusCodes.BAD_REQUEST, ErrorMessages.INVALID_PHONE_NUMBER, false))
 	}
 }
