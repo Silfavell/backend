@@ -21,11 +21,15 @@ class ElasticSearch {
 	)
 
 	private static createIndex = () => (
-		ElasticSearch.client.indices.create({
-			index,
-			body: {
-				number_of_shards: 4,
-				number_of_replicas: 3
+		ElasticSearch.client.indices.exists({ index }).then((result) => {
+			if (!result.body) {
+				ElasticSearch.client.indices.create({
+					index,
+					body: {
+						number_of_shards: 4,
+						number_of_replicas: 3
+					}
+				})
 			}
 		})
 	)
@@ -75,13 +79,6 @@ class ElasticSearch {
 			body: {
 				doc: {
 					properties: {
-						// geometry: {
-						// 	properties: {
-						// 		location: {
-						// 			type: 'geo_point'
-						// 		}
-						// 	}
-						// },
 						name: {
 							type: 'text'
 						}
@@ -92,8 +89,7 @@ class ElasticSearch {
 	)
 
 	private static bootstrap = () => (
-		ElasticSearch.deleteIndex()
-			.then(ElasticSearch.createIndex)
+		ElasticSearch.createIndex()
 			.then(ElasticSearch.closeIndex)
 			.then(ElasticSearch.putSettings)
 			.then(ElasticSearch.putMapping)
