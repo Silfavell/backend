@@ -11,7 +11,8 @@ export type OrderDocument = Document & {
 	address: string,
 	date: Date,
 	products: ProductDocument[],
-	status: boolean
+	status: boolean,
+	paidPrice: number
 }
 
 const orderSchema = new Schema({
@@ -44,6 +45,10 @@ const orderSchema = new Schema({
 	status: {
 		type: Boolean,
 		default: null
+	},
+	paidPrice: {
+		type: Number,
+		required: 0
 	}
 }, {
 	timestamps: true

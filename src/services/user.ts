@@ -116,7 +116,9 @@ export const saveOrderToDatabase = (user: UserDocument, { cart }: any, address: 
 		customer: user.nameSurname,
 		phoneNumber: user.phoneNumber,
 		address: address.openAddress,
-		products: Object.values(cart)
+		products: Object.values(cart),
+		// @ts-ignore
+		paidPrice: Object.values(cart).reduce((previousValue: number, currentValue: any) => previousValue + parseFloat(currentValue.discountedPrice || currentValue.price) * currentValue.quantity, 0).toFixed(2)
 	}).save()
 )
 
