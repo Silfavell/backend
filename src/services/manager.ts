@@ -1,13 +1,13 @@
-import {
-	Order,
-	// eslint-disable-next-line no-unused-vars
-	OrderDocument
-} from '../models'
+import { Order } from '../models'
 
 export const getOrderById = (orderId: string) => (
 	Order.findById(orderId)
 )
 
-export const updateOrderStatus = (orderId: string, status: boolean) => (
-	Order.findByIdAndUpdate(orderId, { status }, { new: true })
-)
+export const updateOrderStatus = (orderId: string, status: boolean, result: string) => {
+	if (status) {
+		return Order.findByIdAndUpdate(orderId, { status, trackingNumber: result }, { new: true })
+	} else {
+		return Order.findByIdAndUpdate(orderId, { status, cancellationReason: result }, { new: true })
+	}
+}

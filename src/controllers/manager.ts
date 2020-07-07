@@ -32,7 +32,7 @@ router.get('/order/:_id', (req, res, next) => {
 
 router.put('/orders/cancel/:_id', (req, res, next) => {
 	validateCancelOrder(req.body)
-		.then(() => updateOrderStatus(req.params._id, false))
+		.then(() => updateOrderStatus(req.params._id, false, req.body.cancellationReason))
 		.then((order) => {
 			// sendSms(order.phoneNumber, `${order.date} Tarihinde verdiğiniz sipariş, ${req.body.cancellationReason} nedeniyle iptal edilmiştir. Ödemeniz en kısa sürece hesabına geri aktarılacaktır. Anlayışınız için teşekkürler.`)
 			res.json(order)
@@ -44,7 +44,7 @@ router.put('/orders/cancel/:_id', (req, res, next) => {
 
 router.put('/orders/confirm/:_id', (req, res, next) => {
 	validateConfirmOrder(req.body)
-		.then(() => updateOrderStatus(req.params._id, true))
+		.then(() => updateOrderStatus(req.params._id, true, req.body.trackingNumber))
 		.then((order) => {
 			// sendSms(order.phoneNumber, `${order.date} Tarihinde verdiğiniz sipariş, Yurtiçi Kargoya verilmiştir, Kargo takip numarası : ${req.body.trackingNumber}`)
 			res.json(order)

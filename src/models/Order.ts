@@ -12,6 +12,8 @@ export type OrderDocument = Document & {
 	date: Date,
 	products: ProductDocument[],
 	status: boolean,
+	trackingNumber: string,
+	cancellationReason: string,
 	paidPrice: number
 }
 
@@ -44,6 +46,14 @@ const orderSchema = new Schema({
 	},
 	status: {
 		type: Boolean,
+		default: null
+	},
+	trackingNumber: {
+		type: String,
+		default: null
+	},
+	cancellationReason: {
+		type: String,
 		default: null
 	},
 	paidPrice: {
