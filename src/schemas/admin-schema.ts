@@ -39,6 +39,7 @@ export const updateProductSchema = Joi.object({
 	brand: Joi.string().allow(null),
 	name: Joi.string().allow(null),
 	price: Joi.number().min(0).allow(null),
+	discountedPrice: Joi.number().min(0).allow(null),
 	imageCount: Joi.number().min(0).default(0).allow(null),
 	colorGroup: Joi.string().allow(null),
 	color: colorSchema.allow(null)
