@@ -30,7 +30,8 @@ import {
 	indexProduct,
 	saveSubCategoryToDatabase,
 	deleteSubCategoryFromDatabase,
-	updateCategoryOfProduct
+	updateCategoryOfProduct,
+	removeProductFromSearch
 } from '../services/admin'
 
 const router = Router()
@@ -158,6 +159,7 @@ router.post('/product', (req, res, next) => {
 router.put('/product/:_id', (req, res, next) => {
 	validateUpdateProduct(req.body)
 		.then(() => updateProduct(req.params._id, req.body))
+		.then((product: any) => indexProduct(product).then(() => product))
 		.then((product) => {
 			res.json(product)
 		})
@@ -168,11 +170,12 @@ router.put('/product/:_id', (req, res, next) => {
 
 router.delete('/product/:_id', (req, res, next) => {
 	deleteProductFromDatabase(req.params._id)
+		.then((product: any) => removeProductFromSearch(product))
 		.then(() => {
 			res.json()
 		})
 		.catch((reason) => {
-			next(handleError(reason, 'PUT /admin/product/:_id'))
+			next(handleError(reason, 'DELETE /admin/product/:_id'))
 		})
 })
 

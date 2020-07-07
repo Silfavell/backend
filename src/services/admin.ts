@@ -85,8 +85,18 @@ export const indexProduct = (product: ProductDocument) => (
 		.index({
 			index: 'doc',
 			type: 'doc',
+			id: product._id,
 			// refresh: true,
 			body: replaceProductId(product)
+		})
+)
+
+export const removeProductFromSearch = (product: ProductDocument) => (
+	Elasticsearch.getClient
+		.delete({
+			index: 'doc',
+			type: 'doc',
+			id: product._id
 		})
 )
 
