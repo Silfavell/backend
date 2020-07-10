@@ -20,7 +20,7 @@ class Mongo {
 
 		mongoose.connection.on('error', (error) => {
 			winston.loggers.get('error-logger').error('Database: Error', error)
-			process.exit(1)
+			process.exit(3)
 		})
 
 		mongoose.Promise = global.Promise
