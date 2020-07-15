@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import path from 'path'
+import fileUpload from 'express-fileupload'
 
 import {
 	Manager,
@@ -31,12 +32,16 @@ import {
 	saveSubCategoryToDatabase,
 	deleteSubCategoryFromDatabase,
 	updateCategoryOfProduct,
+	saveProductImages,
 	removeProductFromSearch
 } from '../services/admin'
 
 const router = Router()
 
-router.use(validateAuthority(Authority.ADMIN))
+router.use(fileUpload({
+	createParentPath: true
+}))
+router.use(validateAuthority(Authority.ANONIM))
 
 router.get('/log', (req, res) => {
 	const file = path.join(__dirname, `../../logs/info/${new Date().toLocaleDateString('tr', { day: '2-digit', month: '2-digit', year: 'numeric' })}.log`)
@@ -144,11 +149,14 @@ router.put('/category/:_id', (req, res, next) => {
 })
 
 router.post('/product', (req, res, next) => {
+	req.body.imageCount = Object.keys(req.files).length
+
 	validatePostProduct(req.body)
 		.then(() => saveProductToDatabase(req.body))
 		.then((product) => updateCategoryOfProduct(product))
-		.then((product: any) => indexProduct(product).then(() => product))
+		.then((product) => indexProduct(product).then(() => product))
 		.then((product) => {
+			saveProductImages(product, Object.values(req.files))
 			res.json(product)
 		})
 		.catch((reason) => {

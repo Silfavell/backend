@@ -1,3 +1,4 @@
+import fs from 'fs'
 import { Elasticsearch } from '../startup'
 
 // eslint-disable-next-line no-unused-vars
@@ -53,8 +54,8 @@ export const updateCategory = (categoryId: string, categoryContext: CategoryDocu
 )
 
 
-export const saveProductToDatabase = (productContext: ProductDocument) => (
-	new Product(productContext).save()
+export const saveProductToDatabase = (productBody: any) => (
+	new Product(productBody).save()
 )
 
 export const updateCategoryOfProduct = (product: any) => (
@@ -79,6 +80,14 @@ export const updateCategoryOfProduct = (product: any) => (
 		return category.save().then(() => product)
 	})
 )
+
+export const saveProductImages = (product: ProductDocument, images: any[]) => {
+	images.map((image, index) => {
+		fs.writeFile(`./public/assets/products/${product.image}-${index}.webp`, image.data, 'binary', (err) => {
+			if (err) throw err
+		})
+	})
+}
 
 export const indexProduct = (product: ProductDocument) => (
 	Elasticsearch.getClient
