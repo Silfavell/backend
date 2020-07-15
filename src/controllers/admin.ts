@@ -149,14 +149,20 @@ router.put('/category/:_id', (req, res, next) => {
 })
 
 router.post('/product', (req, res, next) => {
-	req.body.imageCount = Object.keys(req.files).length
+
+	if (req.files) {
+		req.body.imageCount = Object.keys(req.files).length
+	}
+	req.body.color = JSON.parse(req.body.color)
 
 	validatePostProduct(req.body)
 		.then(() => saveProductToDatabase(req.body))
 		.then((product) => updateCategoryOfProduct(product))
 		.then((product) => indexProduct(product).then(() => product))
 		.then((product) => {
-			saveProductImages(product, Object.values(req.files))
+			if (req.files) {
+				saveProductImages(product, Object.values(req.files))
+			}
 			res.json(product)
 		})
 		.catch((reason) => {
