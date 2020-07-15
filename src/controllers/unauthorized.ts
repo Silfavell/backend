@@ -59,17 +59,6 @@ const router = Router()
 router.use(validateAuthority(Authority.ANONIM))
 router.use(validatePhone())
 
-router.get('/banners', (req, res, next) => {
-	// eslint-disable-next-line security/detect-non-literal-fs-filename
-	fs.readdir(path.join(__dirname, '../../public/assets/banners'), (reason, files) => {
-		if (reason) {
-			next(handleError(reason, 'GET /banners'))
-		} else {
-			res.json(files.length)
-		}
-	})
-})
-
 router.get('/categories', (req, res, next) => {
 	getCategories().then((categories) => {
 		res.json(categories)

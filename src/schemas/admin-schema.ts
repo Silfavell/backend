@@ -36,7 +36,8 @@ export const saveProductSchema = Joi.object({
 }).with('colorGroup', ['color']).required()
 
 export const updateProductSchema = Joi.object({
-	category: Joi.string().allow(null),
+	categoryId: Joi.string().allow(null),
+	subCategoryId: Joi.string().required(),
 	brand: Joi.string().allow(null),
 	name: Joi.string().allow(null),
 	price: Joi.number().min(0).allow(null),

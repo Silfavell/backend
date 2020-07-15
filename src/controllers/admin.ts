@@ -173,10 +173,22 @@ router.post('/product', (req, res, next) => {
 })
 
 router.put('/product/:_id', (req, res, next) => {
+	if (req.files) {
+		req.body.imageCount = Object.keys(req.files).length
+	}
+
+	if (req.body.color) {
+		req.body.color = JSON.parse(req.body.color)
+	}
+
 	validateUpdateProduct(req.body)
 		.then(() => updateProduct(req.params._id, req.body))
 		.then((product: any) => indexProduct(product).then(() => product))
 		.then((product) => {
+			if (req.files) {
+				saveProductImages(product, Object.values(req.files))
+			}
+
 			res.json(product)
 		})
 		.catch((reason) => {
