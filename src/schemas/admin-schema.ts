@@ -29,6 +29,7 @@ export const saveProductSchema = Joi.object({
 	brand: Joi.string().required(),
 	name: Joi.string().required(),
 	price: Joi.number().min(0).required(),
+	discountedPrice: Joi.number().min(0).allow(null),
 	imageCount: Joi.number().min(0).default(0).allow(null),
 	colorGroup: Joi.string().allow(null),
 	color: colorSchema.allow(null)
