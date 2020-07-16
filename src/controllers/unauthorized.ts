@@ -30,7 +30,8 @@ import {
 	getFilteredProducts,
 	getFilteredProductsWithCategories,
 	validateObjectId,
-	setProductToCart
+	setProductToCart,
+	saveTicket
 } from '../services/unauthorized'
 
 import {
@@ -48,6 +49,7 @@ import {
 	validateRegisterManagerRequest,
 	validateLoginRequest,
 	validateResetPasswordRequest,
+	validatePostTicketRequest,
 	validateGetProductsFilterWithCategoriesRequest,
 	validateSetProductRequest
 } from '../validators/unauthorized-validator'
@@ -265,6 +267,16 @@ router.put('/reset-password', (req, res, next) => {
 		})
 		.catch((reason) => {
 			next(handleError(reason, 'PUT /reset-password'))
+		})
+})
+
+router.post('/ticket', (req, res, next) => {
+	validatePostTicketRequest(req.body)
+		.then(() => saveTicket(req.body))
+		.then((ticket) => {
+			res.json(ticket)
+		}).catch((reason) => {
+			next(handleError(reason, 'POST /ticket'))
 		})
 })
 

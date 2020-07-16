@@ -5,7 +5,8 @@ import {
 	registerManagerSchema,
 	loginSchema,
 	resetPasswordSchema,
-	setProductSchema
+	setProductSchema,
+	postTicketSchema
 } from '../schemas/unauthorized-schema'
 
 export const validateGetProductsFilterWithCategoriesRequest = (body: any) => productsFilterWithCategoriesSchema.validateAsync(body)
@@ -21,3 +22,5 @@ export const validateLoginRequest = (body: any) => loginSchema.validateAsync(bod
 export const validateResetPasswordRequest = (body: any) => resetPasswordSchema.validateAsync(body)
 
 export const validateSetProductRequest = (body: any) => setProductSchema.validateAsync(body)
+
+export const validatePostTicketRequest = (body: any) => postTicketSchema.validateAsync(body)

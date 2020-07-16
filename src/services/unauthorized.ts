@@ -19,7 +19,8 @@ import {
 	// eslint-disable-next-line no-unused-vars
 	CategoryDocument,
 	Category,
-	Product
+	Product,
+	Ticket
 } from '../models'
 import ErrorMessages from '../errors/ErrorMessages'
 import ActivationCodes from '../enums/activation-code-enum'
@@ -631,6 +632,10 @@ export const changePassword = (user: UserDocument, newPassword: string) => {
 		})
 	))
 }
+
+export const saveTicket = (body: any) => (
+	new Ticket(body).save()
+)
 
 export const handleError = (error: any, path: string): Error => {
 	if (error.httpCode) {
