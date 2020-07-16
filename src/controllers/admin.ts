@@ -41,7 +41,7 @@ const router = Router()
 router.use(fileUpload({
 	createParentPath: true
 }))
-router.use(validateAuthority(Authority.ANONIM))
+router.use(validateAuthority(Authority.ADMIN))
 
 router.get('/log', (req, res) => {
 	const file = path.join(__dirname, `../../logs/info/${new Date().toLocaleDateString('tr', { day: '2-digit', month: '2-digit', year: 'numeric' })}.log`)
