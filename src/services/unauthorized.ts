@@ -369,6 +369,41 @@ export const getProductAndWithColorGroup = (productId: string) => (
 				foreignField: 'colorGroup',
 				as: 'group'
 			}
+		},
+		{
+			$unwind: '$group'
+		},
+		{
+			$match: {
+				'group.color': {
+					$ne: null
+				}
+			}
+		},
+		{
+			$group: {
+				_id: '$_id',
+				root: { $first: '$$ROOT' },
+				group: {
+					$push: '$group'
+				}
+			}
+		},
+		{
+			$addFields: {
+				'root.group': '$group'
+			}
+		},
+		{
+			$replaceRoot: {
+				newRoot: {
+					$mergeObjects: [
+						{
+							group: '$groups'
+						}, '$root'
+					]
+				}
+			}
 		}
 	])
 )
