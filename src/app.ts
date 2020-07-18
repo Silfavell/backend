@@ -20,7 +20,7 @@ middlewares(app)
 Mongo.connect(process.env.DB_HOST)
 Elasticsearch.connect(process.env.ES_HOST)
 
-app.use('/', controller)
+app.use('/api/', controller)
 app.use(errorHandlerMiddleware)
 
 export default app
