@@ -127,8 +127,8 @@ router.post('/sub-category', (req, res, next) => {
 })
 
 router.delete('/sub-category', (req, res, next) => {
-	validateDeleteSubCategory(req.body)
-		.then(() => deleteSubCategoryFromDatabase(req.body))
+	validateDeleteSubCategory(req.query)
+		.then(() => deleteSubCategoryFromDatabase(req.query))
 		.then((category: any) => {
 			res.json(category)
 		})
