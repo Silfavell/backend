@@ -3,6 +3,7 @@ import {
 	updateProductSchema,
 	categorySchema,
 	saveSubCategorySchema,
+	updateSubCategorySchema,
 	deleteSubCategorySchema,
 } from '../schemas/admin-schema'
 
@@ -13,6 +14,8 @@ export const validatePostSubCategory = (body: any) => saveSubCategorySchema.vali
 export const validateDeleteSubCategory = (body: any) => deleteSubCategorySchema.validateAsync(body)
 
 export const validateUpdateCategory = (category: any) => categorySchema.validateAsync(category)
+
+export const validateUpdateSubCategory = (subCategory: any) => updateSubCategorySchema.validateAsync(subCategory)
 
 export const validatePostProduct = (product: any) => saveProductSchema.validateAsync(product)
 

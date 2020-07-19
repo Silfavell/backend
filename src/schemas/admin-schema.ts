@@ -13,6 +13,12 @@ export const saveSubCategorySchema = Joi.object({
 	name: Joi.string().required()
 }).required()
 
+export const updateSubCategorySchema = Joi.object({
+	parentCategoryId: Joi.string().required(),
+	subCategoryId: Joi.string().required(),
+	name: Joi.string().required()
+}).required()
+
 export const deleteSubCategorySchema = Joi.object({
 	parentCategoryId: Joi.string().required(),
 	_id: Joi.string().required()

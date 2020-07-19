@@ -53,6 +53,13 @@ export const updateCategory = (categoryId: string, categoryContext: CategoryDocu
 	Category.findByIdAndUpdate(categoryId, categoryContext)
 )
 
+export const updateSubCategory = (body: any) => ( // is category exists ? isSubCategoryExists ? test. // TODO
+	Category.findById(body.parentCategoryId).then((parentCategory) => {
+		const subCategory = parentCategory.subCategories.find((subCategory) => subCategory._id.toString() === body.subCategoryId)
+		subCategory.name = body.name
+		return parentCategory.save()
+	})
+)
 
 export const saveProductToDatabase = (productBody: any) => (
 	new Product(productBody).save()

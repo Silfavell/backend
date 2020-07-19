@@ -16,6 +16,7 @@ import {
 	validateUpdateProduct,
 	validatePostCategory,
 	validateUpdateCategory,
+	validateUpdateSubCategory,
 	validatePostSubCategory,
 	validateDeleteSubCategory
 } from '../validators/admin-validator'
@@ -25,6 +26,7 @@ import {
 	updateProduct,
 	deleteProductFromDatabase,
 	updateCategory,
+	updateSubCategory,
 	saveCategoryToDatabase,
 	deleteCategoryFromDatabase,
 	verifyManager,
@@ -145,6 +147,17 @@ router.put('/category/:_id', (req, res, next) => {
 		})
 		.catch((reason) => {
 			next(handleError(reason, 'PUT /admin/category/:_id'))
+		})
+})
+
+router.put('/sub-category', (req, res, next) => {
+	validateUpdateSubCategory(req.body)
+		.then(() => updateSubCategory(req.body))
+		.then((category) => {
+			res.json(category)
+		})
+		.catch((reason) => {
+			next(handleError(reason, 'PUT /admin/sub-category'))
 		})
 })
 
