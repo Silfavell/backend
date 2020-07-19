@@ -376,9 +376,18 @@ export const getProductAndWithColorGroup = (productId: string) => (
 		},
 		{
 			$match: {
-				'group.color': {
-					$ne: null
-				}
+				$or: [
+					{
+						'group.color': {
+							$ne: null
+						}
+					},
+					{
+						'group._id': { // TODO test
+							$eq: mongoose.Types.ObjectId(productId)
+						}
+					}
+				]
 			}
 		},
 		{
