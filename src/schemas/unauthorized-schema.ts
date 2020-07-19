@@ -45,3 +45,11 @@ export const resetPasswordSchema = Joi.object({
 export const setProductSchema = Joi.object({
 	quantity: Joi.number().min(0).required()
 })
+
+export const postTicketSchema = Joi.object({
+	name: Joi.string().required(),
+	surname: Joi.string().required(),
+	email: Joi.string().required(),
+	subject: Joi.string().required(),
+	message: Joi.string().required()
+})

@@ -16,6 +16,7 @@ import {
 	validateUpdateProduct,
 	validatePostCategory,
 	validateUpdateCategory,
+	validateUpdateSubCategory,
 	validatePostSubCategory,
 	validateDeleteSubCategory
 } from '../validators/admin-validator'
@@ -25,6 +26,7 @@ import {
 	updateProduct,
 	deleteProductFromDatabase,
 	updateCategory,
+	updateSubCategory,
 	saveCategoryToDatabase,
 	deleteCategoryFromDatabase,
 	verifyManager,
@@ -41,7 +43,7 @@ const router = Router()
 router.use(fileUpload({
 	createParentPath: true
 }))
-router.use(validateAuthority(Authority.ANONIM))
+router.use(validateAuthority(Authority.ADMIN))
 
 router.get('/log', (req, res) => {
 	const file = path.join(__dirname, `../../logs/info/${new Date().toLocaleDateString('tr', { day: '2-digit', month: '2-digit', year: 'numeric' })}.log`)
@@ -127,8 +129,8 @@ router.post('/sub-category', (req, res, next) => {
 })
 
 router.delete('/sub-category', (req, res, next) => {
-	validateDeleteSubCategory(req.body)
-		.then(() => deleteSubCategoryFromDatabase(req.body))
+	validateDeleteSubCategory(req.query)
+		.then(() => deleteSubCategoryFromDatabase(req.query))
 		.then((category: any) => {
 			res.json(category)
 		})
@@ -148,12 +150,25 @@ router.put('/category/:_id', (req, res, next) => {
 		})
 })
 
-router.post('/product', (req, res, next) => {
+router.put('/sub-category', (req, res, next) => {
+	validateUpdateSubCategory(req.body)
+		.then(() => updateSubCategory(req.body))
+		.then((category) => {
+			res.json(category)
+		})
+		.catch((reason) => {
+			next(handleError(reason, 'PUT /admin/sub-category'))
+		})
+})
 
+router.post('/product', (req, res, next) => {
 	if (req.files) {
 		req.body.imageCount = Object.keys(req.files).length
 	}
-	req.body.color = JSON.parse(req.body.color)
+
+	if (req.body.color) {
+		req.body.color = JSON.parse(req.body.color)
+	}
 
 	validatePostProduct(req.body)
 		.then(() => saveProductToDatabase(req.body))
@@ -171,10 +186,22 @@ router.post('/product', (req, res, next) => {
 })
 
 router.put('/product/:_id', (req, res, next) => {
+	if (req.files) {
+		req.body.imageCount = Object.keys(req.files).length
+	}
+
+	if (req.body.color) {
+		req.body.color = JSON.parse(req.body.color)
+	}
+
 	validateUpdateProduct(req.body)
 		.then(() => updateProduct(req.params._id, req.body))
 		.then((product: any) => indexProduct(product).then(() => product))
 		.then((product) => {
+			if (req.files) {
+				saveProductImages(product, Object.values(req.files))
+			}
+
 			res.json(product)
 		})
 		.catch((reason) => {

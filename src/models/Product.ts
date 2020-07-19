@@ -6,6 +6,7 @@ export type ProductDocument = Document & {
 	subCategoryId: string,
 	brand: string,
 	name: string,
+	details: string,
 	price: number,
 	discountedPrice: number,
 	image: number,
@@ -31,6 +32,10 @@ const productSchema = new Schema({
 		required: true
 	},
 	name: {
+		type: String,
+		required: true
+	},
+	details: {
 		type: String,
 		required: true
 	},

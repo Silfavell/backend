@@ -13,6 +13,12 @@ export const saveSubCategorySchema = Joi.object({
 	name: Joi.string().required()
 }).required()
 
+export const updateSubCategorySchema = Joi.object({
+	parentCategoryId: Joi.string().required(),
+	subCategoryId: Joi.string().required(),
+	name: Joi.string().required()
+}).required()
+
 export const deleteSubCategorySchema = Joi.object({
 	parentCategoryId: Joi.string().required(),
 	_id: Joi.string().required()
@@ -28,6 +34,7 @@ export const saveProductSchema = Joi.object({
 	subCategoryId: Joi.string().required(),
 	brand: Joi.string().required(),
 	name: Joi.string().required(),
+	details: Joi.string().allow(null, ''),
 	price: Joi.number().min(0).required(),
 	discountedPrice: Joi.number().min(0).allow(null),
 	imageCount: Joi.number().min(0).default(0).allow(null),
@@ -36,9 +43,11 @@ export const saveProductSchema = Joi.object({
 }).with('colorGroup', ['color']).required()
 
 export const updateProductSchema = Joi.object({
-	category: Joi.string().allow(null),
+	categoryId: Joi.string().allow(null),
+	subCategoryId: Joi.string().allow(null),
 	brand: Joi.string().allow(null),
 	name: Joi.string().allow(null),
+	details: Joi.string().allow(null, ''),
 	price: Joi.number().min(0).allow(null),
 	discountedPrice: Joi.number().min(0).allow(null),
 	imageCount: Joi.number().min(0).default(0).allow(null),

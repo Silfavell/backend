@@ -19,7 +19,8 @@ import {
 	// eslint-disable-next-line no-unused-vars
 	CategoryDocument,
 	Category,
-	Product
+	Product,
+	Ticket
 } from '../models'
 import ErrorMessages from '../errors/ErrorMessages'
 import ActivationCodes from '../enums/activation-code-enum'
@@ -369,6 +370,50 @@ export const getProductAndWithColorGroup = (productId: string) => (
 				foreignField: 'colorGroup',
 				as: 'group'
 			}
+		},
+		{
+			$unwind: '$group'
+		},
+		{
+			$match: {
+				$or: [
+					{
+						'group.color': {
+							$ne: null
+						}
+					},
+					{
+						'group._id': { // TODO test
+							$eq: mongoose.Types.ObjectId(productId)
+						}
+					}
+				]
+			}
+		},
+		{
+			$group: {
+				_id: '$_id',
+				root: { $first: '$$ROOT' },
+				group: {
+					$push: '$group'
+				}
+			}
+		},
+		{
+			$addFields: {
+				'root.group': '$group'
+			}
+		},
+		{
+			$replaceRoot: {
+				newRoot: {
+					$mergeObjects: [
+						{
+							group: '$groups'
+						}, '$root'
+					]
+				}
+			}
 		}
 	])
 )
@@ -596,6 +641,10 @@ export const changePassword = (user: UserDocument, newPassword: string) => {
 		})
 	))
 }
+
+export const saveTicket = (body: any) => (
+	new Ticket(body).save()
+)
 
 export const handleError = (error: any, path: string): Error => {
 	if (error.httpCode) {
