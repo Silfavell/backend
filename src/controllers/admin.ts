@@ -45,6 +45,10 @@ router.use(fileUpload({
 }))
 router.use(validateAuthority(Authority.ADMIN))
 
+router.get('/test', (req, res) => {
+	res.json({ status: true })
+})
+
 router.get('/log', (req, res) => {
 	const file = path.join(__dirname, `../../logs/info/${new Date().toLocaleDateString('tr', { day: '2-digit', month: '2-digit', year: 'numeric' })}.log`)
 	res.download(file)
