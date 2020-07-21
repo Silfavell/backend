@@ -1,7 +1,6 @@
 import { Router } from 'express'
 import HttpStatusCodes from 'http-status-codes'
-import fs from 'fs'
-import path from 'path'
+import rateLimit from 'express-rate-limit'
 
 import Authority from '../enums/authority-enum'
 
@@ -55,6 +54,11 @@ import {
 } from '../validators/unauthorized-validator'
 
 import ActivationCodes from '../enums/activation-code-enum'
+
+const apiLimiter = rateLimit({
+	windowMs: 6 * 60 * 60 * 1000, // 6 Hours
+	max: 5
+})
 
 const router = Router()
 
@@ -228,7 +232,7 @@ router.post('/register-manager', (req, res, next) => {
 		})
 })
 
-router.post('/login-manager', (req, res, next) => {
+router.post('/login-manager', apiLimiter, (req: any, res: any, next: any) => {
 	validateLoginRequest(req.body)
 		.then(() => isManagerExists(req.body.phoneNumber))
 		.then((manager) => login(manager, req.body.password))
