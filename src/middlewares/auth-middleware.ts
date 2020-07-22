@@ -13,15 +13,19 @@ import ErrorMessages from '../errors/ErrorMessages'
 export const validateAuthority = (authority: Authority) => (req: Request, res: Response, next: NextFunction) => {
 	if (authority === Authority.ANONIM) {
 		if (req.headers.authorization) {
-			const decoded: any = jwt.verify(req.headers.authorization, process.env.SECRET)
+			try {
+				const decoded: any = jwt.verify(req.headers.authorization, process.env.SECRET)
 
-			if (decoded?.payload?.phoneNumber) {
-				User.findOne({ phoneNumber: decoded.payload.phoneNumber }).then((user) => {
-					// @ts-ignore
-					req.user = user
-					next()
-				})
-			} else {
+				if (decoded?.payload?.phoneNumber) {
+					User.findOne({ phoneNumber: decoded.payload.phoneNumber }).then((user) => {
+						// @ts-ignore
+						req.user = user
+						next()
+					})
+				} else {
+					res.status(HttpStatusCodes.UNAUTHORIZED).end('Unauthorized')
+				}
+			} catch (error) {
 				res.status(HttpStatusCodes.UNAUTHORIZED).end('Unauthorized')
 			}
 		} else {
