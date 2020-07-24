@@ -120,7 +120,9 @@ router.put('/verify-manager/:_id', (req, res, next) => {
 
 router.post('/category', (req, res, next) => {
 	validatePostCategory(req.body)
-		.then(() => saveCategoryToDatabase(req.body))
+		.then(() => getSeoUrl(req.body.name))
+		.then((slug) => isCategorySlugExists(slug))
+		.then((slug) => saveCategoryToDatabase({ ...req.body, slug }))
 		.then((category) => {
 			res.json(category)
 		})
