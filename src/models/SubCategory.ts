@@ -15,8 +15,7 @@ const subCategorySchema = new Schema({
 	},
 	slug: {
 		type: String,
-		required: true,
-		unique: true
+		required: true
 	},
 	brands: [Brand.schema]
 })
