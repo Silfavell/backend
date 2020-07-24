@@ -76,11 +76,11 @@ router.get('/error-log', (req, res) => {
 		res.download(file)
 	} else {
 		const date = new Date()
-		const year = date.getFullYear().toString().substr(-2)
+		const year = date.getFullYear().toString()
 		const month = ('0' + (date.getMonth() + 1)).slice(-2)
 		const day = ('0' + date.getDate()).slice(-2)
 
-		const file = path.join(__dirname, `../../logs/error/${day}-${month}-${year}.log`)
+		const file = path.join(__dirname, `../../logs/error/${year}-${month}-${day}.log`)
 		res.download(file)
 	}
 })
