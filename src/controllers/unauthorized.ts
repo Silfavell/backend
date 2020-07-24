@@ -82,8 +82,8 @@ router.get('/products-with-categories', (req, res, next) => {
 })
 
 // FOR WEB
-router.get('/products-filter', (req, res, next) => {
-	getFilteredProducts(req.query).then((products) => {
+router.get('/products-filter/:category?/:subCategory?', (req, res, next) => {
+	getFilteredProducts(req.query, req.params).then((products) => {
 		res.json(products)
 	}).catch((reason) => {
 		next(handleError(reason, 'GET /products-filter'))
@@ -150,16 +150,14 @@ router.put('/set-product/:_id', (req, res, next) => {
 		})
 })
 
-router.get('/product/:_id', (req, res, next) => {
+router.get('/product/:slug', (req, res, next) => {
 	// @ts-ignore
-	validateObjectId(req.params._id)
-		// @ts-ignore
-		.then(() => getProductAndWithColorGroup(req.params._id, req.user))
+	getProductAndWithColorGroup(req.params.slug, req.user)
 		.then((response) => {
 			res.json(response[0])
 		})
 		.catch((reason) => {
-			next((handleError(reason, 'GET /product/:_id')))
+			next((handleError(reason, 'GET /product/:slug')))
 		})
 })
 

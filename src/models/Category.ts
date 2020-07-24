@@ -7,6 +7,7 @@ import Brand, { BrandDocument } from './Brand'
 
 export type CategoryDocument = Document & {
 	name: string,
+	slug: string,
 	subCategories: [SubCategoryDocument],
 	brands: [BrandDocument],
 	imagePath: number
@@ -18,12 +19,18 @@ const categorySchema = new Schema({
 		required: true,
 		unique: true
 	},
+	slug: {
+		type: String,
+		required: true,
+		unique: true
+	},
 	subCategories: [SubCategory.schema],
 	brands: [Brand.schema],
 	imagePath: {
 		type: Number,
 		default: 0,
-		required: true
+		required: true,
+		unique: true
 	}
 })
 

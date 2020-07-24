@@ -1,5 +1,6 @@
 import fs from 'fs'
 import { Elasticsearch } from '../startup'
+import HttpStatusCodes from 'http-status-codes'
 
 // eslint-disable-next-line no-unused-vars
 import {
@@ -12,10 +13,25 @@ import {
 	CategoryDocument
 } from '../models'
 import Brand from '../models/Brand'
+import ServerError from '../errors/ServerError'
+import ErrorMessages from '../errors/ErrorMessages'
 
 const replaceProductId = (product: ProductDocument) => (
 	JSON.parse(JSON.stringify(product).split('"_id":').join('"id":')) // TODO ??
 )
+
+export const getSeoUrl = (name: string) => {
+	return name.toString()               // Convert to string
+		.normalize('NFD')                // Change diacritics
+		.replace(/[\u0300-\u036f]/g, '') // Remove illegal characters
+		.replace(/\s+/g, '-')            // Change whitespace to dashes
+		.toLowerCase()                   // Change to lowercase
+		.replace(/&/g, '-and-')          // Replace ampersand
+		.replace(/[^a-z0-9\-]/g, '')     // Remove anything that is not a letter, number or dash
+		.replace(/-+/g, '-')             // Remove duplicate dashes
+		.replace(/^-*/, '')              // Remove starting dashes
+		.replace(/-*$/, '');             // Remove trailing dashes
+}
 
 export const verifyManager = (managerId: string) => (
 	Manager.findByIdAndUpdate(managerId, { verified: true }, { new: true })
@@ -29,7 +45,8 @@ export const saveSubCategoryToDatabase = (body: any) => (
 	Category.findByIdAndUpdate(body.parentCategoryId, {
 		$push: {
 			subCategories: {
-				name: body.name
+				name: body.name,
+				slug: body.slug
 			}
 		}
 	}, { new: true })
@@ -53,11 +70,44 @@ export const updateCategory = (categoryId: string, categoryContext: CategoryDocu
 	Category.findByIdAndUpdate(categoryId, categoryContext)
 )
 
-export const updateSubCategory = (body: any) => ( // is category exists ? isSubCategoryExists ? test. // TODO
+export const isSubCategorySlugExists = (body: any, slug: string) => ( // is category exists ? isSubCategoryExists ? test. // TODO
+	Category.findById(body.parentCategoryId).then((parentCategory) => {
+		const subCategory = parentCategory.subCategories.find((subCategory) => subCategory.slug === slug)
+
+		if (subCategory) {
+			throw new ServerError(ErrorMessages.ANOTHER_SUB_CATEGORY_WITH_THE_SAME_NAME, HttpStatusCodes.BAD_REQUEST, ErrorMessages.ANOTHER_SUB_CATEGORY_WITH_THE_SAME_NAME, false)
+		}
+
+		return slug;
+	})
+)
+
+export const updateSubCategory = (body: any, slug: string) => ( // is category exists ? isSubCategoryExists ? test. // TODO
 	Category.findById(body.parentCategoryId).then((parentCategory) => {
 		const subCategory = parentCategory.subCategories.find((subCategory) => subCategory._id.toString() === body.subCategoryId)
 		subCategory.name = body.name
+		subCategory.slug = slug
 		return parentCategory.save()
+	})
+)
+
+export const isProductSlugExists = (slug: string) => (
+	Product.findOne({ slug }).then((product) => {
+		if (product) {
+			throw new ServerError(ErrorMessages.ANOTHER_PRODUCT_WITH_THE_SAME_NAME, HttpStatusCodes.BAD_REQUEST, ErrorMessages.ANOTHER_PRODUCT_WITH_THE_SAME_NAME, false)
+		}
+
+		return slug;
+	})
+)
+
+export const isCategorySlugExists = (slug: string) => (
+	Category.findOne({ slug }).then((category) => {
+		if (category) {
+			throw new ServerError(ErrorMessages.ANOTHER_CATEGORY_WITH_THE_SAME_NAME, HttpStatusCodes.BAD_REQUEST, ErrorMessages.ANOTHER_CATEGORY_WITH_THE_SAME_NAME, false)
+		}
+
+		return slug;
 	})
 )
 

@@ -6,6 +6,7 @@ export type ProductDocument = Document & {
 	subCategoryId: string,
 	brand: string,
 	name: string,
+	slug: string,
 	details: string,
 	price: number,
 	discountedPrice: number,
@@ -35,9 +36,13 @@ const productSchema = new Schema({
 		type: String,
 		required: true
 	},
-	details: {
+	slug: {
 		type: String,
-		required: true
+		required: true,
+		unique: true
+	},
+	details: {
+		type: String
 	},
 	price: {
 		type: Number,
@@ -51,7 +56,8 @@ const productSchema = new Schema({
 	image: {
 		type: Number,
 		default: 0,
-		required: true
+		required: true,
+		unique: true
 	},
 	imageCount: {
 		type: Number,

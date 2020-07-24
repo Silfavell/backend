@@ -27,6 +27,12 @@ class ErrorMessages {
 
     static UNKNOWN_OBJECT_ID = 'UNKNOWN_OBJECT_ID'
 
+    static ANOTHER_PRODUCT_WITH_THE_SAME_NAME = 'Aynı isimde başka bir ürün var! Lütfen tekil bir isim kullanınız.'
+
+    static ANOTHER_CATEGORY_WITH_THE_SAME_NAME = 'Aynı isimde başka bir kategori var! Lütfen tekil bir isim kullanınız.'
+
+    static ANOTHER_SUB_CATEGORY_WITH_THE_SAME_NAME = 'Aynı isimde başka bir alt kategori var! Lütfen tekil bir isim kullanınız.'
+
 
     static MANAGER_ALREADY_EXISTS = 'Telefon numarasına ait yönetici var'
 

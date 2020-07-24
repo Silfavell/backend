@@ -240,8 +240,150 @@ export const getFilteredProductsWithCategories = (query: any) => {
 	])
 }
 
-export const getFilteredProducts = (query: any) => {
+export const getFilteredProducts = (query: any, params: any) => {
 	const stages = []
+
+	if (params.category) {
+		if (params.subCategory) {
+			stages.push(
+				{
+					$lookup: {
+						from: Category.collection.name,
+						pipeline: [
+							{
+								$match: {
+									$expr: {
+										$and: [
+											{
+												$eq: [params.category, '$slug']
+											}
+										]
+									}
+								}
+							}
+						],
+						as: 'category'
+					}
+				},
+				{
+					$project: {
+						root: '$$ROOT',
+						categoryId: {
+							$toObjectId: '$categoryId'
+						},
+						subCategoryId: {
+							$toObjectId: '$subCategoryId'
+						},
+						category: { $arrayElemAt: ['$category', 0] }
+					}
+				},
+				{
+					$project: {
+						root: 1,
+						categoryId: 1,
+						subCategoryId: 1,
+						category: {
+							_id: 1,
+							subCategories: {
+								$filter: {
+									input: '$category.subCategories',
+									as: 'subCategory',
+									cond: {
+										$eq: ['$$subCategory.slug', params.subCategory]
+									}
+								}
+							}
+						}
+					}
+				},
+				{
+					$project: {
+						root: 1,
+						categoryId: 1,
+						subCategoryId: 1,
+						category: {
+							_id: 1,
+							subCategory: {
+								$arrayElemAt: ['$category.subCategories', 0]
+							}
+						}
+					}
+				},
+				{
+					$match: {
+						$expr: {
+							$and: [
+								{
+									$eq: ['$category._id', '$categoryId']
+								},
+								{
+									$eq: ['$category.subCategory._id', '$subCategoryId']
+								}
+							]
+						}
+					}
+				},
+				{
+					$replaceRoot: {
+						newRoot: '$root'
+					}
+				},
+				{
+					$project: {
+						category: 0
+					}
+				}
+			)
+		} else {
+			stages.push(
+				{
+					$lookup: {
+						from: Category.collection.name,
+						pipeline: [
+							{
+								$match: {
+									$expr: {
+										$and: [
+											{
+												$eq: [params.category, '$slug']
+											}
+										]
+									}
+								}
+							}
+						],
+						as: 'category'
+					}
+				},
+				{
+					$project: {
+						root: '$$ROOT',
+						categoryId: {
+							$toObjectId: '$categoryId'
+						},
+						category: { $arrayElemAt: ['$category', 0] }
+					}
+				},
+				{
+					$match: {
+						$expr: {
+							$eq: ['$category._id', '$categoryId']
+						}
+					}
+				},
+				{
+					$replaceRoot: {
+						newRoot: '$root'
+					}
+				},
+				{
+					$project: {
+						category: 0
+					}
+				}
+			)
+		}
+	}
 
 	if (query.categoryId) {
 		stages.push({
@@ -315,7 +457,6 @@ export const getFilteredProducts = (query: any) => {
 		}
 	}
 
-
 	return Product.aggregate(stages)
 }
 
@@ -356,11 +497,11 @@ export const getSingleProduct = (productId: string, user: UserDocument) => (
 	})
 )
 
-export const getProductAndWithColorGroup = (productId: string) => (
+export const getProductAndWithColorGroup = (slug: string) => (
 	Product.aggregate([
 		{
 			$match: {
-				_id: mongoose.Types.ObjectId(productId)
+				slug
 			}
 		},
 		{
@@ -383,8 +524,8 @@ export const getProductAndWithColorGroup = (productId: string) => (
 						}
 					},
 					{
-						'group._id': { // TODO test
-							$eq: mongoose.Types.ObjectId(productId)
+						'group.slug': { // TODO Test
+							$eq: slug
 						}
 					}
 				]

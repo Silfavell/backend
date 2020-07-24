@@ -35,7 +35,11 @@ import {
 	deleteSubCategoryFromDatabase,
 	updateCategoryOfProduct,
 	saveProductImages,
-	removeProductFromSearch
+	removeProductFromSearch,
+	getSeoUrl,
+	isProductSlugExists,
+	isCategorySlugExists,
+	isSubCategorySlugExists
 } from '../services/admin'
 
 const router = Router()
@@ -43,7 +47,7 @@ const router = Router()
 router.use(fileUpload({
 	createParentPath: true
 }))
-router.use(validateAuthority(Authority.ADMIN))
+router.use(validateAuthority(Authority.ANONIM))
 
 router.get('/test', (req, res) => {
 	res.json({ status: true })
@@ -137,7 +141,9 @@ router.delete('/category/:_id', (req, res, next) => {
 
 router.post('/sub-category', (req, res, next) => {
 	validatePostSubCategory(req.body)
-		.then(() => saveSubCategoryToDatabase(req.body))
+		.then(() => getSeoUrl(req.body.name))
+		.then((slug) => isSubCategorySlugExists(req.body, slug))
+		.then((slug) => saveSubCategoryToDatabase({ ...req.body, slug }))
 		.then((category: any) => {
 			res.json(category)
 		})
@@ -159,7 +165,9 @@ router.delete('/sub-category', (req, res, next) => {
 
 router.put('/category/:_id', (req, res, next) => {
 	validateUpdateCategory(req.body)
-		.then(() => updateCategory(req.params._id, req.body))
+		.then(() => getSeoUrl(req.body.name))
+		.then((slug) => isCategorySlugExists(slug))
+		.then((slug) => updateCategory(req.params._id, { ...req.body, slug }))
 		.then((category) => {
 			res.json(category)
 		})
@@ -170,7 +178,9 @@ router.put('/category/:_id', (req, res, next) => {
 
 router.put('/sub-category', (req, res, next) => {
 	validateUpdateSubCategory(req.body)
-		.then(() => updateSubCategory(req.body))
+		.then(() => getSeoUrl(req.body.name))
+		.then((slug) => isSubCategorySlugExists(req.body, slug))
+		.then((slug) => updateSubCategory(req.body, slug))
 		.then((category) => {
 			res.json(category)
 		})
@@ -189,7 +199,9 @@ router.post('/product', (req, res, next) => {
 	}
 
 	validatePostProduct(req.body)
-		.then(() => saveProductToDatabase(req.body))
+		.then(() => getSeoUrl(req.body.name))
+		.then((slug) => isProductSlugExists(slug))
+		.then((slug) => saveProductToDatabase({ ...req.body, slug }))
 		.then((product) => updateCategoryOfProduct(product))
 		.then((product) => indexProduct(product).then(() => product))
 		.then((product) => {
@@ -213,7 +225,9 @@ router.put('/product/:_id', (req, res, next) => {
 	}
 
 	validateUpdateProduct(req.body)
-		.then(() => updateProduct(req.params._id, req.body))
+		.then(() => getSeoUrl(req.body.name))
+		.then((slug) => isProductSlugExists(slug))
+		.then((slug) => updateProduct(req.params._id, { ...req.body, slug }))
 		.then((product: any) => indexProduct(product).then(() => product))
 		.then((product) => {
 			if (req.files) {
