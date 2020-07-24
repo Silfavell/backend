@@ -153,10 +153,10 @@ router.put('/set-product/:_id', (req, res, next) => {
 router.get('/product/:slug', (req, res, next) => {
 	// @ts-ignore
 	getProductAndWithColorGroup(req.params.slug, req.user)
-		.then((response) => {
+		.then((response: any) => {
 			res.json(response[0])
 		})
-		.catch((reason) => {
+		.catch((reason: any) => {
 			next((handleError(reason, 'GET /product/:slug')))
 		})
 })
