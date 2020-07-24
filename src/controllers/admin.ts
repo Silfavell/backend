@@ -54,25 +54,33 @@ router.get('/test', (req, res) => {
 })
 
 router.get('/log', (req, res) => {
-	const date = new Date().toLocaleDateString('tr', { day: '2-digit', month: '2-digit', year: 'numeric' })
-
 	if (process.platform === 'win32') {
+		const date = new Date().toLocaleDateString('tr', { day: '2-digit', month: '2-digit', year: 'numeric' })
 		const file = path.join(__dirname, `../../logs/info/${date}.log`)
 		res.download(file)
 	} else {
-		const file = path.join(__dirname, `../../logs/info/${date.split('/').join('-')}.log`)
+		const date = new Date()
+		const year = date.getFullYear().toString().substr(-2)
+		const month = ('0' + (date.getMonth() + 1)).slice(-2)
+		const day = ('0' + date.getDate()).slice(-2)
+
+		const file = path.join(__dirname, `../../logs/info/${day}-${month}-${year}.log`)
 		res.download(file)
 	}
 })
 
 router.get('/error-log', (req, res) => {
-	const date = new Date().toLocaleDateString('tr', { day: '2-digit', month: '2-digit', year: 'numeric' })
-
 	if (process.platform === 'win32') {
+		const date = new Date().toLocaleDateString('tr', { day: '2-digit', month: '2-digit', year: 'numeric' })
 		const file = path.join(__dirname, `../../logs/error/${date}.log`)
 		res.download(file)
 	} else {
-		const file = path.join(__dirname, `../../logs/error/${date.split('/').join('-')}.log`)
+		const date = new Date()
+		const year = date.getFullYear().toString().substr(-2)
+		const month = ('0' + (date.getMonth() + 1)).slice(-2)
+		const day = ('0' + date.getDate()).slice(-2)
+
+		const file = path.join(__dirname, `../../logs/error/${day}-${month}-${year}.log`)
 		res.download(file)
 	}
 })
