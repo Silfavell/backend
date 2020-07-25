@@ -8,6 +8,14 @@ export type ProductDocument = Document & {
 	name: string,
 	slug: string,
 	details: string,
+	specifications: {
+		form: string,
+		benefit: string,
+		colorDetail: string,
+		kind: string,
+		brushThickness: string,
+		feature: string
+	}
 	price: number,
 	discountedPrice: number,
 	image: number,
@@ -43,6 +51,14 @@ const productSchema = new Schema({
 	},
 	details: {
 		type: String
+	},
+	specifications: {
+		form: String,
+		benefit: String,
+		colorDetail: String,
+		kind: String,
+		brushThickness: String,
+		feature: String
 	},
 	price: {
 		type: Number,

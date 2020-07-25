@@ -29,12 +29,22 @@ const colorSchema = Joi.object({
 	code: Joi.string().regex(/^#[A-Fa-f0-9]{6}$/).required()
 })
 
+const specificationsSchema = Joi.object({
+	form: Joi.string().allow(null),
+	benefit: Joi.string().allow(null),
+	colorDetail: Joi.string().allow(null),
+	kind: Joi.string().allow(null),
+	brushThickness: Joi.string().allow(null),
+	feature: Joi.string().allow(null)
+})
+
 export const saveProductSchema = Joi.object({
 	categoryId: Joi.string().required(),
 	subCategoryId: Joi.string().required(),
 	brand: Joi.string().required(),
 	name: Joi.string().required(),
 	details: Joi.string().allow(null, ''),
+	specifications: specificationsSchema.allow(null),
 	price: Joi.number().min(0).required(),
 	discountedPrice: Joi.number().min(0).allow(null),
 	imageCount: Joi.number().min(0).default(0).allow(null),
@@ -48,6 +58,7 @@ export const updateProductSchema = Joi.object({
 	brand: Joi.string().allow(null),
 	name: Joi.string().allow(null),
 	details: Joi.string().allow(null, ''),
+	specifications: specificationsSchema.allow(null),
 	price: Joi.number().min(0).allow(null),
 	discountedPrice: Joi.number().min(0).allow(null),
 	imageCount: Joi.number().min(0).default(0).allow(null),

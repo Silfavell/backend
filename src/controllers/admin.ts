@@ -208,6 +208,10 @@ router.post('/product', (req, res, next) => {
 		req.body.color = JSON.parse(req.body.color)
 	}
 
+	if (req.body.specifications) {
+		req.body.specifications = JSON.parse(req.body.specifications)
+	}
+
 	validatePostProduct(req.body)
 		.then(() => getSeoUrl(req.body.name))
 		.then((slug) => isProductSlugExists(slug))
@@ -232,6 +236,10 @@ router.put('/product/:_id', (req, res, next) => {
 
 	if (req.body.color) {
 		req.body.color = JSON.parse(req.body.color)
+	}
+
+	if (req.body.specifications) {
+		req.body.specifications = JSON.parse(req.body.specifications)
 	}
 
 	validateUpdateProduct(req.body)
