@@ -92,9 +92,9 @@ export const updateSubCategory = (body: any, slug: string) => ( // is category e
 	})
 )
 
-export const isProductSlugExists = (slug: string) => (
+export const isProductSlugExists = (slug: string, updateId?: string) => (
 	Product.findOne({ slug }).then((product) => {
-		if (product) {
+		if (product && updateId !== product._id.toString()) {
 			throw new ServerError(ErrorMessages.ANOTHER_PRODUCT_WITH_THE_SAME_NAME, HttpStatusCodes.BAD_REQUEST, ErrorMessages.ANOTHER_PRODUCT_WITH_THE_SAME_NAME, false)
 		}
 
