@@ -15,6 +15,7 @@ import {
 	getSingleProduct,
 	getProductAndWithColorGroup,
 	getProductsWithCategories,
+	getBestSellerProducts,
 	getCategories,
 	addProductToCart,
 	isManagerVerified,
@@ -78,6 +79,14 @@ router.get('/products-with-categories', (req, res, next) => {
 		res.json(products)
 	}).catch((reason) => {
 		next(handleError(reason, 'GET /products-with-categories'))
+	})
+})
+
+router.get('/best-seller', (req, res, next) => {
+	getBestSellerProducts().then((products) => {
+		res.json(products)
+	}).catch((reason) => {
+		next(handleError(reason, 'GET /best-seller'))
 	})
 })
 

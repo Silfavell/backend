@@ -133,6 +133,70 @@ export const getProductsWithCategories = () => (
 	])
 )
 
+export const getBestSellerProducts = () => (
+	Category.aggregate([
+		{
+			$project: {
+				_id: {
+					$toString: '$_id'
+				},
+				name: 1,
+				brands: 1,
+				imagePath: 1,
+			}
+		},
+		{
+			$lookup: {
+				from: Product.collection.name,
+				let: { 'categoryId': '$_id' },
+				pipeline: [
+					{
+						$match: {
+							$expr: {
+								$and: [
+									{
+										$eq: ['$$categoryId', '$categoryId']
+									}, {
+										$eq: ['$purchasable', true]
+									}
+								]
+							}
+						}
+					},
+					{
+						$sort: {
+							timesSold: -1
+						}
+					},
+					{
+						$limit: 20
+					}
+				],
+				as: 'products'
+			}
+		},
+		{
+			$match: {
+				'products.0': { $exists: true }
+			}
+		},
+		{
+			$group: {
+				_id: '$_id',
+				name: { $first: '$name' },
+				imagePath: { $first: '$imagePath' },
+				brands: { $first: '$brands' },
+				products: { $first: '$products' }
+			}
+		},
+		{
+			$sort: {
+				imagePath: 1
+			}
+		}
+	])
+)
+
 export const getProductsLength = (query: any) => {
 	// eslint-disable-next-line no-param-reassign
 	delete query.sortType
