@@ -20,6 +20,7 @@ export type ProductDocument = Document & {
 	discountedPrice: number,
 	image: number,
 	imageCount: number,
+	purchasable: boolean,
 	color: {
 		name: string,
 		code: string
@@ -79,6 +80,11 @@ const productSchema = new Schema({
 		type: Number,
 		default: 0,
 		required: true
+	},
+	purchasable: {
+		type: Boolean,
+		required: true,
+		default: true
 	},
 	color: {
 		name: {

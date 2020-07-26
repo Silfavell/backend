@@ -81,6 +81,24 @@ export const getProductsWithCategories = () => (
 		},
 		{
 			$project: {
+				name: 1,
+				imagePath: 1,
+				brands: 1,
+				subCategoryName: 1,
+				subCategoryId: 1,
+				products: {
+					$filter: {
+						input: '$products',
+						as: 'product',
+						cond: {
+							$eq: ['$$product.purchasable', true]
+						}
+					}
+				}
+			}
+		},
+		{
+			$project: {
 				products: {
 					subCategoryId: 0,
 					__v: 0

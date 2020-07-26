@@ -48,6 +48,7 @@ export const saveProductSchema = Joi.object({
 	price: Joi.number().min(0).required(),
 	discountedPrice: Joi.number().min(0).allow(null),
 	imageCount: Joi.number().min(0).default(0).allow(null),
+	purchasable: Joi.boolean().default(true).required(),
 	colorGroup: Joi.string().allow(null),
 	color: colorSchema.allow(null)
 }).with('colorGroup', ['color']).required()
@@ -62,6 +63,7 @@ export const updateProductSchema = Joi.object({
 	price: Joi.number().min(0).allow(null),
 	discountedPrice: Joi.number().min(0).allow(null),
 	imageCount: Joi.number().min(0).default(0).allow(null),
+	purchasable: Joi.boolean().allow(null),
 	colorGroup: Joi.string().allow(null),
 	color: colorSchema.allow(null)
 }).with('colorGroup', ['color']).required()
