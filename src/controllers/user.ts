@@ -130,8 +130,8 @@ router.delete('/cart', (req, res, next) => {
 
 router.get('/cart', (req, res, next) => {
 	//  @ts-ignore
-	getCart(req.user._id.toString()).then((result) => {
-		res.json(result)
+	getCart(req.user._id.toString()).then((cart) => {
+		res.json({ cart })
 	}).catch((reason) => {
 		next(handleError(reason, 'GET /user/cart'))
 	})

@@ -7,7 +7,9 @@ import ServerError from '../errors/ServerError'
 import {
 	User, Order,
 	// eslint-disable-next-line no-unused-vars
-	UserDocument, OrderDocument, ProductDocument, Product
+	UserDocument,
+	ProductDocument,
+	Product
 } from '../models'
 import Cart from '../models/Cart'
 
@@ -98,19 +100,20 @@ export const checkMakeOrderValues = (user: UserDocument, context: any) => {
 	const selectedAddress = user.addresses.find((address) => address._id.toString() === context.address)
 
 	// @ts-ignore
-	return Cart.findOne({ userId: user._id.toString() }).then((cart) => {
-		if (!cart) {
+	return Cart.findOne({ userId: user._id.toString() }).then((cartObj) => {
+		if (!cartObj || !cartObj.cart) {
 			throw new ServerError(ErrorMessages.EMPTY_CART, HttpStatusCodes.BAD_REQUEST, null, false)
-			// @ts-ignore
 		} else if (!selectedAddress) {
 			throw new ServerError(ErrorMessages.NO_ADDRESS, HttpStatusCodes.BAD_REQUEST, null, false)
 		} else {
-			return ({ cart, selectedAddress, card: context.card })
+			return createCart(cartObj.cart).then((cart) => {
+				return ({ cart, selectedAddress, card: context.card })
+			})
 		}
 	})
 }
 
-export const saveOrderToDatabase = (user: UserDocument, { cart }: any, address: any) => (
+export const saveOrderToDatabase = (user: UserDocument, cart: any, address: any) => (
 	new Order({
 		customer: user.nameSurname,
 		phoneNumber: user.phoneNumber,
@@ -338,7 +341,7 @@ export const createPaymentWithRegisteredCard = (user: UserDocument, price: numbe
 )
 
 
-export const completePayment = (user: UserDocument, { cart }: any, address: string, cardToken: string) => (
+export const completePayment = (user: UserDocument, cart: any, address: string, cardToken: string) => (
 	createPaymentWithRegisteredCard(
 		user,
 		// @ts-ignore
