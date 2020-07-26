@@ -38,6 +38,14 @@ const orderSchema = new Schema({
 	products: {
 		type: [{
 			...Product.schema.obj,
+			slug: {
+				type: String,
+				required: true
+			},
+			image: {
+				type: Number,
+				required: true
+			},
 			quantity: {
 				type: Number
 			}

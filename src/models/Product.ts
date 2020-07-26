@@ -21,6 +21,7 @@ export type ProductDocument = Document & {
 	image: number,
 	imageCount: number,
 	purchasable: boolean,
+	timesSold: number,
 	color: {
 		name: string,
 		code: string
@@ -85,6 +86,11 @@ const productSchema = new Schema({
 		type: Boolean,
 		required: true,
 		default: true
+	},
+	timesSold: {
+		type: Number,
+		required: true,
+		default: 0
 	},
 	color: {
 		name: {

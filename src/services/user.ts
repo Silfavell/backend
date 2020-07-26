@@ -124,6 +124,14 @@ export const saveOrderToDatabase = (user: UserDocument, cart: any, address: any)
 	}).save()
 )
 
+export const updateProductsSoldTimes = (cart: any) => {
+	const updates = Object.values(cart).map((cartProduct: any) => (
+		Product.findByIdAndUpdate(cartProduct._id, { $inc: { timesSold: cartProduct.quantity } })
+	))
+
+	return Promise.all(updates)
+}
+
 export const saveAddressToDatabase = (userId: string, address: any) => (
 	User.findByIdAndUpdate(userId, {
 		$push: {
