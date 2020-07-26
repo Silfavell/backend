@@ -146,6 +146,7 @@ export const getProductsLength = (query: any) => {
 		// eslint-disable-next-line no-param-reassign
 		delete query.brands
 		return Product
+			.where('purchasable', true)
 			.where('brand')
 			.in(brandList)
 			.countDocuments(query)
@@ -226,6 +227,24 @@ export const getFilteredProductsWithCategories = (query: any) => {
 				let: { subCategoryId: '$subCategoryId' },
 				as: 'products',
 				pipeline
+			}
+		},
+		{
+			$project: {
+				name: 1,
+				imagePath: 1,
+				brands: 1,
+				subCategoryName: 1,
+				subCategoryId: 1,
+				products: {
+					$filter: {
+						input: '$products',
+						as: 'product',
+						cond: {
+							$eq: ['$$product.purchasable', true]
+						}
+					}
+				}
 			}
 		},
 		{
@@ -474,6 +493,14 @@ export const getFilteredProducts = (query: any, params: any) => {
 			default: break
 		}
 	}
+
+	stages.push({
+		$match: {
+			purchasable: {
+				$eq: true
+			}
+		}
+	})
 
 	return Product.aggregate(stages)
 }
