@@ -15,6 +15,7 @@ import {
 	getSingleProduct,
 	getProductAndWithColorGroup,
 	getProductsWithCategories,
+	getBestSellerProducts,
 	getCategories,
 	addProductToCart,
 	isManagerVerified,
@@ -81,6 +82,14 @@ router.get('/products-with-categories', (req, res, next) => {
 	})
 })
 
+router.get('/best-seller', (req, res, next) => {
+	getBestSellerProducts().then((products) => {
+		res.json(products)
+	}).catch((reason) => {
+		next(handleError(reason, 'GET /best-seller'))
+	})
+})
+
 // FOR WEB
 router.get('/products-filter/:category?/:subCategory?', (req, res, next) => {
 	getFilteredProducts(req.query, req.params).then((products) => {
@@ -101,15 +110,6 @@ router.get('/products-filter-with-categories', (req, res, next) => {
 			next(handleError(reason, 'GET /products-filter-with-categories'))
 		})
 })
-
-router.get('/products-by-range', (req, res, next) => {
-	getProductsByRange(req.query.categoryId, req.query.start, req.query.quantity).then((products) => {
-		res.json(products)
-	}).catch((reason) => {
-		next(handleError(reason, 'GET /products-by-range'))
-	})
-})
-
 
 router.get('/products-length', (req, res, next) => {
 	getProductsLength(req.query).then((length) => {

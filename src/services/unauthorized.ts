@@ -81,6 +81,24 @@ export const getProductsWithCategories = () => (
 		},
 		{
 			$project: {
+				name: 1,
+				imagePath: 1,
+				brands: 1,
+				subCategoryName: 1,
+				subCategoryId: 1,
+				products: {
+					$filter: {
+						input: '$products',
+						as: 'product',
+						cond: {
+							$eq: ['$$product.purchasable', true]
+						}
+					}
+				}
+			}
+		},
+		{
+			$project: {
 				products: {
 					subCategoryId: 0,
 					__v: 0
@@ -115,6 +133,70 @@ export const getProductsWithCategories = () => (
 	])
 )
 
+export const getBestSellerProducts = () => (
+	Category.aggregate([
+		{
+			$project: {
+				_id: {
+					$toString: '$_id'
+				},
+				name: 1,
+				brands: 1,
+				imagePath: 1,
+			}
+		},
+		{
+			$lookup: {
+				from: Product.collection.name,
+				let: { 'categoryId': '$_id' },
+				pipeline: [
+					{
+						$match: {
+							$expr: {
+								$and: [
+									{
+										$eq: ['$$categoryId', '$categoryId']
+									}, {
+										$eq: ['$purchasable', true]
+									}
+								]
+							}
+						}
+					},
+					{
+						$sort: {
+							timesSold: -1
+						}
+					},
+					{
+						$limit: 20
+					}
+				],
+				as: 'products'
+			}
+		},
+		{
+			$match: {
+				'products.0': { $exists: true }
+			}
+		},
+		{
+			$group: {
+				_id: '$_id',
+				name: { $first: '$name' },
+				imagePath: { $first: '$imagePath' },
+				brands: { $first: '$brands' },
+				products: { $first: '$products' }
+			}
+		},
+		{
+			$sort: {
+				imagePath: 1
+			}
+		}
+	])
+)
+
 export const getProductsLength = (query: any) => {
 	// eslint-disable-next-line no-param-reassign
 	delete query.sortType
@@ -128,6 +210,7 @@ export const getProductsLength = (query: any) => {
 		// eslint-disable-next-line no-param-reassign
 		delete query.brands
 		return Product
+			.where('purchasable', true)
 			.where('brand')
 			.in(brandList)
 			.countDocuments(query)
@@ -208,6 +291,24 @@ export const getFilteredProductsWithCategories = (query: any) => {
 				let: { subCategoryId: '$subCategoryId' },
 				as: 'products',
 				pipeline
+			}
+		},
+		{
+			$project: {
+				name: 1,
+				imagePath: 1,
+				brands: 1,
+				subCategoryName: 1,
+				subCategoryId: 1,
+				products: {
+					$filter: {
+						input: '$products',
+						as: 'product',
+						cond: {
+							$eq: ['$$product.purchasable', true]
+						}
+					}
+				}
 			}
 		},
 		{
@@ -456,6 +557,14 @@ export const getFilteredProducts = (query: any, params: any) => {
 			default: break
 		}
 	}
+
+	stages.push({
+		$match: {
+			purchasable: {
+				$eq: true
+			}
+		}
+	})
 
 	return Product.aggregate(stages)
 }

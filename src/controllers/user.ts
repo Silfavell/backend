@@ -16,6 +16,7 @@ import {
 	deleteAddress,
 	getCart,
 	saveOrderToDatabase,
+	updateProductsSoldTimes,
 	getOrders,
 	getFavoriteProductsFromDatabase,
 	saveFavoriteProductToDatabase,
@@ -213,11 +214,12 @@ router.post('/order', (req, res, next) => {
 		// @ts-ignore
 		.then(({ cart, card, selectedAddress }) => completePayment(req.user, cart, selectedAddress.openAddress, card).then((result) => ({ cart, selectedAddress, result })))
 		// @ts-ignore
-		.then(({ cart, selectedAddress, result }) => saveOrderToDatabase(req.user, cart, selectedAddress).then((order) => ({ order, result })))
+		.then(({ cart, selectedAddress, result }) => saveOrderToDatabase(req.user, cart, selectedAddress).then((order) => ({ cart, order, result })))
+		.then((orderResult) => updateProductsSoldTimes(orderResult.cart).then(() => orderResult))
 		// @ts-ignore
-		.then((result) => clearCart(req.user._id.toString()).then(() => result))
-		.then((result) => {
-			res.json(result)
+		.then((orderResult) => clearCart(req.user._id.toString()).then(() => orderResult))
+		.then((orderResult) => {
+			res.json(orderResult)
 		})
 		.catch((reason) => {
 			next(handleError(reason, 'POST /user/order'))
