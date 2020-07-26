@@ -34,7 +34,7 @@ import {
 } from '../validators'
 import ActivationCode from '../models/ActivationCode'
 // eslint-disable-next-line no-unused-vars
-import Cart from '../models/Cart'
+import Cart, { CartDocument } from '../models/Cart'
 import ProductSort from '../enums/product-sort-enum'
 
 export const sendSms = (to: string, message: string) => {
@@ -577,40 +577,40 @@ export const getProductAndWithColorGroup = (slug: string) => (
 	])
 )
 
-export const addProductToCart = (product: any, cartObj: any, user: UserDocument, quantity: number) => (
+export const addProductToCart = (product: ProductDocument, cartObj: CartDocument, user: UserDocument, quantity: number) => (
 	new Promise((resolve) => {
 		// @ts-ignore
 		if (user?._id.toString()) {
 			if (cartObj && cartObj.cart) {
-				if (Object.keys(cartObj.cart).includes(product._id.toString())) {
-					Cart.findOneAndUpdate({ userId: user._id.toString() }, {
-						cart: {
-							...cartObj.cart,
-							[product._id.toString()]: Object.assign(product._doc, {
-								quantity: cartObj.cart[product._id.toString()].quantity + quantity
-							})
-						}
-					}).then(() => {
-						resolve(Object.assign(product._doc, { quantity: cartObj.cart[product._id.toString()].quantity + quantity }))
+				const foundCartProduct = cartObj.cart.find((cartProduct => cartProduct._id === product._id.toString()))
+
+				if (foundCartProduct) {
+					foundCartProduct.quantity += quantity
+
+					cartObj.save().then(() => {
+						resolve(Object.assign(product.toObject(), { quantity: foundCartProduct.quantity }))
 					})
 				} else {
 					Cart.findOneAndUpdate({ userId: user._id.toString() }, {
-						cart: {
-							...cartObj.cart,
-							[product._id.toString()]: Object.assign(product._doc, { quantity })
+						$push: {
+							cart: {
+								_id: product._id.toString(),
+								quantity
+							}
 						}
-					}).then(() => {
-						resolve(Object.assign(product._doc, { quantity }))
+					}, { new: true }).then(() => {
+						resolve(Object.assign(product.toObject(), { quantity }))
 					})
 				}
 			} else {
 				new Cart({
 					userId: user._id.toString(),
-					cart: {
-						[product._id.toString()]: Object.assign(product._doc, { quantity })
-					}
-				}).save().then(() => {
-					resolve(Object.assign(product._doc, { quantity }))
+					cart: [{
+						_id: product._id.toString(),
+						quantity
+					}]
+				}).save().then((x) => {
+					resolve(Object.assign(product.toObject(), { quantity }))
 				})
 			}
 		} else {
@@ -619,26 +619,33 @@ export const addProductToCart = (product: any, cartObj: any, user: UserDocument,
 	})
 )
 
-export const setProductToCart = (product: any, cartObj: any, user: UserDocument, quantity: number) => (
+export const setProductToCart = (product: ProductDocument, cartObj: CartDocument, user: UserDocument, quantity: number) => (
 	new Promise((resolve) => {
 		// @ts-ignore
 		if (user?._id.toString()) {
 			if (quantity === 0) {
-				Cart.findOne({ userId: user._id.toString() }).then((cartObj: any) => {
-					// eslint-disable-next-line no-param-reassign
-					delete cartObj.cart[product._id.toString()]
-					cartObj.update({ cart: cartObj.cart }).then(() => {
-						resolve(product)
-					})
+				Cart.findOneAndUpdate({ userId: user._id.toString() }, {
+					$pull: {
+						cart: {
+							_id: product._id
+						}
+					}
+				}, { new: true }).then(() => {
+					resolve(product)
 				})
 			} else {
-				Cart.findOneAndUpdate({ userId: user._id.toString() }, {
-					cart: {
-						...cartObj.cart,
-						[product._id.toString()]: Object.assign(product._doc, { quantity })
-					}
-				}).then(() => {
-					resolve(Object.assign(product._doc, { quantity }))
+				const foundProduct = cartObj.cart.find((cartProduct) => cartProduct._id.toString() === product._id.toString())
+				if (foundProduct) {
+					foundProduct.quantity = quantity
+				} else {
+					cartObj.cart.push({
+						_id: product._id,
+						quantity
+					})
+				}
+
+				cartObj.save().then(() => {
+					resolve(Object.assign(product.toObject(), { quantity }))
 				})
 			}
 		} else {
@@ -647,34 +654,28 @@ export const setProductToCart = (product: any, cartObj: any, user: UserDocument,
 	})
 )
 
-export const takeOffProductFromCart = (product: any, cartObj: any, user: UserDocument, quantity: number) => (
+export const takeOffProductFromCart = (product: ProductDocument, cartObj: CartDocument, user: UserDocument, quantity: number) => (
 	new Promise((resolve, reject) => {
 		if (user?._id.toString()) {
 			if (cartObj && cartObj.cart) {
-				if (Object.keys(cartObj.cart).includes(product._id.toString())) {
-					if (cartObj.cart[product._id.toString()].quantity > quantity) {
-						Cart.findOneAndUpdate({ userId: user._id.toString() }, {
-							cart: Object.assign(
-								cartObj.cart,
-								{
-									[product._id.toString()]: Object.assign(product._doc, {
-										quantity: cartObj.cart[product._id.toString()].quantity - quantity
-									})
-								}
-							)
-						}).then(() => {
-							resolve(Object.assign(product._doc, { quantity: cartObj.cart[product._id.toString()].quantity }))
+				const foundCartProduct = cartObj.cart.find((cartProduct => cartProduct._id === product._id.toString()))
+
+				if (foundCartProduct) {
+					if (foundCartProduct.quantity > quantity) {
+						foundCartProduct.quantity -= quantity
+
+						cartObj.save().then(() => {
+							resolve(Object.assign(product.toObject(), { quantity: foundCartProduct.quantity }))
 						})
 					} else {
-						// eslint-disable-next-line no-shadow
-						Cart.findOne({ userId: user._id.toString() }).then((cartObj2: any) => {
-							// eslint-disable-next-line no-param-reassign
-							delete cartObj2.cart[product._id.toString()]
-							cartObj2.update({
-								cart: cartObj2.cart
-							}).then(() => {
-								resolve(Object.assign(product._doc, { quantity: 0 }))
-							})
+						Cart.findOneAndUpdate({ userId: user._id.toString() }, {
+							$pull: {
+								cart: {
+									_id: product._id.toString()
+								}
+							}
+						}, { new: true }).then(() => {
+							resolve(Object.assign(product.toObject(), { quantity: 0 }))
 						})
 					}
 				} else {

@@ -7,7 +7,9 @@ import ServerError from '../errors/ServerError'
 import {
 	User, Order,
 	// eslint-disable-next-line no-unused-vars
-	UserDocument, OrderDocument, ProductDocument, Product
+	UserDocument,
+	ProductDocument,
+	Product
 } from '../models'
 import Cart from '../models/Cart'
 
@@ -37,7 +39,7 @@ export const validateSaveCartProducts = (body: any) => (
 export const createCart = (body: { _id: string, quantity: number }[]) => {
 	const productIds = body.map((product) => product._id)
 
-	return Product.find().where('_id').in(productIds).then((products: any[]) => (
+	return Product.find().where('_id').in(productIds).then((products: ProductDocument[]) => (
 		products.reduce((json, product, index) => {
 			if (!product) {
 				throw new ServerError(ErrorMessages.NON_EXISTS_PRODUCT, HttpStatusCodes.BAD_REQUEST, ErrorMessages.NON_EXISTS_PRODUCT, false)
@@ -45,7 +47,7 @@ export const createCart = (body: { _id: string, quantity: number }[]) => {
 
 			return Object.assign(json, {
 				// eslint-disable-next-line security/detect-object-injection
-				[product._id.toString()]: Object.assign(product._doc, { quantity: body[index].quantity })
+				[product._id.toString()]: Object.assign(product.toObject(), { quantity: body[index].quantity })
 			})
 		}, {})
 	))
@@ -54,11 +56,8 @@ export const createCart = (body: { _id: string, quantity: number }[]) => {
 export const saveCart = (userId: string, cart: ProductDocument[]) => (
 	new Promise((resolve) => {
 		Cart.findOne({ userId }).then((cartObj) => {
-			if (cartObj && cart) {
-				// eslint-disable-next-line no-param-reassign
-				cartObj.update({
-					cart
-				}).then((res) => {
+			if (cartObj) {
+				cartObj.update({ cart }).then((res) => {
 					resolve(res)
 				})
 			} else {
@@ -71,12 +70,14 @@ export const saveCart = (userId: string, cart: ProductDocument[]) => (
 )
 
 export const getCart = (userId: string) => (
-	new Promise((resolve, reject) => {
-		Cart.findOne({ userId }).then((cart) => {
-			resolve(cart)
-		}).catch((reason) => {
-			reject(new Error(reason.message))
-		})
+	Cart.findOne({ userId }).then((cart) => {
+		if (cart) {
+			return createCart(cart.cart).then((cartObj) => (
+				cartObj
+			))
+		} else {
+			return {}
+		}
 	})
 )
 
@@ -99,19 +100,20 @@ export const checkMakeOrderValues = (user: UserDocument, context: any) => {
 	const selectedAddress = user.addresses.find((address) => address._id.toString() === context.address)
 
 	// @ts-ignore
-	return Cart.findOne({ userId: user._id.toString() }).then((cart) => {
-		if (!cart) {
+	return Cart.findOne({ userId: user._id.toString() }).then((cartObj) => {
+		if (!cartObj || !cartObj.cart) {
 			throw new ServerError(ErrorMessages.EMPTY_CART, HttpStatusCodes.BAD_REQUEST, null, false)
-			// @ts-ignore
 		} else if (!selectedAddress) {
 			throw new ServerError(ErrorMessages.NO_ADDRESS, HttpStatusCodes.BAD_REQUEST, null, false)
 		} else {
-			return ({ cart, selectedAddress, card: context.card })
+			return createCart(cartObj.cart).then((cart) => {
+				return ({ cart, selectedAddress, card: context.card })
+			})
 		}
 	})
 }
 
-export const saveOrderToDatabase = (user: UserDocument, { cart }: any, address: any) => (
+export const saveOrderToDatabase = (user: UserDocument, cart: any, address: any) => (
 	new Order({
 		customer: user.nameSurname,
 		phoneNumber: user.phoneNumber,
@@ -339,7 +341,7 @@ export const createPaymentWithRegisteredCard = (user: UserDocument, price: numbe
 )
 
 
-export const completePayment = (user: UserDocument, { cart }: any, address: string, cardToken: string) => (
+export const completePayment = (user: UserDocument, cart: any, address: string, cardToken: string) => (
 	createPaymentWithRegisteredCard(
 		user,
 		// @ts-ignore

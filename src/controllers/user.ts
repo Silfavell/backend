@@ -109,9 +109,8 @@ router.post('/cart', (req, res, next) => {
 	validateSaveCartRequest(req.body)
 		// @ts-ignore
 		.then(() => validateSaveCartProducts(req.body))
-		.then(() => createCart(req.body))
 		// @ts-ignore
-		.then((cart) => saveCart(req.user._id.toString(), cart))
+		.then(() => saveCart(req.user._id, req.body))
 		.then((result) => {
 			res.json(result)
 		})
@@ -131,8 +130,8 @@ router.delete('/cart', (req, res, next) => {
 
 router.get('/cart', (req, res, next) => {
 	//  @ts-ignore
-	getCart(req.user._id.toString()).then((result) => {
-		res.json(result)
+	getCart(req.user._id.toString()).then((cart) => {
+		res.json({ cart })
 	}).catch((reason) => {
 		next(handleError(reason, 'GET /user/cart'))
 	})

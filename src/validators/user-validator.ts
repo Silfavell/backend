@@ -21,7 +21,7 @@ export const validateProducts = (products: ProductDocument[]) => Joi.array().min
 
 export const validateUpdateProfileRequest = (body: any) => updateProfileSchema.validateAsync(body)
 
-export const validateSaveCartRequest = (cart: any) => validateProducts(Object.values(cart))
+export const validateSaveCartRequest = (cart: any) => validateProducts(cart)
 
 export const validateSaveAddressRequest = (body: any) => saveAddressSchema.validateAsync(body)
 
