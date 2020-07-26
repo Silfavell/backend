@@ -109,9 +109,8 @@ router.post('/cart', (req, res, next) => {
 	validateSaveCartRequest(req.body)
 		// @ts-ignore
 		.then(() => validateSaveCartProducts(req.body))
-		.then(() => createCart(req.body))
 		// @ts-ignore
-		.then((cart) => saveCart(req.user._id.toString(), cart))
+		.then(() => saveCart(req.user._id, req.body))
 		.then((result) => {
 			res.json(result)
 		})

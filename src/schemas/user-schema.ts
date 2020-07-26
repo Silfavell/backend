@@ -10,10 +10,6 @@ export const phoneSchema = Joi.object({
 
 export const productSchema = Joi.object({
 	_id: Joi.string().required(),
-	//	brand: Joi.string().required(),
-	//	name: Joi.string().required(),
-	//	price: Joi.number().required(),
-	//	images: Joi.array().items(Joi.string()).required(),
 	quantity: Joi.number().min(1).required()
 })
 
