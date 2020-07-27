@@ -20,7 +20,8 @@ import {
 	CategoryDocument,
 	Category,
 	Product,
-	Ticket
+	Ticket,
+	ProductType
 } from '../models'
 import ErrorMessages from '../errors/ErrorMessages'
 import ActivationCodes from '../enums/activation-code-enum'
@@ -49,7 +50,41 @@ export const sendSms = (to: string, message: string) => {
 }
 
 export const getCategories = () => (
-	Category.find()
+	Category.aggregate([
+		{
+			$unwind: '$subCategories'
+		},
+		{
+			$lookup: {
+				from: ProductType.collection.name,
+				let: { 'types': '$subCategories.types' },
+				pipeline: [
+					{
+						$match: {
+							$expr: {
+								$and: [
+									{
+										$in: ['$_id', '$$types']
+									}
+								]
+							}
+						}
+					}
+				],
+				as: 'subCategories.types'
+			}
+		},
+		{
+			$group: {
+				_id: '$_id',
+				imagePath: { $first: '$imagePath' },
+				name: { $first: '$name' },
+				slug: { $first: '$slug' },
+				brands: { $first: '$brands' },
+				subCategories: { $push: "$subCategories" },
+			}
+		}
+	])
 )
 
 export const getProductsWithCategories = () => (

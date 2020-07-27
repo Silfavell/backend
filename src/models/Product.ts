@@ -1,5 +1,6 @@
 // eslint-disable-next-line no-unused-vars
 import mongoose, { Document, Schema } from 'mongoose'
+import ProductSpecification, { ProductSpecificationDocument } from './ProductSpecification'
 
 export type ProductDocument = Document & {
 	categoryId: string,
@@ -8,14 +9,8 @@ export type ProductDocument = Document & {
 	name: string,
 	slug: string,
 	details: string,
-	specifications: {
-		form: string,
-		benefit: string,
-		colorDetail: string,
-		kind: string,
-		brushThickness: string,
-		feature: string
-	}
+	type: Schema.Types.ObjectId
+	specifications: [ProductSpecificationDocument]
 	price: number,
 	discountedPrice: number,
 	image: number,
@@ -54,14 +49,19 @@ const productSchema = new Schema({
 	details: {
 		type: String
 	},
-	specifications: {
-		form: String,
-		benefit: String,
-		colorDetail: String,
-		kind: String,
-		brushThickness: String,
-		feature: String
+	type: {
+		type: Schema.Types.ObjectId,
+		required: true
 	},
+	specifications: [ProductSpecification.schema],
+	//	specifications: {
+	//		form: String,
+	//		benefit: String,
+	//		colorDetail: String,
+	//		kind: String,
+	//		brushThickness: String,
+	//		feature: String
+	//	},
 	price: {
 		type: Number,
 		required: true,

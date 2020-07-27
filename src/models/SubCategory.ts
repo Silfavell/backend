@@ -6,6 +6,7 @@ import Brand, { BrandDocument } from './Brand'
 export type SubCategoryDocument = Document & {
 	name: string,
 	slug: string,
+	types: [Schema.Types.ObjectId],
 	brands: [BrandDocument]
 }
 
@@ -17,6 +18,7 @@ const subCategorySchema = new Schema({
 		type: String,
 		required: true
 	},
+	types: [Schema.Types.ObjectId],
 	brands: [Brand.schema]
 })
 

@@ -18,7 +18,8 @@ import {
 	validateUpdateCategory,
 	validateUpdateSubCategory,
 	validatePostSubCategory,
-	validateDeleteSubCategory
+	validateDeleteSubCategory,
+	validateSaveTypeRequest
 } from '../validators/admin-validator'
 
 import {
@@ -39,8 +40,11 @@ import {
 	getSeoUrl,
 	isProductSlugExists,
 	isCategorySlugExists,
-	isSubCategorySlugExists
+	isSubCategorySlugExists,
+	saveType
 } from '../services/admin'
+
+import { validateObjectId } from './../services/unauthorized'
 
 const router = Router()
 
@@ -176,7 +180,7 @@ router.delete('/sub-category', (req, res, next) => {
 router.put('/category/:_id', (req, res, next) => {
 	validateUpdateCategory(req.body)
 		.then(() => getSeoUrl(req.body.name))
-		.then((slug) => isCategorySlugExists(slug))
+		.then((slug) => isCategorySlugExists(slug, req.params._id))
 		.then((slug) => updateCategory(req.params._id, { ...req.body, slug }))
 		.then((category) => {
 			res.json(category)
@@ -260,13 +264,25 @@ router.put('/product/:_id', (req, res, next) => {
 })
 
 router.delete('/product/:_id', (req, res, next) => {
-	deleteProductFromDatabase(req.params._id)
+	validateObjectId(req.params._id)
+		.then(() => deleteProductFromDatabase(req.params._id))
 		.then((product: any) => removeProductFromSearch(product))
 		.then(() => {
 			res.json()
 		})
 		.catch((reason) => {
 			next(handleError(reason, 'DELETE /admin/product/:_id'))
+		})
+})
+
+router.post('/save-type', (req, res, next) => {
+	validateSaveTypeRequest(req.body)
+		.then(() => saveType(req.body))
+		.then((type) => {
+			res.json(type)
+		})
+		.catch((reason) => {
+			next(handleError(reason, 'POST /admin/save-type'))
 		})
 })
 
