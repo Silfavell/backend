@@ -277,7 +277,8 @@ router.delete('/product/:_id', (req, res, next) => {
 
 router.post('/save-type', (req, res, next) => {
 	validateSaveTypeRequest(req.body)
-		.then(() => saveType(req.body))
+		.then(() => getSeoUrl(req.body.name)) // TODO is type slug exists ?
+		.then((slug) => saveType({ ...req.body, slug }))
 		.then((type) => {
 			res.json(type)
 		})

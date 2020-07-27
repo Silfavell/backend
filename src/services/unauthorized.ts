@@ -62,11 +62,7 @@ export const getCategories = () => (
 					{
 						$match: {
 							$expr: {
-								$and: [
-									{
-										$in: ['$_id', '$$types']
-									}
-								]
+								$in: ['$_id', '$$types']
 							}
 						}
 					}
@@ -389,11 +385,7 @@ export const getFilteredProducts = (query: any, params: any) => {
 							{
 								$match: {
 									$expr: {
-										$and: [
-											{
-												$eq: [params.category, '$slug']
-											}
-										]
+										$eq: [params.category, '$slug']
 									}
 								}
 							}
@@ -479,11 +471,7 @@ export const getFilteredProducts = (query: any, params: any) => {
 							{
 								$match: {
 									$expr: {
-										$and: [
-											{
-												$eq: [params.category, '$slug']
-											}
-										]
+										$eq: [params.category, '$slug']
 									}
 								}
 							}
@@ -519,6 +507,43 @@ export const getFilteredProducts = (query: any, params: any) => {
 				}
 			)
 		}
+	}
+
+	if (query.type) {
+		stages.push(
+			{
+				$lookup: {
+					from: ProductType.collection.name,
+					pipeline: [
+						{
+							$match: {
+								$expr: {
+									$eq: [query.type, '$slug']
+								}
+							}
+						}
+					],
+					as: 'typeObj'
+				}
+			},
+			{
+				$addFields: {
+					typeObj: { $arrayElemAt: ['$typeObj', 0] }
+				}
+			},
+			{
+				$match: {
+					$expr: {
+						$eq: ['$typeObj._id', '$type']
+					}
+				}
+			},
+			{
+				$project: {
+					typeObj: 0
+				}
+			}
+		)
 	}
 
 	if (query.categoryId) {
