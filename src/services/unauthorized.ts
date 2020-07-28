@@ -562,7 +562,9 @@ export const getFilteredProducts = (query: any, params: any) => {
 				products: { $first: '$products' }
 			}
 		},
-		{ $unwind: '$values' },
+		{
+			$unwind: '$values'
+		},
 		{
 			$group: {
 				_id: { name: '$_id', val: '$values' },
@@ -621,11 +623,11 @@ export const getFilteredProducts = (query: any, params: any) => {
 	)
 
 	return Category.aggregate([
-		{
-			$match: {
-				slug: params.category
-			}
-		},
+		//	{
+		//		$match: {
+		//			slug: params.category
+		//		}
+		//	},
 		{
 			$lookup: {
 				from: Product.collection.name,
