@@ -77,7 +77,7 @@ export const getCategories = () => (
 				name: { $first: '$name' },
 				slug: { $first: '$slug' },
 				brands: { $first: '$brands' },
-				subCategories: { $push: "$subCategories" },
+				subCategories: { $push: '$subCategories' },
 			}
 		}
 	])
@@ -374,51 +374,23 @@ export const getFilteredProductsWithCategories = (query: any) => {
 
 export const getFilteredProducts = (query: any, params: any) => {
 	const stages = []
+	const match = []
+	const ext = []
 
 	if (params.category) {
 		if (params.subCategory) {
 			stages.push(
 				{
-					$lookup: {
-						from: Category.collection.name,
-						pipeline: [
-							{
-								$match: {
-									$expr: {
-										$eq: [params.category, '$slug']
-									}
-								}
-							}
-						],
-						as: 'category'
-					}
-				},
-				{
 					$project: {
-						root: '$$ROOT',
-						categoryId: {
-							$toObjectId: '$categoryId'
-						},
-						subCategoryId: {
-							$toObjectId: '$subCategoryId'
-						},
-						category: { $arrayElemAt: ['$category', 0] }
-					}
-				},
-				{
-					$project: {
-						root: 1,
-						categoryId: 1,
-						subCategoryId: 1,
-						category: {
-							_id: 1,
-							subCategories: {
-								$filter: {
-									input: '$category.subCategories',
-									as: 'subCategory',
-									cond: {
-										$eq: ['$$subCategory.slug', params.subCategory]
-									}
+						_id: 1,
+						slug: 1,
+						products: 1,
+						subCategories: {
+							$filter: {
+								input: '$subCategories',
+								as: 'subCategory',
+								cond: {
+									$eq: ['$$subCategory.slug', params.subCategory]
 								}
 							}
 						}
@@ -426,83 +398,22 @@ export const getFilteredProducts = (query: any, params: any) => {
 				},
 				{
 					$project: {
-						root: 1,
-						categoryId: 1,
-						subCategoryId: 1,
-						category: {
-							_id: 1,
-							subCategory: {
-								$arrayElemAt: ['$category.subCategories', 0]
-							}
+						_id: 1,
+						slug: 1,
+						products: 1,
+						subCategory: {
+							$arrayElemAt: ['$subCategories', 0]
 						}
-					}
-				},
-				{
-					$match: {
-						$expr: {
-							$and: [
-								{
-									$eq: ['$category._id', '$categoryId']
-								},
-								{
-									$eq: ['$category.subCategory._id', '$subCategoryId']
-								}
-							]
-						}
-					}
-				},
-				{
-					$replaceRoot: {
-						newRoot: '$root'
-					}
-				},
-				{
-					$project: {
-						category: 0
 					}
 				}
 			)
 		} else {
 			stages.push(
 				{
-					$lookup: {
-						from: Category.collection.name,
-						pipeline: [
-							{
-								$match: {
-									$expr: {
-										$eq: [params.category, '$slug']
-									}
-								}
-							}
-						],
-						as: 'category'
-					}
-				},
-				{
-					$project: {
-						root: '$$ROOT',
-						categoryId: {
-							$toObjectId: '$categoryId'
-						},
-						category: { $arrayElemAt: ['$category', 0] }
-					}
-				},
-				{
 					$match: {
 						$expr: {
-							$eq: ['$category._id', '$categoryId']
+							$eq: ['$categoryId', '$categoryId']
 						}
-					}
-				},
-				{
-					$replaceRoot: {
-						newRoot: '$root'
-					}
-				},
-				{
-					$project: {
-						category: 0
 					}
 				}
 			)
@@ -518,7 +429,8 @@ export const getFilteredProducts = (query: any, params: any) => {
 						{
 							$match: {
 								$expr: {
-									$eq: [query.type, '$slug']
+									$eq: [query.type, '$name']
+									// $eq: [query.type, '$slug'] // TODO .....
 								}
 							}
 						}
@@ -532,9 +444,15 @@ export const getFilteredProducts = (query: any, params: any) => {
 				}
 			},
 			{
-				$match: {
-					$expr: {
-						$eq: ['$typeObj._id', '$type']
+				$project: {
+					products: {
+						$filter: {
+							input: '$products',
+							as: 'product',
+							cond: {
+								$eq: ['$typeObj._id', '$$product.type']
+							}
+						}
 					}
 				}
 			},
@@ -547,49 +465,37 @@ export const getFilteredProducts = (query: any, params: any) => {
 	}
 
 	if (query.categoryId) {
-		stages.push({
-			$match: {
-				categoryId: query.categoryId
-			}
+		match.push({
+			$eq: ['$categoryId', query.categoryId]
 		})
 	}
 
 	if (query.subCategoryId) {
-		stages.push({
-			$match: {
-				subCategoryId: query.subCategoryId
-			}
+		match.push({
+			$eq: ['$subCategoryId', query.subCategoryId]
 		})
 	}
 
 	if (query.brands) {
-		stages.push({
-			$match: {
-				brand: {
-					$in: query.brands.split(',')
-				}
-			}
+		match.push({
+			$in: ['$brand', query.brands.split(',')]
 		})
 	}
 
 	if (query.productIds) {
-		stages.push({
-			$match: {
-				_id: {
-					$in: query.productIds.split(',').map((productId: any) => mongoose.Types.ObjectId(productId))
-				}
-			}
+		match.push({
+			$in: ['$_id', query.productIds.split(',').map((productId: any) => mongoose.Types.ObjectId(productId))]
 		})
 	}
 
 	if (query.start) {
-		stages.push({
+		ext.push({
 			$skip: parseInt(query.start)
 		})
 	}
 
 	if (query.quantity) {
-		stages.push({
+		ext.push({
 			$limit: parseInt(query.quantity)
 		})
 	}
@@ -618,15 +524,102 @@ export const getFilteredProducts = (query: any, params: any) => {
 		}
 	}
 
-	stages.push({
-		$match: {
-			purchasable: {
-				$eq: true
-			}
-		}
+	match.push({
+		$eq: ['$purchasable', true]
 	})
 
-	return Product.aggregate(stages)
+	stages.push(
+		{
+			$addFields: {
+				specifications: {
+					$map: {
+						input: '$products',
+						as: 'product',
+						in: '$$product.specifications'
+					}
+				}
+			}
+		},
+		{
+			$addFields: {
+				specifications: {
+					$reduce: {
+						input: '$specifications',
+						initialValue: [],
+						in: { $concatArrays: ['$$value', '$$this'] }
+					}
+				}
+			}
+		},
+		{
+			$unwind: '$specifications'
+		},
+		{
+			$group: {
+				_id: '$specifications.name',
+				values: { $push: '$specifications.value' },
+				productId: { $first: '$_id' },
+				products: { $first: '$products' }
+			}
+		},
+		{
+			$project: {
+				values: 1,
+				productId: 1,
+				products: 1,
+				specifications: {
+					$arrayToObject: {
+						$map: { // TODO map not required but, without map can not crate key value pair ?
+							input: '$values',
+							as: 'el',
+							in: {
+								k: '$_id',
+								v: '$values'
+							}
+						}
+					}
+				}
+			}
+		},
+		{
+			$group: {
+				_id: '$productId',
+				products: { $first: '$products' },
+				specifications: { $push: '$specifications' }
+			}
+		},
+		{
+			$addFields: {
+				productsLength: { $size: '$products' }
+			}
+		}
+	)
+
+	return Category.aggregate([
+		{
+			$match: {
+				slug: params.category
+			}
+		},
+		{
+			$lookup: {
+				from: Product.collection.name,
+				let: { categoryId: '$_id' },
+				pipeline: [
+					{
+						$match: {
+							$expr: {
+								$and: match
+							}
+						}
+					},
+					...ext
+				],
+				as: 'products'
+			}
+		},
+		...stages
+	])
 }
 
 export const getProductsByRange = (categoryId: string, start: string, quantity: string) => (

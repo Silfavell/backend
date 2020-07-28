@@ -93,7 +93,7 @@ router.get('/best-seller', (req, res, next) => {
 // FOR WEB
 router.get('/products-filter/:category?/:subCategory?', (req, res, next) => {
 	getFilteredProducts(req.query, req.params).then((products) => {
-		res.json(products)
+		res.json(products[0])
 	}).catch((reason) => {
 		next(handleError(reason, 'GET /products-filter'))
 	})
