@@ -610,6 +610,13 @@ export const getFilteredProducts = (query: any, params: any) => {
 			$addFields: {
 				productsLength: { $size: '$products' }
 			}
+		},
+		{
+			$project: {
+				products: {
+					specifications: 0
+				}
+			}
 		}
 	)
 
