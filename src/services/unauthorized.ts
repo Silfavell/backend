@@ -562,22 +562,36 @@ export const getFilteredProducts = (query: any, params: any) => {
 				products: { $first: '$products' }
 			}
 		},
+		{ $unwind: '$values' },
+		{
+			$group: {
+				_id: { name: '$_id', val: '$values' },
+				productId: { $first: '$productId' },
+				products: { $first: '$products' },
+				count: { $sum: 1 }
+			}
+		},
+		{
+			$group: {
+				_id: '$_id.name',
+				productId: { $first: '$productId' },
+				products: { $first: '$products' },
+				values: {
+					$push: {
+						value: '$_id.val',
+						count: '$count'
+					}
+				}
+			}
+		},
 		{
 			$project: {
-				values: 1,
+				_id: 1,
 				productId: 1,
 				products: 1,
-				specifications: {
-					$arrayToObject: {
-						$map: { // TODO map not required but, without map can not crate key value pair ?
-							input: '$values',
-							as: 'el',
-							in: {
-								k: '$_id',
-								v: '$values'
-							}
-						}
-					}
+				values: {
+					name: '$_id',
+					values: '$values'
 				}
 			}
 		},
@@ -585,7 +599,11 @@ export const getFilteredProducts = (query: any, params: any) => {
 			$group: {
 				_id: '$productId',
 				products: { $first: '$products' },
-				specifications: { $push: '$specifications' }
+				specifications: {
+					$push: {
+						$arrayElemAt: ['$values', 0]
+					}
+				}
 			}
 		},
 		{
