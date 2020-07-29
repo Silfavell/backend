@@ -76,3 +76,8 @@ export const saveTypeSchema = Joi.object({
 	name: Joi.string().required(),
 	specifications: Joi.array().min(1).items(typeSpecificationSchema).sparse(false).allow(null)
 })
+
+export const updateTypeSchema = Joi.object({
+	name: Joi.string().required(),
+	specifications: Joi.array().min(1).items(typeSpecificationSchema).sparse(false).allow(null)
+})

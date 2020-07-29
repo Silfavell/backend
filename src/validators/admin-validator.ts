@@ -5,7 +5,8 @@ import {
 	saveSubCategorySchema,
 	updateSubCategorySchema,
 	deleteSubCategorySchema,
-	saveTypeSchema
+	saveTypeSchema,
+	updateTypeSchema
 } from '../schemas/admin-schema'
 
 export const validatePostCategory = (category: any) => categorySchema.validateAsync(category)
@@ -23,3 +24,5 @@ export const validatePostProduct = (product: any) => saveProductSchema.validateA
 export const validateUpdateProduct = (product: any) => updateProductSchema.validateAsync(product)
 
 export const validateSaveTypeRequest = (type: any) => saveTypeSchema.validateAsync(type)
+
+export const validateUpdateTypeRequest = (type: any) => updateTypeSchema.validateAsync(type)

@@ -19,7 +19,8 @@ import {
 	validateUpdateSubCategory,
 	validatePostSubCategory,
 	validateDeleteSubCategory,
-	validateSaveTypeRequest
+	validateSaveTypeRequest,
+	validateUpdateTypeRequest
 } from '../validators/admin-validator'
 
 import {
@@ -41,7 +42,10 @@ import {
 	isProductSlugExists,
 	isCategorySlugExists,
 	isSubCategorySlugExists,
-	saveType
+	saveType,
+	updateType,
+	getTypes,
+	isTypeSlugExists
 } from '../services/admin'
 
 import { validateObjectId } from './../services/unauthorized'
@@ -275,15 +279,40 @@ router.delete('/product/:_id', (req, res, next) => {
 		})
 })
 
+router.get('/types', (req, res, next) => {
+	getTypes()
+		.then((types) => {
+			res.json(types)
+		})
+		.catch((reason) => {
+			next(handleError(reason, 'GET /admin/types'))
+		})
+})
+
+
 router.post('/save-type', (req, res, next) => {
 	validateSaveTypeRequest(req.body)
-		.then(() => getSeoUrl(req.body.name)) // TODO is type slug exists ?
+		.then(() => getSeoUrl(req.body.name))
+		.then((slug) => isTypeSlugExists(slug))
 		.then((slug) => saveType({ ...req.body, slug }))
 		.then((type) => {
 			res.json(type)
 		})
 		.catch((reason) => {
 			next(handleError(reason, 'POST /admin/save-type'))
+		})
+})
+
+router.put('/update-type/:_id', (req, res, next) => {
+	validateUpdateTypeRequest(req.body)
+		.then(() => getSeoUrl(req.body.name))
+		.then((slug) => isTypeSlugExists(slug, req.params._id))
+		.then((slug) => updateType(req.params._id, { ...req.body, slug }))
+		.then((type) => {
+			res.json(type)
+		})
+		.catch((reason) => {
+			next(handleError(reason, 'PUT /admin/update-type/:_id'))
 		})
 })
 
