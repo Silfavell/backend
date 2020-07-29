@@ -429,8 +429,7 @@ export const getFilteredProducts = (query: any, params: any) => {
 						{
 							$match: {
 								$expr: {
-									$eq: [query.type, '$name']
-									// $eq: [query.type, '$slug'] // TODO .....
+									$eq: [query.type, '$slug']
 								}
 							}
 						}
