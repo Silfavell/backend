@@ -16,16 +16,7 @@ const productTypeSchema = new Schema({
 		type: String,
 		required: true
 	},
-	specifications: [{
-		_id: {
-			type: Schema.Types.ObjectId,
-			required: true
-		},
-		name: {
-			type: String,
-			required: true
-		}
-	}]
+	specifications: [Schema.Types.ObjectId] // TODO ?
 })
 
 export default mongoose.model<ProductTypeDocument>('ProductType', productTypeSchema)

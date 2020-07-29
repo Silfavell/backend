@@ -53,9 +53,9 @@ import { validateObjectId } from './../services/unauthorized'
 const router = Router()
 
 router.use(fileUpload({
-	createParentPath: true
+	createParentPath: true	
 }))
-router.use(validateAuthority(Authority.ANONIM))
+router.use(validateAuthority(Authority.ADMIN))
 
 router.get('/test', (req, res) => {
 	res.json({ status: true })
