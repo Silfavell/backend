@@ -372,6 +372,95 @@ export const getFilteredProductsWithCategories = (query: any) => {
 	])
 }
 
+const getSpecificationFilterStages = (query: any) => {
+
+	const blackList = [
+		'category',
+		'type',
+		'categoryId',
+		'subCategoryId',
+		'brands',
+		'productIds',
+		'start',
+		'quantity',
+		'sortType'
+	]
+
+	const specificationKeys = Object.keys(query).filter((key) => !blackList.includes(key))
+
+	if (specificationKeys.length > 0) {
+		return [
+			{
+				$addFields: {
+					specs: '$specifications'
+				}
+			},
+			{
+				$unwind: '$specifications'
+			},
+			{
+				$match: {
+					$expr: {
+						$or: (
+							specificationKeys.reduce((prevVal: any, curVal) => {
+								return [...prevVal, {
+									$and: [
+										{
+											$eq: ['$specifications.name', curVal],
+										},
+										{
+											$in: ['$specifications.value', query[curVal].split(',')]
+										}
+									]
+								}]
+							}, [])
+						)
+					}
+				}
+			},
+			//	{
+			//		$match: {
+			//			$expr: {
+			//				$or: [
+			//					{
+			//						$and: [
+			//							{
+			//								$eq: ['$specifications.name', 'Renk'],
+			//							},
+			//							{
+			//								$in: ['$specifications.value', ['Mor', 'Mavi']]
+			//							}
+			//						]
+			//					}
+			//				]
+			//			}
+			//		}
+			//	},
+			{
+				$group: {
+					_id: '$_id',
+					root: { $first: '$$ROOT' },
+					specs: { $first: '$specs' }
+				}
+			},
+			{
+				$addFields: {
+					root: {
+						specifications: '$specs'
+					}
+				}
+			},
+			{
+				$replaceRoot: {
+					newRoot: '$root'
+				}
+			}
+		]
+	}
+
+	return []
+}
+
 export const getFilteredProducts = (query: any, params: any) => {
 	const stages = []
 	const match = []
@@ -483,7 +572,7 @@ export const getFilteredProducts = (query: any, params: any) => {
 
 	if (query.productIds) {
 		match.push({
-			$in: ['$_id', query.productIds.split(',').map((productId: any) => mongoose.Types.ObjectId(productId))]
+			$in: ['$_id', query.productIds.split(',').map((productId: string) => mongoose.Types.ObjectId(productId))]
 		})
 	}
 
@@ -615,7 +704,8 @@ export const getFilteredProducts = (query: any, params: any) => {
 		{
 			$project: {
 				products: {
-					specifications: 0
+					specifications: 0,
+					specs: 0
 				}
 			}
 		}
@@ -642,7 +732,8 @@ export const getFilteredProducts = (query: any, params: any) => {
 							}
 						}
 					},
-					...ext
+					...ext,
+					...getSpecificationFilterStages(query)
 				],
 				as: 'products'
 			}

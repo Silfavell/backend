@@ -53,7 +53,7 @@ import { validateObjectId } from './../services/unauthorized'
 const router = Router()
 
 router.use(fileUpload({
-	createParentPath: true	
+	createParentPath: true
 }))
 router.use(validateAuthority(Authority.ADMIN))
 
@@ -218,6 +218,11 @@ router.post('/product', (req, res, next) => {
 
 	if (req.body.specifications) {
 		req.body.specifications = JSON.parse(req.body.specifications)
+
+		req.body.specifications.map((spec: any) => ({
+			...spec,
+			slug: getSeoUrl(spec.name)
+		}))
 	}
 
 	validatePostProduct(req.body)
@@ -248,6 +253,11 @@ router.put('/product/:_id', (req, res, next) => {
 
 	if (req.body.specifications) {
 		req.body.specifications = JSON.parse(req.body.specifications)
+
+		req.body.specifications.map((spec: any) => ({
+			...spec,
+			slug: getSeoUrl(spec.name)
+		}))
 	}
 
 	validateUpdateProduct(req.body)

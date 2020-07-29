@@ -3,11 +3,16 @@ import mongoose, { Document, Schema } from 'mongoose'
 
 export type ProductSpecificationDocument = Document & {
     name: string,
+    slug: string,
     value: string
 }
 
 const productSpecificationSchema = new Schema({
     name: {
+        type: String,
+        required: true
+    },
+    slug: {
         type: String,
         required: true
     },
