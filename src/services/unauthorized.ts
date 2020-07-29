@@ -628,6 +628,9 @@ export const getFilteredProducts = (query: any, params: any) => {
 		//		}
 		//	},
 		{
+			$limit: 1
+		},
+		{
 			$lookup: {
 				from: Product.collection.name,
 				let: { categoryId: '$_id' },
