@@ -148,14 +148,6 @@ export const getProductsWithCategories = () => (
 			}
 		},
 		{
-			$project: {
-				products: {
-					subCategoryId: 0,
-					__v: 0
-				}
-			}
-		},
-		{
 			$match: {
 				'products.0': { $exists: true }
 			}
