@@ -472,6 +472,36 @@ const getSpecificationFilterStages = (query: any) => {
 	return []
 }
 
+const getSortSpecificationsStages = () => ([
+	{
+		$unwind: '$specifications'
+	},
+	{
+		$sort: {
+			'specifications.name': 1
+		}
+	},
+	{
+		$group: {
+			_id: '$_id',
+			specifications: { $push: '$specifications' },
+			root: { $first: '$$ROOT' }
+		}
+	},
+	{
+		$addFields: {
+			root: {
+				specifications: '$specifications'
+			}
+		}
+	},
+	{
+		$replaceRoot: {
+			newRoot: '$root'
+		}
+	}
+])
+
 export const filterShop = (query: any, params: any) => {
 	const stages = []
 	const match = []
@@ -719,7 +749,8 @@ export const filterShop = (query: any, params: any) => {
 					specs: 0
 				}
 			}
-		}
+		},
+		...getSortSpecificationsStages()
 	)
 
 	return Category.aggregate([
