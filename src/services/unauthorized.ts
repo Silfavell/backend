@@ -58,6 +58,11 @@ export const getCategories = () => (
 			}
 		},
 		{
+			$addFields: {
+				subCategories: { $ifNull: ['$subCategories', { types: [] }] }
+			}
+		},
+		{
 			$lookup: {
 				from: ProductType.collection.name,
 				let: { 'types': '$subCategories.types' },
