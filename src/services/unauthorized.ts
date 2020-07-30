@@ -239,27 +239,6 @@ export const getBestSellerProducts = () => (
 	])
 )
 
-export const getProductsLength = (query: any) => {
-	// eslint-disable-next-line no-param-reassign
-	delete query.sortType
-	// eslint-disable-next-line no-param-reassign
-	delete query.start
-	// eslint-disable-next-line no-param-reassign
-	delete query.quantity
-
-	if (query.brands) {
-		const brandList = query.brands.split(',')
-		// eslint-disable-next-line no-param-reassign
-		delete query.brands
-		return Product
-			.where('purchasable', true)
-			.where('brand')
-			.in(brandList)
-			.countDocuments(query)
-	}
-	return Product.countDocuments(query)
-}
-
 export const getFilteredProductsWithCategories = (query: any) => {
 	const match = [
 		{

@@ -25,7 +25,6 @@ import {
 	takeOffProductFromCart,
 	changePassword,
 	sendActivationCode,
-	getProductsLength,
 	filterShop,
 	getFilteredProductsWithCategories,
 	validateObjectId,
@@ -108,14 +107,6 @@ router.get('/products-filter-with-categories', (req, res, next) => {
 		}).catch((reason) => {
 			next(handleError(reason, 'GET /products-filter-with-categories'))
 		})
-})
-
-router.get('/products-length', (req, res, next) => {
-	getProductsLength(req.query).then((length) => {
-		res.json(length)
-	}).catch((reason) => {
-		next(handleError(reason, 'GET /products-length'))
-	})
 })
 
 router.put('/add-product/:_id', (req, res, next) => {
