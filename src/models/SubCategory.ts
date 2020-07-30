@@ -12,13 +12,17 @@ export type SubCategoryDocument = Document & {
 
 const subCategorySchema = new Schema({
 	name: {
-		type: String
+		type: String,
+		required: true
 	},
 	slug: {
 		type: String,
 		required: true
 	},
-	types: [Schema.Types.ObjectId],
+	types: {
+		type: [Schema.Types.ObjectId],
+		default: []
+	},
 	brands: [Brand.schema]
 })
 

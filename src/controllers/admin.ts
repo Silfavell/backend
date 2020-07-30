@@ -219,7 +219,7 @@ router.post('/product', (req, res, next) => {
 	if (req.body.specifications) {
 		req.body.specifications = JSON.parse(req.body.specifications)
 
-		req.body.specifications.map((spec: any) => ({
+		req.body.specifications = req.body.specifications.map((spec: any) => ({
 			...spec,
 			slug: getSeoUrl(spec.name)
 		}))
@@ -254,7 +254,7 @@ router.put('/product/:_id', (req, res, next) => {
 	if (req.body.specifications) {
 		req.body.specifications = JSON.parse(req.body.specifications)
 
-		req.body.specifications.map((spec: any) => ({
+		req.body.specifications = req.body.specifications.map((spec: any) => ({
 			...spec,
 			slug: getSeoUrl(spec.name)
 		}))

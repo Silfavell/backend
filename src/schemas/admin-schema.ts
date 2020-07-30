@@ -32,6 +32,7 @@ const colorSchema = Joi.object({
 
 const productSpecificationsSchema = Joi.object({
 	name: Joi.string().required(),
+	slug: Joi.string().required(),
 	value: Joi.string().required()
 })
 
@@ -67,17 +68,12 @@ export const updateProductSchema = Joi.object({
 	color: colorSchema.allow(null)
 }).with('colorGroup', ['color']).required()
 
-const typeSpecificationSchema = Joi.object({
-	_id: Joi.string().required(),
-	name: Joi.string().required()
-})
-
 export const saveTypeSchema = Joi.object({
 	name: Joi.string().required(),
-	specifications: Joi.array().min(1).items(typeSpecificationSchema).sparse(false).allow(null)
+	specifications: Joi.array().min(1).items(Joi.string().required()).sparse(false).allow(null)
 })
 
 export const updateTypeSchema = Joi.object({
 	name: Joi.string().required(),
-	specifications: Joi.array().min(1).items(typeSpecificationSchema).sparse(false).allow(null)
+	specifications: Joi.array().min(1).items(Joi.string().required()).sparse(false).allow(null)
 })

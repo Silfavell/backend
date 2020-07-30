@@ -4,7 +4,7 @@ import mongoose, { Document, Schema } from 'mongoose'
 export type ProductTypeDocument = Document & {
 	name: string,
 	slug: string,
-	specifications: [Schema.Types.ObjectId]
+	specifications: [string]
 }
 
 const productTypeSchema = new Schema({
@@ -16,7 +16,10 @@ const productTypeSchema = new Schema({
 		type: String,
 		required: true
 	},
-	specifications: [Schema.Types.ObjectId] // TODO ?
+	specifications: {
+		type: [String],
+		default: []
+	}
 })
 
 export default mongoose.model<ProductTypeDocument>('ProductType', productTypeSchema)

@@ -25,9 +25,8 @@ import {
 	takeOffProductFromCart,
 	changePassword,
 	sendActivationCode,
-	getProductsByRange,
 	getProductsLength,
-	getFilteredProducts,
+	filterShop,
 	getFilteredProductsWithCategories,
 	validateObjectId,
 	setProductToCart,
@@ -91,9 +90,9 @@ router.get('/best-seller', (req, res, next) => {
 })
 
 // FOR WEB
-router.get('/products-filter/:category?/:subCategory?', (req, res, next) => {
-	getFilteredProducts(req.query, req.params).then((products) => {
-		res.json(products[0])
+router.get('/filter-shop/:category?/:subCategory?', (req, res, next) => {
+	filterShop(req.query, req.params).then((shop) => {
+		res.json(shop[0])
 	}).catch((reason) => {
 		next(handleError(reason, 'GET /products-filter'))
 	})

@@ -44,7 +44,7 @@ export const sendSms = (to: string, message: string) => {
 		apiSecret: 'ivcyJQr7tWmvT4yP',
 	})
 
-	const from = 'Platform App'
+	const from = 'Silfavell'
 
 	smsManager.message.sendSms(from, to, message)
 }
@@ -52,7 +52,10 @@ export const sendSms = (to: string, message: string) => {
 export const getCategories = () => (
 	Category.aggregate([
 		{
-			$unwind: '$subCategories'
+			$unwind: {
+				path: '$subCategories',
+				preserveNullAndEmptyArrays: true
+			}
 		},
 		{
 			$lookup: {
@@ -77,7 +80,23 @@ export const getCategories = () => (
 				name: { $first: '$name' },
 				slug: { $first: '$slug' },
 				brands: { $first: '$brands' },
-				subCategories: { $push: '$subCategories' },
+				subCategories: { $push: '$subCategories' }
+			}
+		},
+		{
+			$project: {
+				_id: 1,
+				imagePath: 1,
+				name: 1,
+				slug: 1,
+				brands: 1,
+				subCategories: {
+					$filter: {
+						input: '$subCategories',
+						as: 'subCategory',
+						cond: { $gt: ['$$subCategory._id', null] }
+					}
+				}
 			}
 		}
 	])
@@ -461,7 +480,7 @@ const getSpecificationFilterStages = (query: any) => {
 	return []
 }
 
-export const getFilteredProducts = (query: any, params: any) => {
+export const filterShop = (query: any, params: any) => {
 	const stages = []
 	const match = []
 	const ext = []
@@ -741,11 +760,6 @@ export const getFilteredProducts = (query: any, params: any) => {
 		...stages
 	])
 }
-
-export const getProductsByRange = (categoryId: string, start: string, quantity: string) => (
-	// eslint-disable-next-line radix
-	Product.find({ categoryId }).skip(parseInt(start)).limit(parseInt(quantity))
-)
 
 export const validateObjectId = (objectId: string) => (
 	new Promise((resolve, reject) => {
