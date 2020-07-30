@@ -476,7 +476,10 @@ const getListSpecificationsStages = () => [
 		}
 	},
 	{
-		$unwind: '$specifications'
+		$unwind: {
+			path: '$specifications',
+			preserveNullAndEmptyArrays: true
+		}
 	},
 	{
 		$group: {
@@ -488,7 +491,10 @@ const getListSpecificationsStages = () => [
 		}
 	},
 	{
-		$unwind: '$values'
+		$unwind: {
+			path: '$values',
+			preserveNullAndEmptyArrays: true
+		}
 	},
 	{
 		$group: {
@@ -525,6 +531,22 @@ const getListSpecificationsStages = () => [
 		}
 	},
 	{
+		$project: {
+			_id: 1,
+			productId: 1,
+			products: 1,
+			values: {
+				$filter: {
+					input: '$values',
+					as: 'value',
+					cond: {
+						$ne: ['$$value.slug', null]
+					}
+				}
+			}
+		}
+	},
+	{
 		$group: {
 			_id: '$productId',
 			products: { $first: '$products' },
@@ -552,7 +574,10 @@ const getListSpecificationsStages = () => [
 
 const getSortSpecificationsStages = () => ([
 	{
-		$unwind: '$specifications'
+		$unwind: {
+			path: '$specifications',
+			preserveNullAndEmptyArrays: true
+		}
 	},
 	{
 		$sort: {
