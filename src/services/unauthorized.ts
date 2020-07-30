@@ -417,7 +417,7 @@ const getSpecificationFilterStages = (query: any) => {
 								return [...prevVal, {
 									$and: [
 										{
-											$eq: ['$specifications.name', curVal],
+											$eq: ['$specifications.slug', curVal],
 										},
 										{
 											$in: ['$specifications.value', query[curVal].split(',')]
@@ -686,6 +686,7 @@ export const filterShop = (query: any, params: any) => {
 		{
 			$group: {
 				_id: '$specifications.name',
+				specificationSlug: { $first: '$specifications.slug' },
 				values: { $push: '$specifications.value' },
 				productId: { $first: '$_id' },
 				products: { $first: '$products' }
@@ -696,7 +697,7 @@ export const filterShop = (query: any, params: any) => {
 		},
 		{
 			$group: {
-				_id: { name: '$_id', val: '$values' },
+				_id: { name: '$_id', slug: '$specificationSlug', val: '$values' },
 				productId: { $first: '$productId' },
 				products: { $first: '$products' },
 				count: { $sum: 1 }
@@ -705,6 +706,7 @@ export const filterShop = (query: any, params: any) => {
 		{
 			$group: {
 				_id: '$_id.name',
+				specificationSlug: { $first: '$_id.slug' },
 				productId: { $first: '$productId' },
 				products: { $first: '$products' },
 				values: {
@@ -722,6 +724,7 @@ export const filterShop = (query: any, params: any) => {
 				products: 1,
 				values: {
 					name: '$_id',
+					slug: '$specificationSlug',
 					values: '$values'
 				}
 			}
