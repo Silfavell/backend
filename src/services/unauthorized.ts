@@ -658,51 +658,70 @@ export const filterShop = (query: any, params: any) => {
 	const match = []
 	const ext = []
 
+	const categoryMatch = []
+
 	if (params.category) {
 		if (params.subCategory) {
-			stages.push(
+			categoryMatch.push(
 				{
-					$project: {
-						_id: 1,
-						slug: 1,
-						products: 1,
-						subCategories: {
-							$filter: {
-								input: '$subCategories',
-								as: 'subCategory',
-								cond: {
-									$eq: ['$$subCategory.slug', params.subCategory]
-								}
-							}
-						}
+					$match: {
+						slug: params.category
+					}
+				},
+				{
+					$unwind: '$subCategories'
+				},
+				{
+					$match: {
+						'subCategories.slug': params.subCategory
 					}
 				},
 				{
 					$project: {
-						_id: 1,
-						slug: 1,
-						products: 1,
-						subCategory: {
-							$arrayElemAt: ['$subCategories', 0]
+						categoryId: {
+							$toString: '$_id'
+						},
+						subCategoryId: {
+							$toString: '$subCategories._id'
 						}
 					}
 				}
 			)
+
+			match.push({
+				$and: [
+					{
+						$eq: ['$categoryId', '$$categoryId']
+					},
+					{
+						$eq: ['$subCategoryId', '$$subCategoryId']
+					}
+				]
+			})
 		} else {
-			stages.push(
+			categoryMatch.push(
 				{
 					$match: {
-						$expr: {
-							$eq: ['$categoryId', '$categoryId']
+						slug: params.category
+					}
+				},
+				{
+					$project: {
+						categoryId: {
+							$toString: '$_id'
 						}
 					}
 				}
 			)
+
+			match.push({
+				$eq: ['$categoryId', '$$categoryId']
+			})
 		}
 	}
 
 	if (query.type) {
-		stages.push(
+		ext.push(
 			{
 				$lookup: {
 					from: ProductType.collection.name,
@@ -724,15 +743,9 @@ export const filterShop = (query: any, params: any) => {
 				}
 			},
 			{
-				$project: {
-					products: {
-						$filter: {
-							input: '$products',
-							as: 'product',
-							cond: {
-								$eq: ['$typeObj._id', '$$product.type']
-							}
-						}
+				$match: {
+					$expr: {
+						$eq: ['$typeObj._id', '$type']
 					}
 				}
 			},
@@ -783,7 +796,7 @@ export const filterShop = (query: any, params: any) => {
 	if (query.sortType) {
 		switch (parseInt(query.sortType)) {
 			case ProductSort.MIN_PRICE: {
-				stages.push({
+				ext.push({
 					$sort: {
 						price: -1
 					}
@@ -792,7 +805,7 @@ export const filterShop = (query: any, params: any) => {
 			}
 
 			case ProductSort.MAX_PRICE: {
-				stages.push({
+				ext.push({
 					$sort: {
 						price: 1
 					}
@@ -809,18 +822,14 @@ export const filterShop = (query: any, params: any) => {
 	})
 
 	return Category.aggregate([
-		//	{
-		//		$match: {
-		//			slug: params.category
-		//		}
-		//	},
-		{
-			$limit: 1
-		},
+		...categoryMatch,
 		{
 			$lookup: {
 				from: Product.collection.name,
-				let: { categoryId: '$_id' },
+				let: {
+					categoryId: '$categoryId',
+					subCategoryId: '$subCategoryId'
+				},
 				pipeline: [
 					{
 						$match: {

@@ -44,10 +44,7 @@ export const saveCategoryToDatabase = (categoryContext: CategoryDocument) => (
 export const saveSubCategoryToDatabase = (body: any) => (
 	Category.findByIdAndUpdate(body.parentCategoryId, {
 		$push: {
-			subCategories: {
-				name: body.name,
-				slug: body.slug
-			}
+			subCategories: body
 		}
 	}, { new: true })
 )
