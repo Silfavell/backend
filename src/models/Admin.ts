@@ -32,13 +32,11 @@ const adminSchema = new Schema({
 
 // eslint-disable-next-line func-names, consistent-return
 adminSchema.pre('save', function (next) { // do not update.
-	const manager = this
-	if (!manager.isModified('password')) return next()
+	const admin = this as AdminDocument
+	if (!admin.isModified('password')) return next()
 
-	// @ts-ignore
-	bcrypt.hash(manager.password, 10).then((hash) => {
-		// @ts-ignore
-		manager.password = hash
+	bcrypt.hash(admin.password, 10).then((hash) => {
+		admin.password = hash
 		next()
 	})
 })

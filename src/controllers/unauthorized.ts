@@ -110,11 +110,8 @@ router.get('/products-filter-with-categories', (req, res, next) => {
 })
 
 router.put('/add-product/:_id', (req, res, next) => {
-	// @ts-ignore
 	validateObjectId(req.params._id)
-		// @ts-ignore
 		.then(() => getSingleProduct(req.params._id, req.user))
-		// @ts-ignore
 		.then(({ product, cart }) => addProductToCart(product, cart || null, req.user, req.body.quantity))
 		.then((response) => {
 			res.json(response)
@@ -125,12 +122,9 @@ router.put('/add-product/:_id', (req, res, next) => {
 })
 
 router.put('/set-product/:_id', (req, res, next) => {
-	// @ts-ignore
 	validateObjectId(req.params._id)
 		.then(() => validateSetProductRequest(req.body))
-		// @ts-ignore
 		.then(() => getSingleProduct(req.params._id, req.user))
-		// @ts-ignore
 		.then(({ product, cart }) => setProductToCart(product, cart || null, req.user, req.body.quantity))
 		.then((response) => {
 			res.json(response)
@@ -141,8 +135,7 @@ router.put('/set-product/:_id', (req, res, next) => {
 })
 
 router.get('/product/:slug', (req, res, next) => {
-	// @ts-ignore
-	getProductAndWithColorGroup(req.params.slug, req.user)
+	getProductAndWithColorGroup(req.params.slug)
 		.then((response: any) => {
 			res.json(response[0])
 		})
@@ -152,11 +145,8 @@ router.get('/product/:slug', (req, res, next) => {
 })
 
 router.put('/deduct-product/:_id', (req, res, next) => {
-	// @ts-ignore
 	validateObjectId(req.params._id)
-		// @ts-ignore
 		.then(() => getSingleProduct(req.params._id, req.user))
-		// @ts-ignore
 		.then(({ product, cart }) => takeOffProductFromCart(product, cart || null, req.user, req.body.quantity))
 		.then((response: any) => {
 			res.json(response)

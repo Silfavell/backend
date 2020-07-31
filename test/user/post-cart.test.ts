@@ -53,8 +53,6 @@ export default () => describe('POST /user/cart', () => {
 				}
 
 				expect(Object.values(response.body.cart).length).to.equal(2)
-				// @ts-ignore
-				// eslint-disable-next-line security/detect-object-injection
 				expect([
 					{
 						_id: JSON.parse(process.env.product)._id,
@@ -64,8 +62,7 @@ export default () => describe('POST /user/cart', () => {
 						_id: JSON.parse(process.env.product2)._id,
 						quantity: 4
 					}
-					// @ts-ignore
-					// eslint-disable-next-line security/detect-object-injection
+				// @ts-ignore
 				].every((product, index) => product._id === Object.values(response.body.cart)[index]._id)).to.equal(true)
 				done()
 			})

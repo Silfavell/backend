@@ -1,5 +1,4 @@
 import JoiBase from '@hapi/joi'
-// @ts-ignore
 import JoiPhoneNumber from 'joi-phone-number'
 
 const Joi = JoiBase.extend(JoiPhoneNumber)

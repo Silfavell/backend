@@ -109,11 +109,10 @@ const productSchema = new Schema({
 
 // eslint-disable-next-line func-names
 productSchema.pre('save', function (next) {
-	const product = this
+	const product = this as ProductDocument
 	if (product.isNew) {
 		// eslint-disable-next-line no-use-before-define
-		Product.find().sort({ image: -1 }).limit(1).then((total) => {
-			// @ts-ignore
+		Product.find().sort({ image: -1 }).limit(1).then((total: ProductDocument[]) => {
 			product.image = total.length === 0 ? 1 : total[0].image + 1
 			next()
 		})

@@ -51,7 +51,6 @@ const router = Router()
 router.use(validateAuthority(Authority.USER))
 
 router.get('/list-cards', (req, res, next) => {
-	// @ts-ignore
 	listCards(req.user.cardUserKey).then((cards) => {
 		res.json(cards)
 	}).catch((reason) => {
@@ -62,7 +61,6 @@ router.get('/list-cards', (req, res, next) => {
 router.post('/payment-card', (req, res, next) => {
 	// addCardToUser(req.user.cardUserKey, req.body.card).then((result) => {
 	validatePostPaymentCardRequest(req.body.card)
-		// @ts-ignore
 		.then(() => addCardToUser(req.user, req.body.card))
 		.then((result) => {
 			res.json(result)
@@ -73,7 +71,6 @@ router.post('/payment-card', (req, res, next) => {
 
 router.put('/payment-card', (req, res, next) => {
 	validateDeletePaymentCardRequest(req.body)
-		// @ts-ignore
 		.then(() => deleteCard(req.user, req.body.cardToken))
 		.then((result) => {
 			res.json(result)
@@ -83,7 +80,6 @@ router.put('/payment-card', (req, res, next) => {
 })
 
 router.get('/profile', (req, res, next) => {
-	// @ts-ignore
 	isUserExists(req.user.phoneNumber)
 		.then((user) => {
 			res.json(user)
@@ -95,7 +91,6 @@ router.get('/profile', (req, res, next) => {
 
 router.put('/profile', (req, res, next) => {
 	validateUpdateProfileRequest(req.body)
-		// @ts-ignore
 		.then(() => updateUser(req.user._id, req.body))
 		.then((user) => {
 			res.json(user)
@@ -106,11 +101,8 @@ router.put('/profile', (req, res, next) => {
 })
 
 router.post('/cart', (req, res, next) => {
-	// @ts-ignore
 	validateSaveCartRequest(req.body)
-		// @ts-ignore
 		.then(() => validateSaveCartProducts(req.body))
-		// @ts-ignore
 		.then(() => saveCart(req.user._id, req.body))
 		.then((result) => {
 			res.json(result)
@@ -121,7 +113,6 @@ router.post('/cart', (req, res, next) => {
 })
 
 router.delete('/cart', (req, res, next) => {
-	//  @ts-ignore
 	clearCart(req.user._id.toString()).then(() => {
 		res.json()
 	}).catch((reason) => {
@@ -130,7 +121,6 @@ router.delete('/cart', (req, res, next) => {
 })
 
 router.get('/cart', (req, res, next) => {
-	//  @ts-ignore
 	getCart(req.user._id.toString()).then((cart) => {
 		res.json({ cart })
 	}).catch((reason) => {
@@ -140,7 +130,6 @@ router.get('/cart', (req, res, next) => {
 
 router.post('/address', (req, res, next) => {
 	validateSaveAddressRequest(req.body)
-		// @ts-ignore
 		.then(() => saveAddressToDatabase(req.user._id, req.body))
 		.then((user) => {
 			res.json(user)
@@ -151,7 +140,6 @@ router.post('/address', (req, res, next) => {
 })
 
 router.get('/orders', (req, res, next) => {
-	// @ts-ignore
 	getOrders(req.user.phoneNumber)
 		.then((orders) => {
 			res.json(orders)
@@ -162,7 +150,6 @@ router.get('/orders', (req, res, next) => {
 })
 
 router.get('/favorite-products', (req, res, next) => {
-	// @ts-ignore
 	getFavoriteProductsFromDatabase(req.user._id)
 		.then((favoriteProducts) => {
 			res.json(favoriteProducts[0])
@@ -174,8 +161,7 @@ router.get('/favorite-products', (req, res, next) => {
 
 router.post('/favorite-product', (req, res, next) => {
 	validateFavoriteProductRequest(req.body)
-		// @ts-ignore
-		.then(() => saveFavoriteProductToDatabase(req.user._id, req.body))
+			.then(() => saveFavoriteProductToDatabase(req.user._id, req.body))
 		.then(({ favoriteProducts }) => {
 			res.json(favoriteProducts)
 		})
@@ -186,8 +172,7 @@ router.post('/favorite-product', (req, res, next) => {
 
 router.delete('/favorite-product/:_id', (req, res, next) => {
 	validateFavoriteProductRequest(req.params)
-		// @ts-ignore
-		.then(() => removeFavoriteProductFromDatabase(req.user._id, req.params._id))
+			.then(() => removeFavoriteProductFromDatabase(req.user._id, req.params._id))
 		.then(({ favoriteProducts }) => {
 			res.json(favoriteProducts)
 		})
@@ -197,7 +182,6 @@ router.delete('/favorite-product/:_id', (req, res, next) => {
 })
 
 router.delete('/address/:_id', (req, res, next) => {
-	// @ts-ignore
 	deleteAddress(req.user._id, req.params._id)
 		.then((user) => {
 			res.json(user)
@@ -209,15 +193,11 @@ router.delete('/address/:_id', (req, res, next) => {
 
 router.post('/order', (req, res, next) => {
 	validateMakeOrderRequest(req.body)
-		// @ts-ignore
-		.then(() => checkMakeOrderValues(req.user, req.body))
-		// @ts-ignore
-		.then(({ cart, card, selectedAddress }) => completePayment(req.user, cart, selectedAddress.openAddress, card).then((result) => ({ cart, selectedAddress, result })))
-		// @ts-ignore
-		.then(({ cart, selectedAddress, result }) => saveOrderToDatabase(req.user, cart, selectedAddress).then((order) => ({ cart, order, result })))
+			.then(() => checkMakeOrderValues(req.user, req.body))
+			.then(({ cart, card, selectedAddress }) => completePayment(req.user, cart, selectedAddress.openAddress, card).then((result) => ({ cart, selectedAddress, result })))
+			.then(({ cart, selectedAddress, result }) => saveOrderToDatabase(req.user, cart, selectedAddress).then((order) => ({ cart, order, result })))
 		.then((orderResult) => updateProductsSoldTimes(orderResult.cart).then(() => orderResult))
-		// @ts-ignore
-		.then((orderResult) => clearCart(req.user._id.toString()).then(() => orderResult))
+			.then((orderResult) => clearCart(req.user._id.toString()).then(() => orderResult))
 		.then((orderResult) => {
 			res.json(orderResult)
 		})
@@ -228,12 +208,9 @@ router.post('/order', (req, res, next) => {
 
 router.put('/change-password', (req, res, next) => {
 	validateChangePasswordRequest(req.body)
-		// @ts-ignore
-		.then(() => comparePasswords(req.user.password, req.body.oldPassword))
-		// @ts-ignore
-		.then(() => isUserExists(req.user.phoneNumber))
-		// @ts-ignore
-		.then((user) => changePassword(user, req.body.newPassword))
+			.then(() => comparePasswords(req.user.password, req.body.oldPassword))
+			.then(() => isUserExists(req.user.phoneNumber))
+			.then((user) => changePassword(user, req.body.newPassword))
 		.then(() => {
 			res.json()
 		})

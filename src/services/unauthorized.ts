@@ -479,8 +479,7 @@ const getListSpecificationsStages = () => [
 			specifications: {
 				$reduce: {
 					input: '$specifications',
-					// @ts-ignore
-					initialValue: [],
+					initialValue: [] as string[],
 					in: { $concatArrays: ['$$value', '$$this'] }
 				}
 			}
@@ -653,8 +652,7 @@ const getBrandsStages = () => ([
 			products: {
 				$reduce: {
 					input: '$products',
-					// @ts-ignore
-					initialValue: [],
+					initialValue: [] as string[],
 					in: { $concatArrays: ['$$value', '$$this'] }
 				}
 			}
@@ -930,7 +928,7 @@ export const validateObjectId = (objectId: string) => (
 )
 
 export const getSingleProduct = (productId: string, user: UserDocument) => (
-	Product.findById(productId).then((product) => {
+	Product.findById(productId).then((product: ProductDocument) => {
 		if (product) {
 			return Cart.findOne({ userId: user?._id?.toString() }).then((cart) => {
 				if (cart) {
@@ -1013,7 +1011,6 @@ export const getProductAndWithColorGroup = (slug: string) => (
 
 export const addProductToCart = (product: ProductDocument, cartObj: CartDocument, user: UserDocument, quantity: number) => (
 	new Promise((resolve) => {
-		// @ts-ignore
 		if (user?._id.toString()) {
 			if (cartObj && cartObj.cart) {
 				const foundCartProduct = cartObj.cart.find((cartProduct => cartProduct._id === product._id.toString()))
@@ -1055,7 +1052,6 @@ export const addProductToCart = (product: ProductDocument, cartObj: CartDocument
 
 export const setProductToCart = (product: ProductDocument, cartObj: CartDocument, user: UserDocument, quantity: number) => (
 	new Promise((resolve) => {
-		// @ts-ignore
 		if (user?._id.toString()) {
 			if (quantity === 0) {
 				Cart.findOneAndUpdate({ userId: user._id.toString() }, {
