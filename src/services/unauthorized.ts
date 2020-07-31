@@ -103,6 +103,11 @@ export const getCategories = () => (
 					}
 				}
 			}
+		},
+		{
+			$sort: {
+				imagePath: 1
+			}
 		}
 	])
 )
