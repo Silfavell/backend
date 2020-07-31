@@ -383,7 +383,8 @@ const getSpecificationFilterStages = (query: any) => {
 		'productIds',
 		'start',
 		'quantity',
-		'sortType'
+		'sortType',
+		'price'
 	]
 
 	const specificationKeys = Object.keys(query).filter((key) => !blackList.includes(key))
@@ -796,6 +797,49 @@ export const filterShop = (query: any, params: any) => {
 		ext.push({
 			$limit: parseInt(query.quantity)
 		})
+	}
+
+	if (query.price) {
+		ext.push(
+			{
+				$addFields: {
+					doNotHasDicountedPrice: {
+						$ifNull: ['$price', true]
+					}
+				}
+			},
+			{
+				$match: {
+					$expr: {
+						$or: [
+							{
+								$and: [
+									{
+										$gte: ['$discountedPrice', parseInt(query.price.split('-')[0])]
+									},
+									{
+										$lte: ['$discountedPrice', parseInt(query.price.split('-')[1])]
+									}
+								]
+							},
+							{
+								$and: [
+									{
+										$eq: ['$doNotHasDicountedPrice', true]
+									},
+									{
+										$gte: ['$price', parseInt(query.price.split('-')[0])]
+									},
+									{
+										$lte: ['$price', parseInt(query.price.split('-')[1])]
+									}
+								]
+							}
+						]
+					}
+				}
+			}
+		)
 	}
 
 	if (query.sortType) {
