@@ -618,7 +618,10 @@ const getSortSpecificationsStages = () => ([
 
 const getBrandsStages = () => ([
 	{
-		$unwind: '$products'
+		$unwind: {
+			path: '$products',
+			preserveNullAndEmptyArrays: true
+		}
 	},
 	{
 		$group: {
@@ -653,6 +656,21 @@ const getBrandsStages = () => ([
 					// @ts-ignore
 					initialValue: [],
 					in: { $concatArrays: ['$$value', '$$this'] }
+				}
+			}
+		}
+	},
+	{
+		$project: {
+			_id: 1,
+			productsLength: 1,
+			products: 1,
+			specifications: 1,
+			brands: {
+				$filter: {
+					input: '$brands',
+					as: 'brand',
+					cond: { $gt: ['$$brand.name', null] }
 				}
 			}
 		}
