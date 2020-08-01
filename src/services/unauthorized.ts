@@ -372,9 +372,8 @@ export const getFilteredProductsWithCategories = (query: any) => {
 	])
 }
 
-const getSpecificationFilterStages = (query: any) => {
-
-	const blackList = [
+const getBlackList = () => {
+	return [
 		'category',
 		'type',
 		'categoryId',
@@ -386,20 +385,39 @@ const getSpecificationFilterStages = (query: any) => {
 		'sortType',
 		'price'
 	]
+}
 
-	const specificationKeys = Object.keys(query).filter((key) => !blackList.includes(key))
+const getSpecificationFilterStages = (query: any, outOf?: string) => {
+	const specificationKeys = Object.keys(query).filter((key) => !getBlackList().includes(key))
 
 	if (specificationKeys.length > 0) {
-		return [
+		const stages = [
 			{
 				$addFields: {
-					specs: '$specifications'
+					specs: '$products.specifications'
 				}
 			},
 			{
-				$unwind: '$specifications'
-			},
+				$unwind: '$specs'
+			}
+		]
+
+		if (outOf) {
+			stages.push(
+				{
+					// @ts-ignore
+					$match: {
+						$expr: {
+							$ne: ['$specs.slug', outOf]
+						}
+					}
+				}
+			)
+		}
+
+		stages.push(
 			{
+				// @ts-ignore
 				$match: {
 					$expr: {
 						$or: (
@@ -407,10 +425,10 @@ const getSpecificationFilterStages = (query: any) => {
 								return [...prevVal, {
 									$and: [
 										{
-											$eq: ['$specifications.slug', curVal],
+											$eq: ['$specs.slug', curVal],
 										},
 										{
-											$in: ['$specifications.value', query[curVal].split(',')]
+											$in: ['$specs.value', query[curVal].split(',')]
 										}
 									]
 								}]
@@ -419,168 +437,291 @@ const getSpecificationFilterStages = (query: any) => {
 					}
 				}
 			},
-			//	{
-			//		$match: {
-			//			$expr: {
-			//				$or: [
-			//					{
-			//						$and: [
-			//							{
-			//								$eq: ['$specifications.slug', 'Renk'],
-			//							},
-			//							{
-			//								$in: ['$specifications.value', ['Mor', 'Mavi']]
-			//							}
-			//						]
-			//					}
-			//				]
-			//			}
-			//		}
-			//	},
 			{
 				$group: {
-					_id: '$_id',
-					root: { $first: '$$ROOT' },
-					specs: { $first: '$specs' }
+					_id: '$products._id',
+					categoryId: { $first: '$categoryId' },
+					subCategoryId: { $first: '$subCategoryId' },
+					products: { $first: '$products' },
+					specifications: { $first: '$specifications' },
+					values: { $first: '$values' },
+					brands: { $first: '$brands' },
+					specs: { $push: '$specs' }
 				}
 			},
 			{
-				$addFields: {
-					root: {
-						specifications: '$specs'
-					}
-				}
-			},
-			{
-				$replaceRoot: {
-					newRoot: '$root'
+				$match: {
+					[`specs.${specificationKeys.length - 1}`]: { $exists: true }
 				}
 			}
-		]
+		)
+
+		return stages
 	}
 
 	return []
 }
 
-const getListSpecificationsStages = () => [
-	{
-		$addFields: {
-			specifications: {
-				$map: {
-					input: '$products',
-					as: 'product',
-					in: '$$product.specifications'
-				}
+const getListSpecificationsStages = (query: any) => {
+	const stages = [
+		{
+			// @ts-ignore
+			$unwind: '$products'
+		},
+		...getSpecificationFilterStages(query),
+		{
+			$group: {
+				_id: '$categoryId',
+				categoryId: { $first: '$categoryId' },
+				products: { $push: '$products' },
+				specifications: { $first: '$specifications' }
 			}
-		}
-	},
-	{
-		$addFields: {
-			specifications: {
-				$reduce: {
-					input: '$specifications',
-					initialValue: [] as string[],
-					in: { $concatArrays: ['$$value', '$$this'] }
-				}
-			}
-		}
-	},
-	{
-		$unwind: {
-			path: '$specifications',
-			preserveNullAndEmptyArrays: true
-		}
-	},
-	{
-		$group: {
-			_id: '$specifications.name',
-			specificationSlug: { $first: '$specifications.slug' },
-			values: { $push: '$specifications.value' },
-			productId: { $first: '$_id' },
-			products: { $first: '$products' }
-		}
-	},
-	{
-		$unwind: {
-			path: '$values',
-			preserveNullAndEmptyArrays: true
-		}
-	},
-	{
-		$group: {
-			_id: { name: '$_id', slug: '$specificationSlug', val: '$values' },
-			productId: { $first: '$productId' },
-			products: { $first: '$products' },
-			count: { $sum: 1 }
-		}
-	},
-	{
-		$group: {
-			_id: '$_id.name',
-			specificationSlug: { $first: '$_id.slug' },
-			productId: { $first: '$productId' },
-			products: { $first: '$products' },
-			values: {
-				$push: {
-					value: '$_id.val',
-					count: '$count'
-				}
-			}
-		}
-	},
-	{
-		$project: {
-			_id: 1,
-			productId: 1,
-			products: 1,
-			values: {
-				name: '$_id',
-				slug: '$specificationSlug',
-				values: '$values'
-			}
-		}
-	},
-	{
-		$project: {
-			_id: 1,
-			productId: 1,
-			products: 1,
-			values: {
-				$filter: {
-					input: '$values',
-					as: 'value',
-					cond: {
-						$ne: ['$$value.slug', null]
+		},
+		{
+			$addFields: {
+				specifications: {
+					$map: {
+						input: '$products',
+						as: 'product',
+						in: '$$product.specifications'
 					}
 				}
 			}
-		}
-	},
-	{
-		$group: {
-			_id: '$productId',
-			products: { $first: '$products' },
-			specifications: {
-				$push: {
+		},
+		{
+			$addFields: {
+				specifications: {
+					$reduce: {
+						input: '$specifications',
+						initialValue: [] as string[],
+						in: { $concatArrays: ['$$value', '$$this'] }
+					}
+				}
+			}
+		},
+		{
+			$unwind: {
+				path: '$specifications',
+				preserveNullAndEmptyArrays: true
+			}
+		},
+		{
+			$group: {
+				_id: '$specifications.name',
+				specificationSlug: { $first: '$specifications.slug' },
+				values: { $push: '$specifications.value' },
+				productId: { $first: '$_id' },
+				categoryId: { $first: '$categoryId' },
+				products: { $first: '$products' }
+			}
+		},
+		{
+			$unwind: {
+				path: '$values',
+				preserveNullAndEmptyArrays: true
+			}
+		},
+		{
+			$group: {
+				_id: { name: '$_id', slug: '$specificationSlug', val: '$values' },
+				productId: { $first: '$productId' },
+				categoryId: { $first: '$categoryId' },
+				products: { $first: '$products' },
+				count: { $sum: 1 }
+			}
+		},
+		{
+			$group: {
+				_id: '$_id.name',
+				specificationSlug: { $first: '$_id.slug' },
+				productId: { $first: '$productId' },
+				categoryId: { $first: '$categoryId' },
+				products: { $first: '$products' },
+				values: {
+					$push: {
+						value: '$_id.val',
+						count: '$count'
+					}
+				}
+			}
+		},
+		{
+			$project: {
+				_id: 1,
+				productId: 1,
+				categoryId: 1,
+				products: 1,
+				values: {
+					name: '$_id',
+					slug: '$specificationSlug',
+					values: '$values'
+				}
+			}
+		},
+		{
+			$project: {
+				_id: 1,
+				productId: 1,
+				categoryId: 1,
+				products: 1,
+				values: {
+					$filter: {
+						input: '$values',
+						as: 'value',
+						cond: {
+							$ne: ['$$value.slug', null]
+						}
+					}
+				}
+			}
+		},
+		{
+			$addFields: {
+				values: {
 					$arrayElemAt: ['$values', 0]
 				}
 			}
-		}
-	},
-	{
-		$addFields: {
-			productsLength: { $size: '$products' }
-		}
-	},
-	{
-		$project: {
-			products: {
-				specifications: 0,
-				specs: 0
-			}
-		}
-	}
-]
+		},
+
+		//	/* ***/
+		//	{
+		//		// @ts-ignore
+		//		$unwind: '$products'
+		//	},
+		//	...getSpecificationFilterStages(query, '$values.slug'),
+		//	{
+		//		$group: {
+		//			_id: '$categoryId',
+		//			products: { $push: '$products' },
+		//			valuesSlug: { $first: '$values.slug' },
+		//			specifications: { $first: '$specifications' }
+		//		}
+		//	},
+		//	{
+		//		$addFields: {
+		//			specifications: {
+		//				$map: {
+		//					input: '$products',
+		//					as: 'product',
+		//					in: '$$product.specifications'
+		//				}
+		//			}
+		//		}
+		//	},
+		//	{
+		//		$addFields: {
+		//			specifications: {
+		//				$reduce: {
+		//					input: '$specifications',
+		//					initialValue: [] as string[],
+		//					in: { $concatArrays: ['$$value', '$$this'] }
+		//				}
+		//			}
+		//		}
+		//	},
+		//	{
+		//		$unwind: {
+		//			path: '$specifications',
+		//			preserveNullAndEmptyArrays: true
+		//		}
+		//	},
+		//	{
+		//		$group: {
+		//			_id: '$specifications.name',
+		//			specificationSlug: { $first: '$specifications.slug' },
+		//			valuesSlug: { $first: '$valuesSlug' },
+		//			values: { $push: '$specifications.value' },
+		//			productId: { $first: '$_id' },
+		//			products: { $first: '$products' }
+		//		}
+		//	},
+		//	{
+		//		$unwind: {
+		//			path: '$values',
+		//			preserveNullAndEmptyArrays: true
+		//		}
+		//	},
+		//	{
+		//		$group: {
+		//			_id: { name: '$_id', slug: '$specificationSlug', val: '$values' },
+		//			valuesSlug: { $first: '$valuesSlug' },
+		//			productId: { $first: '$productId' },
+		//			products: { $first: '$products' },
+		//			count: { $sum: 1 }
+		//		}
+		//	},
+		//	{
+		//		$group: {
+		//			_id: '$_id.name',
+		//			specificationSlug: { $first: '$_id.slug' },
+		//			valuesSlug: { $first: '$valuesSlug' },
+		//			productId: { $first: '$productId' },
+		//			products: { $first: '$products' },
+		//			values: {
+		//				$push: {
+		//					value: '$_id.val',
+		//					count: '$count'
+		//				}
+		//			}
+		//		}
+		//	},
+		//	{
+		//		$match: {
+		//			$expr: {
+		//				$eq: ['$specificationSlug', '$valuesSlug']
+		//			}
+		//		}
+		//	},
+		//	{
+		//		$project: {
+		//			_id: 1,
+		//			productId: 1,
+		//			products: 1,
+		//			values: {
+		//				name: '$_id',
+		//				slug: '$specificationSlug',
+		//				values: '$values'
+		//			}
+		//		}
+		//	},
+		//	{
+		//		$project: {
+		//			_id: 1,
+		//			productId: 1,
+		//			products: 1,
+		//			values: {
+		//				$filter: {
+		//					input: '$values',
+		//					as: 'value',
+		//					cond: {
+		//						$ne: ['$$value.slug', null]
+		//					}
+		//				}
+		//			}
+		//		}
+		//	},
+		//	{
+		//		$group: {
+		//			_id: '$productId',
+		//			products: { $first: '$products' },
+		//			specifications: {
+		//				$push: {
+		//					$arrayElemAt: ['$values', 0]
+		//				}
+		//			}
+		//		}
+		//	},
+		//	{
+		//		$project: {
+		//			products: {
+		//				specs: 0
+		//			}
+		//		}
+		//	}
+	]
+
+	return stages
+}
 
 const getSortSpecificationsStages = () => ([
 	{
@@ -615,71 +756,102 @@ const getSortSpecificationsStages = () => ([
 	}
 ])
 
-const getBrandsStages = () => ([
-	{
-		$unwind: {
-			path: '$products',
-			preserveNullAndEmptyArrays: true
-		}
-	},
-	{
-		$group: {
-			_id: '$products.brand',
-			productsLength: { $first: '$productsLength' },
-			products: { $push: '$products' },
-			specifications: { $first: '$specifications' },
-			count: {
-				$sum: 1
+const getBrandsStages = (filterStages: any[]) => {
+	const stages = [
+		{
+			// @ts-ignore
+			$unwind: '$products'
+		},
+		...filterStages,
+		{
+			$group: {
+				_id: '$categoryId',
+				products: { $push: '$products' },
+				specifications: { $first: '$specifications' },
+				brands: { $first: '$brands' }
 			}
-		}
-	},
-	{
-		$group: {
-			_id: '$imagePath',
-			productsLength: { $first: '$productsLength' },
-			products: { $push: '$products' },
-			specifications: { $first: '$specifications' },
-			brands: {
-				$push: {
-					name: '$_id',
-					count: '$count'
+		},
+		{
+			$unwind: {
+				path: '$products',
+				preserveNullAndEmptyArrays: true
+			}
+		},
+		{
+			$group: {
+				_id: '$products.brand',
+				products: { $push: '$products' },
+				specifications: { $first: '$specifications' },
+				count: {
+					$sum: 1
+				}
+			}
+		},
+		{
+			$group: {
+				_id: '$imagePath',
+				products: { $push: '$products' },
+				specifications: { $first: '$specifications' },
+				brands: {
+					$push: {
+						name: '$_id',
+						count: '$count'
+					}
+				}
+			}
+		},
+		{
+			$addFields: {
+				products: {
+					$reduce: {
+						input: '$products',
+						initialValue: [] as string[],
+						in: { $concatArrays: ['$$value', '$$this'] }
+					}
+				}
+			}
+		},
+		{
+			$project: {
+				_id: 1,
+				products: 1,
+				specifications: 1,
+				brands: {
+					$filter: {
+						input: '$brands',
+						as: 'brand',
+						cond: { $gt: ['$$brand.name', null] }
+					}
 				}
 			}
 		}
-	},
-	{
+	]
+
+	/*
+	stages.unshift({
 		$addFields: {
+			// @ts-ignore
 			products: {
-				$reduce: {
-					input: '$products',
-					initialValue: [] as string[],
-					in: { $concatArrays: ['$$value', '$$this'] }
-				}
-			}
-		}
-	},
-	{
-		$project: {
-			_id: 1,
-			productsLength: 1,
-			products: 1,
-			specifications: 1,
-			brands: {
 				$filter: {
-					input: '$brands',
-					as: 'brand',
-					cond: { $gt: ['$$brand.name', null] }
+					input: '$products',
+					as: 'product',
+					cond: {
+						$in: ['$$product.brand', brands]
+					}
 				}
 			}
 		}
-	}
-])
+	})
+	*/
+
+	return stages
+}
 
 export const filterShop = (query: any, params: any) => {
-	const stages = []
 	const match = []
+	const laterMatch = []
+	const laterExt = []
 	const ext = []
-
 	const categoryMatch = []
 
 	if (params.category) {
@@ -792,8 +964,8 @@ export const filterShop = (query: any, params: any) => {
 	}
 
 	if (query.brands) {
-		match.push({
-			$in: ['$brand', query.brands.split(',')]
+		laterMatch.push({
+			$in: ['$products.brand', query.brands.split(',')]
 		})
 	}
 
@@ -804,13 +976,13 @@ export const filterShop = (query: any, params: any) => {
 	}
 
 	if (query.start) {
-		ext.push({
+		laterExt.push({
 			$skip: parseInt(query.start)
 		})
 	}
 
 	if (query.quantity) {
-		ext.push({
+		laterExt.push({
 			$limit: parseInt(query.quantity)
 		})
 	}
@@ -861,18 +1033,18 @@ export const filterShop = (query: any, params: any) => {
 	if (query.sortType) {
 		switch (parseInt(query.sortType)) {
 			case ProductSort.MIN_PRICE: {
-				ext.push({
+				laterExt.push({
 					$sort: {
-						price: -1
+						'products.price': -1
 					}
 				})
 				break
 			}
 
 			case ProductSort.MAX_PRICE: {
-				ext.push({
+				laterExt.push({
 					$sort: {
-						price: 1
+						'products.price': 1
 					}
 				})
 				break
@@ -904,14 +1076,41 @@ export const filterShop = (query: any, params: any) => {
 						}
 					},
 					...ext,
-					...getSpecificationFilterStages(query)
 				],
 				as: 'products'
 			}
 		},
-		...getListSpecificationsStages(),
-		...getSortSpecificationsStages(),
-		...getBrandsStages()
+		...getListSpecificationsStages(query),
+		//	...getSortSpecificationsStages(),
+		//	...getBrandsStages(getSpecificationFilterStages(query)),
+		//	{
+		//		$unwind: '$products'
+		//	},
+		//	...getSpecificationFilterStages(query),
+		//	{
+		//		$match: {
+		//			$expr: {
+		//				$and: laterMatch
+		//			}
+		//		}
+		//	},
+		//	{
+		//		$project: {
+		//			products: {
+		//				specifications: 0
+		//			}
+		//		}
+		//	},
+		//	...laterExt,
+		//	{
+		//		$group: {
+		//			_id: null,
+		//			products: { $push: '$products' },
+		//			productsLength: { $first: '$productsLength' },
+		//			specifications: { $first: '$specifications' },
+		//			brands: { $first: '$brands' }
+		//		}
+		//	}
 	])
 }
 
