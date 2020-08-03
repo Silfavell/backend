@@ -446,10 +446,10 @@ const getSpecificationFilterStages = (query: any) => {
 const getListSpecificationsStages = (query: any) => {
 	const specificationKeys = Object.keys(query).filter((key) => !getBlackList().includes(key))
 
-	const brandsFilter = []
+	const otherFilters = [] // price,brands, etc.. filters. Other than specifications.
 
 	if (query.brands && query.brands.split(',').length > 0) {
-		brandsFilter.push(
+		otherFilters.push(
 			{
 				$addFields: {
 					products: {
@@ -462,7 +462,49 @@ const getListSpecificationsStages = (query: any) => {
 						}
 					}
 				}
-			},
+			}
+		)
+	}
+
+	if (query.price) {
+		otherFilters.push(
+			{
+				$addFields: {
+					products: {
+						$filter: {
+							input: '$products',
+							as: 'product',
+							cond: {
+								$or: [
+									{
+										$and: [
+											{
+												$gte: ['$$product.discountedPrice', parseInt(query.price.split('-')[0])]
+											},
+											{
+												$lte: ['$$product.discountedPrice', parseInt(query.price.split('-')[1])]
+											}
+										]
+									},
+									{
+										$and: [
+											{
+												$lt: ['$$product.discountedPrice', null]
+											},
+											{
+												$gte: ['$$product.price', parseInt(query.price.split('-')[0])]
+											},
+											{
+												$lte: ['$$product.price', parseInt(query.price.split('-')[1])]
+											}
+										]
+									}
+								]
+							}
+						}
+					}
+				}
+			}
 		)
 	}
 
@@ -472,7 +514,7 @@ const getListSpecificationsStages = (query: any) => {
 				prods: '$products'
 			}
 		},
-		...brandsFilter,
+		...otherFilters,
 		{
 			$addFields: {
 				specifications: {
@@ -840,7 +882,45 @@ const getSortSpecificationsStages = (): any[] => ([
 	}
 ])
 
-const getBrandsStages = (filterStages: any[]): any[] => {
+const getBrandsStages = (filterStages: any[], query: any): any[] => {
+	const otherFilters = [...filterStages]
+
+	if (query.price) {
+		otherFilters.unshift(
+			{
+				$match: {
+					$expr: {
+						$or: [
+							{
+								$and: [
+									{
+										$gte: ['$products.discountedPrice', parseInt(query.price.split('-')[0])]
+									},
+									{
+										$lte: ['$products.discountedPrice', parseInt(query.price.split('-')[1])]
+									}
+								]
+							},
+							{
+								$and: [
+									{
+										$lt: ['$products.discountedPrice', null]
+									},
+									{
+										$gte: ['$products.price', parseInt(query.price.split('-')[0])]
+									},
+									{
+										$lte: ['$products.price', parseInt(query.price.split('-')[1])]
+									}
+								]
+							}
+						]
+					}
+				}
+			}
+		)
+	}
+
 	const stages = [
 		{
 			$addFields: {
@@ -850,7 +930,7 @@ const getBrandsStages = (filterStages: any[]): any[] => {
 		{
 			$unwind: '$products'
 		},
-		...filterStages,
+		...otherFilters,
 		{
 			$group: {
 				_id: '$categoryId',
@@ -929,8 +1009,8 @@ const getBrandsStages = (filterStages: any[]): any[] => {
 export const filterShop = (query: any, params: any) => {
 	const match = []
 	const laterMatch = []
-	const laterExt = []
 	const ext = []
+	const laterExt = []
 	const categoryMatch = []
 
 	if (params.category) {
@@ -1067,14 +1147,7 @@ export const filterShop = (query: any, params: any) => {
 	}
 
 	if (query.price) {
-		ext.push(
-			{
-				$addFields: {
-					doNotHasDicountedPrice: {
-						$ifNull: ['$price', true]
-					}
-				}
-			},
+		laterExt.push(
 			{
 				$match: {
 					$expr: {
@@ -1082,23 +1155,23 @@ export const filterShop = (query: any, params: any) => {
 							{
 								$and: [
 									{
-										$gte: ['$discountedPrice', parseInt(query.price.split('-')[0])]
+										$gte: ['$products.discountedPrice', parseInt(query.price.split('-')[0])]
 									},
 									{
-										$lte: ['$discountedPrice', parseInt(query.price.split('-')[1])]
+										$lte: ['$products.discountedPrice', parseInt(query.price.split('-')[1])]
 									}
 								]
 							},
 							{
 								$and: [
 									{
-										$eq: ['$doNotHasDicountedPrice', true]
+										$lt: ['$products.discountedPrice', null]
 									},
 									{
-										$gte: ['$price', parseInt(query.price.split('-')[0])]
+										$gte: ['$products.price', parseInt(query.price.split('-')[0])]
 									},
 									{
-										$lte: ['$price', parseInt(query.price.split('-')[1])]
+										$lte: ['$products.price', parseInt(query.price.split('-')[1])]
 									}
 								]
 							}
@@ -1129,8 +1202,20 @@ export const filterShop = (query: any, params: any) => {
 				break
 			}
 
-			default: break
+			default: {
+				laterExt.push({
+					$sort: {
+						'products._id': 1
+					}
+				})
+			}
 		}
+	} else {
+		laterExt.push({
+			$sort: {
+				'products._id': 1
+			}
+		})
 	}
 
 	match.push({
@@ -1154,14 +1239,14 @@ export const filterShop = (query: any, params: any) => {
 							}
 						}
 					},
-					...ext,
+					...ext
 				],
 				as: 'products'
 			}
 		},
 		...getListSpecificationsStages(query),
 		...getSortSpecificationsStages(),
-		...getBrandsStages(getSpecificationFilterStages(query)),
+		...getBrandsStages(getSpecificationFilterStages(query), query),
 		{
 			$addFields: {
 				_id: {
@@ -1234,11 +1319,6 @@ export const filterShop = (query: any, params: any) => {
 
 		{
 			$unwind: '$products'
-		},
-		{
-			$sort: {
-				'products._id': 1
-			}
 		},
 		...laterExt,
 		{
