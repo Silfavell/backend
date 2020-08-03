@@ -573,7 +573,7 @@ const getListSpecificationsStages = (query: any) => {
 			}
 		},
 
-		/* ***/
+		/****/
 		{
 			$unwind: '$products'
 		},
@@ -604,7 +604,7 @@ const getListSpecificationsStages = (query: any) => {
 						$filter: {
 							input: '$products.specs',
 							as: 'specification',
-							cond: { // TODO X bütün filtreler
+							cond: {
 								$or: (
 									specificationKeys.reduce((prevVal: any, curVal) => {
 										return [...prevVal, {
@@ -627,6 +627,7 @@ const getListSpecificationsStages = (query: any) => {
 		},
 		{
 			$addFields: {
+				specsLength: specificationKeys,
 				'products.specs': {
 					$map: {
 						input: '$products.specs',
@@ -636,7 +637,14 @@ const getListSpecificationsStages = (query: any) => {
 				}
 			}
 		},
-		{// Eğer specslerin içerisinde _id speci varsa ona göre match burada çözülüyor olay
+		{
+			$addFields: {
+				specsLength: {
+					$size: '$specsLength'
+				}
+			}
+		},
+		{
 			$match: {
 				$or: [
 					{
@@ -657,7 +665,7 @@ const getListSpecificationsStages = (query: any) => {
 					{
 						$and: [
 							{
-								[`products.specs.1`]: { $exists: false }
+								specsLength: { $eq: 1 }
 							},
 							{
 								'values.slug': {
@@ -665,6 +673,9 @@ const getListSpecificationsStages = (query: any) => {
 								}
 							}
 						]
+					},
+					{
+						specsLength: { $eq: 0 }
 					}
 				]
 			}
@@ -728,6 +739,7 @@ const getListSpecificationsStages = (query: any) => {
 		{
 			$group: {
 				_id: '$_id.name',
+				slug: { $first: '$_id.slug' },
 				prods: { $first: '$prods' },
 				values: {
 					$push: {
@@ -745,6 +757,7 @@ const getListSpecificationsStages = (query: any) => {
 				specifications: {
 					$push: {
 						name: '$_id',
+						slug: '$slug',
 						values: '$values'
 					}
 				}
