@@ -1334,7 +1334,7 @@ export const filterShop = (query: any, params: any) => {
 		},
 		{
 			$addFields: {
-				productsLength: { $size: '$products' },
+				productsLength: { $size: '$products' }
 			}
 		}
 	])
