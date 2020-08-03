@@ -465,7 +465,28 @@ const getSpecificationFilterStages = (query: any, outOf?: string) => {
 const getListSpecificationsStages = (query: any) => {
 	const specificationKeys = Object.keys(query).filter((key) => !getBlackList().includes(key))
 
+	const brandsFilter = []
+
+	if (query.brands && query.brands.split(',').length > 0) {
+		brandsFilter.push(
+			{
+				$addFields: {
+					products: {
+						$filter: {
+							input: '$products',
+							as: 'product',
+							cond: {
+								$in: ['$$product.brand', query.brands.split(',')]
+							}
+						}
+					}
+				}
+			},
+		)
+	}
+
 	const stages = [
+		...brandsFilter,
 		{
 			$addFields: {
 				specifications: {
