@@ -387,7 +387,7 @@ const getBlackList = () => {
 	]
 }
 
-const getSpecificationFilterStages = (query: any, outOf?: string) => {
+const getSpecificationFilterStages = (query: any) => {
 	const specificationKeys = Object.keys(query).filter((key) => !getBlackList().includes(key))
 
 	if (specificationKeys.length > 0) {
@@ -401,19 +401,6 @@ const getSpecificationFilterStages = (query: any, outOf?: string) => {
 				$unwind: '$specs'
 			}
 		]
-
-		if (outOf) {
-			stages.push(
-				{
-					// @ts-ignore
-					$match: {
-						$expr: {
-							$ne: ['$specs.slug', outOf]
-						}
-					}
-				}
-			)
-		}
 
 		stages.push(
 			{
@@ -486,6 +473,11 @@ const getListSpecificationsStages = (query: any) => {
 	}
 
 	const stages = [
+		{
+			$addFields: {
+				prods: '$products'
+			}
+		},
 		...brandsFilter,
 		{
 			$addFields: {
@@ -522,7 +514,8 @@ const getListSpecificationsStages = (query: any) => {
 				values: { $push: '$specifications.value' },
 				productId: { $first: '$_id' },
 				categoryId: { $first: '$categoryId' },
-				products: { $first: '$products' }
+				products: { $first: '$products' },
+				prods: { $first: '$prods' }
 			}
 		},
 		{
@@ -537,6 +530,7 @@ const getListSpecificationsStages = (query: any) => {
 				productId: { $first: '$productId' },
 				categoryId: { $first: '$categoryId' },
 				products: { $first: '$products' },
+				prods: { $first: '$prods' },
 				count: { $sum: 1 }
 			}
 		},
@@ -547,6 +541,7 @@ const getListSpecificationsStages = (query: any) => {
 				productId: { $first: '$productId' },
 				categoryId: { $first: '$categoryId' },
 				products: { $first: '$products' },
+				prods: { $first: '$prods' },
 				values: {
 					$push: {
 						value: '$_id.val',
@@ -561,6 +556,7 @@ const getListSpecificationsStages = (query: any) => {
 				productId: 1,
 				categoryId: 1,
 				products: 1,
+				prods: 1,
 				values: {
 					name: '$_id',
 					slug: '$specificationSlug',
@@ -574,6 +570,7 @@ const getListSpecificationsStages = (query: any) => {
 				productId: 1,
 				categoryId: 1,
 				products: 1,
+				prods: 1,
 				values: {
 					$filter: {
 						input: '$values',
@@ -587,7 +584,6 @@ const getListSpecificationsStages = (query: any) => {
 		},
 		{
 			$addFields: {
-				prods: '$products',
 				values: {
 					$arrayElemAt: ['$values', 0]
 				}
@@ -892,23 +888,6 @@ const getBrandsStages = (filterStages: any[]) => {
 			}
 		}
 	]
-
-	/*
-	stages.unshift({
-		$addFields: {
-			// @ts-ignore
-			products: {
-				$filter: {
-					input: '$products',
-					as: 'product',
-					cond: {
-						$in: ['$$product.brand', brands]
-					}
-				}
-			}
-		}
-	})
-	*/
 
 	return stages
 }
