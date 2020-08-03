@@ -878,6 +878,11 @@ const getBrandsStages = (filterStages: any[]): any[] => {
 			}
 		},
 		{
+			$sort: {
+				_id: 1
+			}
+		},
+		{
 			$group: {
 				_id: '$imagePath',
 				products: { $push: '$products' },
