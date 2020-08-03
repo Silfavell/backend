@@ -1188,6 +1188,48 @@ export const filterShop = (query: any, params: any) => {
 				}
 			}
 		},
+
+		/** MAX,MIN PRICE */
+		{
+			$sort: {
+				'products.price': 1
+			}
+		},
+		{
+			$group: {
+				_id: '$categoryId',
+				categoryId: { $first: '$categoryId' },
+				subCategoryId: { $first: '$subCategoryId' },
+				products: { $push: '$products' },
+				specifications: { $first: '$specifications' },
+				brands: { $first: '$brands' }
+			}
+		},
+		{
+			$addFields: {
+				minPrice: {
+					$arrayElemAt: ['$products', 0]
+				},
+				maxPrice: {
+					$arrayElemAt: ['$products', -1]
+				}
+			}
+		},
+		{
+			$addFields: {
+				minPrice: {
+					$floor: '$minPrice.price'
+				},
+				maxPrice: {
+					$ceil: '$maxPrice.price'
+				}
+			}
+		},
+		/** MAX,MIN PRICE */
+
+		{
+			$unwind: '$products'
+		},
 		{
 			$sort: {
 				'products._id': 1
@@ -1200,7 +1242,9 @@ export const filterShop = (query: any, params: any) => {
 				subCategoryId: { $first: '$subCategoryId' },
 				products: { $push: '$products' },
 				specifications: { $first: '$specifications' },
-				brands: { $first: '$brands' }
+				brands: { $first: '$brands' },
+				minPrice: { $first: '$minPrice' },
+				maxPrice: { $first: '$maxPrice' }
 			}
 		},
 		{
