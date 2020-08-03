@@ -423,6 +423,7 @@ const getSpecificationFilterStages = (query: any) => {
 					categoryId: { $first: '$categoryId' },
 					subCategoryId: { $first: '$subCategoryId' },
 					products: { $first: '$products' },
+					prods: { $first: '$prods' },
 					specifications: { $first: '$specifications' },
 					values: { $first: '$values' },
 					brands: { $first: '$brands' },
@@ -842,6 +843,11 @@ const getSortSpecificationsStages = (): any[] => ([
 const getBrandsStages = (filterStages: any[]): any[] => {
 	const stages = [
 		{
+			$addFields: {
+				prods: '$products'
+			}
+		},
+		{
 			$unwind: '$products'
 		},
 		...filterStages,
@@ -849,6 +855,7 @@ const getBrandsStages = (filterStages: any[]): any[] => {
 			$group: {
 				_id: '$categoryId',
 				products: { $push: '$products' },
+				prods: { $first: '$prods' },
 				specifications: { $first: '$specifications' },
 				brands: { $first: '$brands' }
 			}
@@ -863,6 +870,7 @@ const getBrandsStages = (filterStages: any[]): any[] => {
 			$group: {
 				_id: '$products.brand',
 				products: { $push: '$products' },
+				prods: { $first: '$prods' },
 				specifications: { $first: '$specifications' },
 				count: {
 					$sum: 1
@@ -873,6 +881,7 @@ const getBrandsStages = (filterStages: any[]): any[] => {
 			$group: {
 				_id: '$imagePath',
 				products: { $push: '$products' },
+				prods: { $first: '$prods' },
 				specifications: { $first: '$specifications' },
 				brands: {
 					$push: {
@@ -896,7 +905,7 @@ const getBrandsStages = (filterStages: any[]): any[] => {
 		{
 			$project: {
 				_id: 1,
-				products: 1,
+				products: '$prods',
 				specifications: 1,
 				brands: {
 					$filter: {
@@ -1157,7 +1166,7 @@ export const filterShop = (query: any, params: any) => {
 		},
 		{
 			$addFields: {
-				_id: '$_id.categoryId',
+				categoryId: '$_id.categoryId',
 				subCategoryId: '$_id.subCategoryId',
 			}
 		},
@@ -1187,7 +1196,7 @@ export const filterShop = (query: any, params: any) => {
 		...laterExt,
 		{
 			$group: {
-				_id: '$_id',
+				_id: '$categoryId',
 				subCategoryId: { $first: '$subCategoryId' },
 				products: { $push: '$products' },
 				specifications: { $first: '$specifications' },
