@@ -700,10 +700,10 @@ const getListSpecificationsStages = (query: any) => {
 		{
 			$match: {
 				$or: [
-					{
+					{ // Should specs includes same length of queried keys
 						[`products.specs.${specificationKeys.length - 1}`]: { $exists: true }
 					},
-					{
+					{ // Should specs includes same length -2 of queried keys and current slug (+1)
 						$and: [
 							{
 								[`products.specs.${specificationKeys.length - 2}`]: { $exists: true }
@@ -715,7 +715,7 @@ const getListSpecificationsStages = (query: any) => {
 							}
 						]
 					},
-					{
+					{ // Should specs length be 1 and it should be current slug
 						$and: [
 							{
 								specsLength: { $eq: 1 }
