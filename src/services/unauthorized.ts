@@ -777,11 +777,40 @@ const getListSpecificationsStages = (query: any) => {
 	return stages
 }
 
-const getSortSpecificationsStages = () => ([
+const getSortSpecificationsStages = (): any[] => ([
 	{
 		$unwind: {
 			path: '$specifications',
 			preserveNullAndEmptyArrays: true
+		}
+	},
+	{
+		$unwind: {
+			path: '$specifications.values',
+			preserveNullAndEmptyArrays: true
+		}
+	},
+	{
+		$sort: {
+			'specifications.values.value': 1
+		}
+	},
+	{
+		$group: {
+			_id: '$specifications.name',
+			products: { $first: '$products' },
+			specifications: {
+				$first: {
+					name: '$specifications.name',
+					slug: '$specifications.slug',
+				}
+			},
+			values: { $push: '$specifications.values' }
+		}
+	},
+	{
+		$addFields: {
+			'specifications.values': '$values'
 		}
 	},
 	{
@@ -791,7 +820,7 @@ const getSortSpecificationsStages = () => ([
 	},
 	{
 		$group: {
-			_id: '$_id',
+			_id: null,
 			specifications: { $push: '$specifications' },
 			root: { $first: '$$ROOT' }
 		}
@@ -810,7 +839,7 @@ const getSortSpecificationsStages = () => ([
 	}
 ])
 
-const getBrandsStages = (filterStages: any[]) => {
+const getBrandsStages = (filterStages: any[]): any[] => {
 	const stages = [
 		{
 			$unwind: '$products'
@@ -1148,6 +1177,11 @@ export const filterShop = (query: any, params: any) => {
 				products: {
 					specifications: 0
 				}
+			}
+		},
+		{
+			$sort: {
+				'products._id': 1
 			}
 		},
 		...laterExt,
