@@ -1129,6 +1129,19 @@ export const filterShop = (query: any, params: any) => {
 		...getSortSpecificationsStages(),
 		...getBrandsStages(getSpecificationFilterStages(query)),
 		{
+			$addFields: {
+				_id: {
+					$arrayElemAt: ['$products', 0]
+				}
+			}
+		},
+		{
+			$addFields: {
+				_id: '$_id.categoryId',
+				subCategoryId: '$_id.subCategoryId',
+			}
+		},
+		{
 			$unwind: '$products'
 		},
 		...getSpecificationFilterStages(query),
@@ -1149,7 +1162,8 @@ export const filterShop = (query: any, params: any) => {
 		...laterExt,
 		{
 			$group: {
-				_id: null,
+				_id: '$_id',
+				subCategoryId: { $first: '$subCategoryId' },
 				products: { $push: '$products' },
 				specifications: { $first: '$specifications' },
 				brands: { $first: '$brands' }
