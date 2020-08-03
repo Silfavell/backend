@@ -250,7 +250,7 @@ export const getBestSellerProducts = () => (
 )
 
 export const getFilteredProductsWithCategories = (query: any) => {
-	const match = [
+	const match: any = [
 		{
 			$eq: ['$categoryId', query.categoryId]
 		},
@@ -261,12 +261,11 @@ export const getFilteredProductsWithCategories = (query: any) => {
 
 	if (query.brands) {
 		match.push({
-			// @ts-ignore
 			$in: ['$brand', query.brands.split(',')]
 		})
 	}
 
-	const pipeline = [
+	const pipeline: any = [
 		{
 			$match: {
 				$expr: {
@@ -280,7 +279,6 @@ export const getFilteredProductsWithCategories = (query: any) => {
 		switch (parseInt(query.sortType)) {
 			case ProductSort.MIN_PRICE: {
 				pipeline.push({
-					// @ts-ignore
 					$sort: { price: 1 }
 				})
 				break
@@ -288,7 +286,6 @@ export const getFilteredProductsWithCategories = (query: any) => {
 
 			case ProductSort.MAX_PRICE: {
 				pipeline.push({
-					// @ts-ignore
 					$sort: { price: -1 }
 				})
 				break
@@ -399,12 +396,8 @@ const getSpecificationFilterStages = (query: any) => {
 			},
 			{
 				$unwind: '$specs'
-			}
-		]
-
-		stages.push(
+			},
 			{
-				// @ts-ignore
 				$match: {
 					$expr: {
 						$or: (
@@ -441,7 +434,7 @@ const getSpecificationFilterStages = (query: any) => {
 					[`specs.${specificationKeys.length - 1}`]: { $exists: true }
 				}
 			}
-		)
+		]
 
 		return stages
 	}
@@ -472,7 +465,7 @@ const getListSpecificationsStages = (query: any) => {
 		)
 	}
 
-	const stages = [
+	const stages: any = [
 		{
 			$addFields: {
 				prods: '$products'
@@ -768,7 +761,6 @@ const getListSpecificationsStages = (query: any) => {
 		},
 		{
 			$group: {
-				// @ts-ignore
 				_id: null,
 				products: { $first: '$prods' },
 				specifications: {
@@ -821,7 +813,6 @@ const getSortSpecificationsStages = () => ([
 const getBrandsStages = (filterStages: any[]) => {
 	const stages = [
 		{
-			// @ts-ignore
 			$unwind: '$products'
 		},
 		...filterStages,
