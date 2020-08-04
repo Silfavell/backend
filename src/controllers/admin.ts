@@ -24,6 +24,7 @@ import {
 } from '../validators/admin-validator'
 
 import {
+	getTickets,
 	saveProductToDatabase,
 	updateProduct,
 	deleteProductFromDatabase,
@@ -59,6 +60,15 @@ router.use(validateAuthority(Authority.ADMIN))
 
 router.get('/test', (req, res) => {
 	res.json({ status: true })
+})
+
+router.get('/tickets', (req, res, next) => {
+	getTickets()
+		.then((tickets) => {
+			res.json(tickets)
+		}).catch((reason) => {
+			next(handleError(reason, 'GET /admin/tickets'))
+		})
 })
 
 router.get('/log', (req, res) => {

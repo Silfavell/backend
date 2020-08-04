@@ -9,7 +9,8 @@ import {
 	ProductType,
 	ProductTypeDocument,
 	ProductDocument,
-	CategoryDocument
+	CategoryDocument,
+	Ticket
 } from '../models'
 import Brand from '../models/Brand'
 import ServerError from '../errors/ServerError'
@@ -32,6 +33,10 @@ export const getSeoUrl = (name: string) => {
 		.replace(/^-*/, '')              // Remove starting dashes
 		.replace(/-*$/, '')             // Remove trailing dashes
 }
+
+export const getTickets = () => (
+	Ticket.find()
+)
 
 export const verifyManager = (managerId: string) => (
 	Manager.findByIdAndUpdate(managerId, { verified: true }, { new: true })
