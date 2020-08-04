@@ -1184,10 +1184,37 @@ export const filterShop = (query: any, params: any) => {
 
 	if (query.sortType) {
 		switch (parseInt(query.sortType)) {
+			case ProductSort.CLASSIC: {
+				laterExt.push({
+					$sort: {
+						'products._id': 1
+					}
+				})
+				break
+			}
+
+			case ProductSort.BEST_SELLER: {
+				laterExt.push({
+					$sort: {
+						'products.timesSold': 1
+					}
+				})
+				break
+			}
+
+			case ProductSort.NEWEST: {
+				laterExt.push({
+					$sort: {
+						'products._id': -1
+					}
+				})
+				break
+			}
+
 			case ProductSort.MIN_PRICE: {
 				laterExt.push({
 					$sort: {
-						'products.price': -1
+						'products.price': 1
 					}
 				})
 				break
@@ -1196,7 +1223,7 @@ export const filterShop = (query: any, params: any) => {
 			case ProductSort.MAX_PRICE: {
 				laterExt.push({
 					$sort: {
-						'products.price': 1
+						'products.price': -1
 					}
 				})
 				break
