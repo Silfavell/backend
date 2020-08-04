@@ -2,15 +2,15 @@ import fs from 'fs'
 import { Elasticsearch } from '../startup'
 import HttpStatusCodes from 'http-status-codes'
 
-// eslint-disable-next-line no-unused-vars
 import {
 	Product,
 	Category,
 	Manager,
-	// eslint-disable-next-line no-unused-vars
+	ProductType,
+	ProductTypeDocument,
 	ProductDocument,
-	// eslint-disable-next-line no-unused-vars
-	CategoryDocument
+	CategoryDocument,
+	Ticket
 } from '../models'
 import Brand from '../models/Brand'
 import ServerError from '../errors/ServerError'
@@ -31,8 +31,12 @@ export const getSeoUrl = (name: string) => {
 		.replace(/[^a-z0-9\-]/g, '')     // Remove anything that is not a letter, number or dash
 		.replace(/-+/g, '-')             // Remove duplicate dashes
 		.replace(/^-*/, '')              // Remove starting dashes
-		.replace(/-*$/, '');             // Remove trailing dashes
+		.replace(/-*$/, '')             // Remove trailing dashes
 }
+
+export const getTickets = () => (
+	Ticket.find()
+)
 
 export const verifyManager = (managerId: string) => (
 	Manager.findByIdAndUpdate(managerId, { verified: true }, { new: true })
@@ -45,10 +49,7 @@ export const saveCategoryToDatabase = (categoryContext: CategoryDocument) => (
 export const saveSubCategoryToDatabase = (body: any) => (
 	Category.findByIdAndUpdate(body.parentCategoryId, {
 		$push: {
-			subCategories: {
-				name: body.name,
-				slug: body.slug
-			}
+			subCategories: body
 		}
 	}, { new: true })
 )
@@ -75,11 +76,11 @@ export const isSubCategorySlugExists = (body: any, slug: string) => ( // is cate
 	Category.findById(body.parentCategoryId).then((parentCategory) => {
 		const subCategory = parentCategory.subCategories.find((subCategory) => subCategory.slug === slug)
 
-		if (subCategory) {
+		if (subCategory && body.subCategoryId !== subCategory._id.toString()) {
 			throw new ServerError(ErrorMessages.ANOTHER_SUB_CATEGORY_WITH_THE_SAME_NAME, HttpStatusCodes.BAD_REQUEST, ErrorMessages.ANOTHER_SUB_CATEGORY_WITH_THE_SAME_NAME, false)
 		}
 
-		return slug;
+		return slug
 	})
 )
 
@@ -87,6 +88,7 @@ export const updateSubCategory = (body: any, slug: string) => ( // is category e
 	Category.findById(body.parentCategoryId).then((parentCategory) => {
 		const subCategory = parentCategory.subCategories.find((subCategory) => subCategory._id.toString() === body.subCategoryId)
 		subCategory.name = body.name
+		subCategory.types = body.types
 		subCategory.slug = slug
 		return parentCategory.save()
 	})
@@ -98,17 +100,17 @@ export const isProductSlugExists = (slug: string, updateId?: string) => (
 			throw new ServerError(ErrorMessages.ANOTHER_PRODUCT_WITH_THE_SAME_NAME, HttpStatusCodes.BAD_REQUEST, ErrorMessages.ANOTHER_PRODUCT_WITH_THE_SAME_NAME, false)
 		}
 
-		return slug;
+		return slug
 	})
 )
 
-export const isCategorySlugExists = (slug: string) => (
+export const isCategorySlugExists = (slug: string, updateId?: string) => (
 	Category.findOne({ slug }).then((category) => {
-		if (category) {
+		if (category && updateId !== category._id.toString()) {
 			throw new ServerError(ErrorMessages.ANOTHER_CATEGORY_WITH_THE_SAME_NAME, HttpStatusCodes.BAD_REQUEST, ErrorMessages.ANOTHER_CATEGORY_WITH_THE_SAME_NAME, false)
 		}
 
-		return slug;
+		return slug
 	})
 )
 
@@ -173,4 +175,26 @@ export const updateProduct = (productId: string, productContext: ProductDocument
 
 export const deleteProductFromDatabase = (productId: string) => (
 	Product.findByIdAndDelete(productId)
+)
+
+export const isTypeSlugExists = (slug: string, updateId?: string) => (
+	ProductType.findOne({ slug }).then((type) => {
+		if (type && updateId !== type._id.toString()) {
+			throw new ServerError(ErrorMessages.ANOTHER_TYPE_WITH_THE_SAME_NAME, HttpStatusCodes.BAD_REQUEST, ErrorMessages.ANOTHER_TYPE_WITH_THE_SAME_NAME, false)
+		}
+
+		return slug
+	})
+)
+
+export const saveType = (body: ProductTypeDocument) => (
+	new ProductType(body).save()
+)
+
+export const updateType = (id: string, body: ProductTypeDocument) => (
+	ProductType.findByIdAndUpdate(id, body, { new: true })
+)
+
+export const getTypes = () => (
+	ProductType.find()
 )

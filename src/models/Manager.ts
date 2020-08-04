@@ -38,12 +38,10 @@ const managerSchema = new Schema({
 
 // eslint-disable-next-line func-names, consistent-return
 managerSchema.pre('save', function (next) { // do not update.
-	const manager = this
+	const manager = this as ManagerDocument
 	if (!manager.isModified('password')) return next()
 
-	// @ts-ignore
 	bcrypt.hash(manager.password, 10).then((hash) => {
-		// @ts-ignore
 		manager.password = hash
 		next()
 	})

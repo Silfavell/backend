@@ -33,6 +33,8 @@ class ErrorMessages {
 
     static ANOTHER_SUB_CATEGORY_WITH_THE_SAME_NAME = 'Aynı isimde başka bir alt kategori var! Lütfen tekil bir isim kullanınız.'
 
+    static ANOTHER_TYPE_WITH_THE_SAME_NAME = 'Aynı isimde başka bir ürün tipi var! Lütfen tekil bir isim kullanınız.'
+
 
     static MANAGER_ALREADY_EXISTS = 'Telefon numarasına ait yönetici var'
 

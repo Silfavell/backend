@@ -18,7 +18,6 @@ export const validateAuthority = (authority: Authority) => (req: Request, res: R
 
 				if (decoded?.payload?.phoneNumber) {
 					User.findOne({ phoneNumber: decoded.payload.phoneNumber }).then((user) => {
-						// @ts-ignore
 						req.user = user
 						next()
 					})
@@ -29,7 +28,6 @@ export const validateAuthority = (authority: Authority) => (req: Request, res: R
 				res.status(HttpStatusCodes.UNAUTHORIZED).end('Unauthorized')
 			}
 		} else {
-			// @ts-ignore
 			req.user = null
 			next()
 		}
@@ -40,7 +38,6 @@ export const validateAuthority = (authority: Authority) => (req: Request, res: R
 				if (authority === Authority.USER) {
 					User.findOne({ phoneNumber: decoded.payload.phoneNumber }).then((user) => {
 						if (user) {
-							// @ts-ignore
 							req.user = user
 							next()
 						} else {
@@ -48,10 +45,8 @@ export const validateAuthority = (authority: Authority) => (req: Request, res: R
 						}
 					})
 				} else if (authority === Authority.MANAGER) {
-					// @ts-ignore
 					Manager.findById(decoded.payload._id).then((manager) => {
 						if (manager) {
-							// @ts-ignore
 							req.manager = manager
 							next()
 						} else {
@@ -62,7 +57,6 @@ export const validateAuthority = (authority: Authority) => (req: Request, res: R
 				} else if (authority === Authority.ADMIN) {
 					Admin.findById(decoded.payload._id).then((admin) => {
 						if (admin) {
-							// @ts-ignore
 							req.admin = admin
 							next()
 						} else {
@@ -85,7 +79,6 @@ export const validatePhone = () => (req: Request, res: Response, next: NextFunct
 	const { value, error } = validatePhoneNumber({ phoneNumber: req.body.phoneNumber })
 
 	if (!error) {
-		// @ts-ignore
 		if (value.phoneNumber) {
 			req.body.phoneNumber = value.phoneNumber
 		}

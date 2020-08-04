@@ -96,10 +96,8 @@ export const deleteAddress = (userId: string, deletedAddressId: string) => (
 )
 
 export const checkMakeOrderValues = (user: UserDocument, context: any) => {
-	// @ts-ignore
 	const selectedAddress = user.addresses.find((address) => address._id.toString() === context.address)
 
-	// @ts-ignore
 	return Cart.findOne({ userId: user._id.toString() }).then((cartObj) => {
 		if (!cartObj || !cartObj.cart) {
 			throw new ServerError(ErrorMessages.EMPTY_CART, HttpStatusCodes.BAD_REQUEST, null, false)
@@ -119,8 +117,7 @@ export const saveOrderToDatabase = (user: UserDocument, cart: any, address: any)
 		phoneNumber: user.phoneNumber,
 		address: address.openAddress,
 		products: Object.values(cart),
-		// @ts-ignore
-		paidPrice: Object.values(cart).reduce((previousValue: number, currentValue: any) => previousValue + parseFloat(currentValue.discountedPrice || currentValue.price) * currentValue.quantity, 0).toFixed(2)
+		paidPrice: (Object.values(cart).reduce((previousValue: number, currentValue: any) => previousValue + parseFloat(currentValue.discountedPrice || currentValue.price) * currentValue.quantity, 0) as Number).toFixed(2)
 	}).save()
 )
 
@@ -289,7 +286,7 @@ export const listCards = (cardUserKey: string) => (
 	})
 )
 
-export const createPaymentWithRegisteredCard = (user: UserDocument, price: number, basketItems: any[], address: string, cardToken: string) => (
+export const createPaymentWithRegisteredCard = (user: UserDocument, price: string, basketItems: any[], address: string, cardToken: string) => (
 	new Promise((resolve, reject) => {
 		const request = {
 			locale: Iyzipay.LOCALE.TR,
@@ -352,8 +349,7 @@ export const createPaymentWithRegisteredCard = (user: UserDocument, price: numbe
 export const completePayment = (user: UserDocument, cart: any, address: string, cardToken: string) => (
 	createPaymentWithRegisteredCard(
 		user,
-		// @ts-ignore
-		Object.values(cart).reduce((previousValue: number, currentValue: any) => previousValue + (currentValue.price * currentValue.quantity), 0).toFixed(2),
+		(Object.values(cart).reduce((previousValue: number, currentValue: any) => previousValue + (currentValue.price * currentValue.quantity), 0) as Number).toFixed(2),
 		Object.values(cart).map(({
 			_id,
 			name,

@@ -6,16 +6,22 @@ import Brand, { BrandDocument } from './Brand'
 export type SubCategoryDocument = Document & {
 	name: string,
 	slug: string,
+	types: [Schema.Types.ObjectId],
 	brands: [BrandDocument]
 }
 
 const subCategorySchema = new Schema({
 	name: {
-		type: String
+		type: String,
+		required: true
 	},
 	slug: {
 		type: String,
 		required: true
+	},
+	types: {
+		type: [Schema.Types.ObjectId],
+		default: []
 	},
 	brands: [Brand.schema]
 })

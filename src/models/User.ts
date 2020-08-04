@@ -48,12 +48,10 @@ const userSchema = new Schema({
 
 // eslint-disable-next-line func-names, consistent-return
 userSchema.pre('save', function (next) { // do not update.
-	const user = this
+	const user = this as UserDocument
 	if (!user.isModified('password')) return next()
 
-	// @ts-ignore
 	bcrypt.hash(user.password, 10).then((hash) => {
-		// @ts-ignore
 		user.password = hash
 		next()
 	})

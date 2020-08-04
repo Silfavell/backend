@@ -18,10 +18,13 @@ import {
 	validateUpdateCategory,
 	validateUpdateSubCategory,
 	validatePostSubCategory,
-	validateDeleteSubCategory
+	validateDeleteSubCategory,
+	validateSaveTypeRequest,
+	validateUpdateTypeRequest
 } from '../validators/admin-validator'
 
 import {
+	getTickets,
 	saveProductToDatabase,
 	updateProduct,
 	deleteProductFromDatabase,
@@ -39,18 +42,33 @@ import {
 	getSeoUrl,
 	isProductSlugExists,
 	isCategorySlugExists,
-	isSubCategorySlugExists
+	isSubCategorySlugExists,
+	saveType,
+	updateType,
+	getTypes,
+	isTypeSlugExists
 } from '../services/admin'
+
+import { validateObjectId } from './../services/unauthorized'
 
 const router = Router()
 
 router.use(fileUpload({
 	createParentPath: true
 }))
-router.use(validateAuthority(Authority.ANONIM))
+router.use(validateAuthority(Authority.ADMIN))
 
 router.get('/test', (req, res) => {
 	res.json({ status: true })
+})
+
+router.get('/tickets', (req, res, next) => {
+	getTickets()
+		.then((tickets) => {
+			res.json(tickets)
+		}).catch((reason) => {
+			next(handleError(reason, 'GET /admin/tickets'))
+		})
 })
 
 router.get('/log', (req, res) => {
@@ -176,7 +194,7 @@ router.delete('/sub-category', (req, res, next) => {
 router.put('/category/:_id', (req, res, next) => {
 	validateUpdateCategory(req.body)
 		.then(() => getSeoUrl(req.body.name))
-		.then((slug) => isCategorySlugExists(slug))
+		.then((slug) => isCategorySlugExists(slug, req.params._id))
 		.then((slug) => updateCategory(req.params._id, { ...req.body, slug }))
 		.then((category) => {
 			res.json(category)
@@ -210,6 +228,11 @@ router.post('/product', (req, res, next) => {
 
 	if (req.body.specifications) {
 		req.body.specifications = JSON.parse(req.body.specifications)
+
+		req.body.specifications = req.body.specifications.map((spec: any) => ({
+			...spec,
+			slug: getSeoUrl(spec.name)
+		}))
 	}
 
 	validatePostProduct(req.body)
@@ -240,6 +263,11 @@ router.put('/product/:_id', (req, res, next) => {
 
 	if (req.body.specifications) {
 		req.body.specifications = JSON.parse(req.body.specifications)
+
+		req.body.specifications = req.body.specifications.map((spec: any) => ({
+			...spec,
+			slug: getSeoUrl(spec.name)
+		}))
 	}
 
 	validateUpdateProduct(req.body)
@@ -260,13 +288,51 @@ router.put('/product/:_id', (req, res, next) => {
 })
 
 router.delete('/product/:_id', (req, res, next) => {
-	deleteProductFromDatabase(req.params._id)
+	validateObjectId(req.params._id)
+		.then(() => deleteProductFromDatabase(req.params._id))
 		.then((product: any) => removeProductFromSearch(product))
 		.then(() => {
 			res.json()
 		})
 		.catch((reason) => {
 			next(handleError(reason, 'DELETE /admin/product/:_id'))
+		})
+})
+
+router.get('/types', (req, res, next) => {
+	getTypes()
+		.then((types) => {
+			res.json(types)
+		})
+		.catch((reason) => {
+			next(handleError(reason, 'GET /admin/types'))
+		})
+})
+
+
+router.post('/save-type', (req, res, next) => {
+	validateSaveTypeRequest(req.body)
+		.then(() => getSeoUrl(req.body.name))
+		.then((slug) => isTypeSlugExists(slug))
+		.then((slug) => saveType({ ...req.body, slug }))
+		.then((type) => {
+			res.json(type)
+		})
+		.catch((reason) => {
+			next(handleError(reason, 'POST /admin/save-type'))
+		})
+})
+
+router.put('/update-type/:_id', (req, res, next) => {
+	validateUpdateTypeRequest(req.body)
+		.then(() => getSeoUrl(req.body.name))
+		.then((slug) => isTypeSlugExists(slug, req.params._id))
+		.then((slug) => updateType(req.params._id, { ...req.body, slug }))
+		.then((type) => {
+			res.json(type)
+		})
+		.catch((reason) => {
+			next(handleError(reason, 'PUT /admin/update-type/:_id'))
 		})
 })
 
