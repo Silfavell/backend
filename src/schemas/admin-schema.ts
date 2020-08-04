@@ -10,14 +10,14 @@ export const categorySchema = Joi.object({
 export const saveSubCategorySchema = Joi.object({
 	parentCategoryId: Joi.string().required(),
 	name: Joi.string().required(),
-	types: Joi.array().min(1).items(Joi.string()).sparse(false).allow(null)
+	types: Joi.array().min(0).items(Joi.string()).sparse(false).allow(null)
 }).required()
 
 export const updateSubCategorySchema = Joi.object({
 	parentCategoryId: Joi.string().required(),
 	subCategoryId: Joi.string().required(),
 	name: Joi.string().required(),
-	types: Joi.array().min(1).items(Joi.string()).sparse(false).allow(null)
+	types: Joi.array().min(0).items(Joi.string()).sparse(false).allow(null)
 }).required()
 
 export const deleteSubCategorySchema = Joi.object({
