@@ -10,7 +10,8 @@ import {
 	Manager,
 	Admin,
 	Category,
-	Order
+	Order,
+	Product
 } from '../src/models'
 import ActivationCode from '../src/models/ActivationCode'
 
@@ -39,6 +40,8 @@ describe('sequentially run tests', () => {
 
 	afterAll((done) => {
 		Promise.all([
+			Product.deleteOne({ name: 'Test Product' }),
+			Product.deleteOne({ name: 'Test Product 2' }),
 			User.deleteOne({ phoneNumber: '0555 555 55 55' }),
 			Manager.deleteOne({ phoneNumber: '0555 555 55 55' }),
 			Admin.deleteOne({ phoneNumber: '555 555 55 55' }),

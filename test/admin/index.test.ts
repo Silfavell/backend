@@ -7,9 +7,11 @@ import putVerifyManagerTests from './put-verify-manager.test'
 import deleteCategoryByIdTests from './delete-category-by-id.test'
 import deleteProductByIdTests from './delete-product-by-id.test'
 import postSubCategoryTests from './post-sub-category.test'
+import getTypesTests from './get-types.test'
 
 export default () => describe('admin', () => {
 	getManagerRequestsTests()
+	getTypesTests()
 	postCategoryTests()
 	postSubCategoryTests()
 	putCategoryByIdTests()
