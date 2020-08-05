@@ -3,11 +3,7 @@ import mongoose, { Document, Schema } from 'mongoose'
 
 export type AddressDocument = Document & {
 	openAddress: string,
-	addressTitle: string,
-	buildingNo: string,
-	floor: string,
-	aptNo: string,
-	directions: string
+	addressTitle: string
 }
 
 const addressSchema = new Schema({
@@ -18,18 +14,6 @@ const addressSchema = new Schema({
 	addressTitle: {
 		type: String,
 		required: true
-	},
-	buildingNo: {
-		type: String
-	},
-	floor: {
-		type: String
-	},
-	aptNo: {
-		type: String
-	},
-	directions: {
-		type: String
 	}
 })
 
