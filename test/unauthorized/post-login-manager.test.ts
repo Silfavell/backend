@@ -7,7 +7,7 @@ import ErrorMessages from '../../src/errors/ErrorMessages'
 export default () => describe('POST /login-manager', () => {
 	it('try to login not verified manager account', (done) => {
 		request(app)
-			.post('/login-manager')
+			.post('/api/login-manager')
 			.send({
 				phoneNumber: '555 555 55 55',
 				password: '1234'

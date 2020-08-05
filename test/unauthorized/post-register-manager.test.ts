@@ -24,7 +24,7 @@ export default () => describe('POST /register-manager', () => {
 
 	it('inconvient phone number', (done) => (
 		request(app)
-			.post('/register-manager')
+			.post('/api/register-manager')
 			.send({
 				phoneNumber: '915555555555', // 91
 				email: 'testUser@hotmail.com',
@@ -34,14 +34,14 @@ export default () => describe('POST /register-manager', () => {
 			})
 			.expect(400)
 			.end((error, response) => {
-				expect(isTextContainsAllKeys(response.body.error, ['Phone', 'invalid'])).to.equal(true)
+				expect(response.body.error).to.equal(ErrorMessages.INVALID_PHONE_NUMBER)
 				done()
 			})
 	))
 
 	it('wrong activation code', (done) => (
 		request(app)
-			.post('/register-manager')
+			.post('/api/register-manager')
 			.send({
 				phoneNumber: '905555555555',
 				email: 'testUser@hotmail.com',
@@ -58,7 +58,7 @@ export default () => describe('POST /register-manager', () => {
 
 	it('without password', (done) => (
 		request(app)
-			.post('/register-manager')
+			.post('/api/register-manager')
 			.send({
 				phoneNumber: '905555555555',
 				email: 'testUser@hotmail.com',
@@ -74,7 +74,7 @@ export default () => describe('POST /register-manager', () => {
 
 	it('without nameSurname', (done) => (
 		request(app)
-			.post('/register-manager')
+			.post('/api/register-manager')
 			.send({
 				phoneNumber: '905555555555',
 				email: 'testUser@hotmail.com',
@@ -90,7 +90,7 @@ export default () => describe('POST /register-manager', () => {
 
 	it('correct', (done) => (
 		request(app)
-			.post('/register-manager')
+			.post('/api/register-manager')
 			.send({
 				phoneNumber: '5555555555',
 				nameSurname: 'testUser',

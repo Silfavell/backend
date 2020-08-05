@@ -4,15 +4,17 @@ import { expect } from 'chai'
 import app from '../../src/app'
 import ActivationCodes from '../../src/enums/activation-code-enum'
 import { isTextContainsAllKeys } from '../tools'
+import ErrorMessages from '../../src/errors/ErrorMessages'
 
 export default () => describe('POST /send-activation-code', () => {
 	describe('POST /send-activation-code', () => {
 		it('without activation code', (done) => (
 			request(app)
-				.post('/send-activation-code')
+				.post('/api/send-activation-code')
 				.send({ phoneNumber: '905555555555' })
 				.expect(400)
 				.end((error, response) => {
+					console.log(response.body)
 					expect(isTextContainsAllKeys(response.body.error, ['activationCode', 'required'])).to.equal(true)
 					done()
 				})
@@ -20,7 +22,7 @@ export default () => describe('POST /send-activation-code', () => {
 
 		it('unkown activation code type', (done) => (
 			request(app)
-				.post('/send-activation-code')
+				.post('/api/send-activation-code')
 				.send({
 					phoneNumber: '905555555555',
 					activationCodeType: 5
@@ -34,24 +36,24 @@ export default () => describe('POST /send-activation-code', () => {
 
 		it('inconvenient phone number', (done) => (
 			request(app)
-				.post('/send-activation-code')
+				.post('/api/send-activation-code')
 				.send({ phoneNumber: '915555555555' })
 				.expect(400)
 				.end((error, response) => {
-					expect(isTextContainsAllKeys(response.body.error, ['Phone', 'invalid'])).to.equal(true)
+					expect(response.body.error).to.equal(ErrorMessages.INVALID_PHONE_NUMBER)
 					done()
 				})
 		))
 
 		it('without body', () => (
 			request(app)
-				.post('/send-activation-code')
+				.post('/api/send-activation-code')
 				.expect(400)
 		))
 
 		it('correct', () => (
 			request(app)
-				.post('/send-activation-code')
+				.post('/api/send-activation-code')
 				.send({
 					phoneNumber: '905555555555',
 					activationCodeType: ActivationCodes.REGISTER_USER

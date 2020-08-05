@@ -10,7 +10,7 @@ import app from '../../src/app'
 export default () => describe('DELETE /user/address', () => {
 	it('correct', (done) => (
 		request(app)
-			.delete(`/user/address/${JSON.parse(process.env.user).addresses[0]._id}`)
+			.delete(`/api/user/address/${JSON.parse(process.env.user).addresses[0]._id}`)
 			.set({ Authorization: process.env.token })
 			.expect(200)
 			.end((error, response) => {

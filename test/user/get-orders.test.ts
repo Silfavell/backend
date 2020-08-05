@@ -6,7 +6,7 @@ import app from '../../src/app'
 export default () => describe('GET /user/orders', () => {
 	it('correct', (done) => (
 		request(app)
-			.get('/user/orders')
+			.get('/api/user/orders')
 			.set({ Authorization: process.env.token })
 			.expect(200)
 			.end((error, response) => {

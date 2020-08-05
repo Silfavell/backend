@@ -8,7 +8,7 @@ export default () => describe('POST /user/payment-card', () => {
 
 	it('with 15 character card', (done) => (
 		request(app)
-			.post('/user/payment-card')
+			.post('/api/user/payment-card')
 			.set({ Authorization: process.env.token })
 			.send({
 				card: {
@@ -28,7 +28,7 @@ export default () => describe('POST /user/payment-card', () => {
 
 	it('wrong expire year', (done) => (
 		request(app)
-			.post('/user/payment-card')
+			.post('/api/user/payment-card')
 			.set({ Authorization: process.env.token })
 			.send({
 				card: {
@@ -48,7 +48,7 @@ export default () => describe('POST /user/payment-card', () => {
 
 	it('wrong expire month', (done) => (
 		request(app)
-			.post('/user/payment-card')
+			.post('/api/user/payment-card')
 			.set({ Authorization: process.env.token })
 			.send({
 				card: {
@@ -68,7 +68,7 @@ export default () => describe('POST /user/payment-card', () => {
 
 	it('save card to use later', (done) => (
 		request(app)
-			.post('/user/payment-card')
+			.post('/api/user/payment-card')
 			.set({ Authorization: process.env.token })
 			.send({
 				card: {
@@ -94,7 +94,7 @@ export default () => describe('POST /user/payment-card', () => {
 
 	it('save card to delete', (done) => (
 		request(app)
-			.post('/user/payment-card')
+			.post('/api/user/payment-card')
 			.set({ Authorization: process.env.token })
 			.send({
 				card: {

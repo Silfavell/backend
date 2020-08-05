@@ -3,10 +3,10 @@ import { expect } from 'chai'
 
 import app from '../../src/app'
 
-export default () => describe('GET /product/:_id with token', () => {
+export default () => describe('GET /add-product/:_id with token', () => {
 	it('get first product firs time', (done) => {
 		request(app)
-			.get(`/add-product/${JSON.parse(process.env.product)._id}`)
+			.get(`/api/add-product/${JSON.parse(process.env.product)._id}`)
 			.set({ Authorization: process.env.token })
 			.expect(200)
 			.end((error, response) => {
@@ -21,7 +21,7 @@ export default () => describe('GET /product/:_id with token', () => {
 
 	it('get first product second time - should return with quantity', (done) => {
 		request(app)
-			.get(`/add-product/${JSON.parse(process.env.product)._id}`)
+			.get(`/api/add-product/${JSON.parse(process.env.product)._id}`)
 			.set({ Authorization: process.env.token })
 			.expect(200)
 			.end((error, response) => {
@@ -37,7 +37,7 @@ export default () => describe('GET /product/:_id with token', () => {
 
 	it('get second product first time - should return with quantity', (done) => {
 		request(app)
-			.get(`/add-product/${JSON.parse(process.env.product2)._id}`)
+			.get(`/api/add-product/${JSON.parse(process.env.product2)._id}`)
 			.set({ Authorization: process.env.token })
 			.expect(200)
 			.end((error, response) => {
@@ -52,7 +52,7 @@ export default () => describe('GET /product/:_id with token', () => {
 
 	it('get second product second time - should return with quantity', (done) => {
 		request(app)
-			.get(`/add-product/${JSON.parse(process.env.product2)._id}`)
+			.get(`/api/add-product/${JSON.parse(process.env.product2)._id}`)
 			.set({ Authorization: process.env.token })
 			.expect(200)
 			.end((error, response) => {
@@ -68,7 +68,7 @@ export default () => describe('GET /product/:_id with token', () => {
 
 	it('get second product third time - should return with quantity', (done) => {
 		request(app)
-			.get(`/add-product/${JSON.parse(process.env.product2)._id}`)
+			.get(`/api/add-product/${JSON.parse(process.env.product2)._id}`)
 			.set({ Authorization: process.env.token })
 			.expect(200)
 			.end((error, response) => {

@@ -8,7 +8,7 @@ import { CategoryDocument } from '../../src/models'
 export default () => describe('DELETE /admin/category/:_id', () => {
 	it('correct', (done) => (
 		request(app)
-			.delete(`/admin/category/${JSON.parse(process.env.testCategory)._id}`)
+			.delete(`/api/admin/category/${JSON.parse(process.env.testCategory)._id}`)
 			.set({ Authorization: process.env.adminToken })
 			.send({
 				name: 'testCategoryUpdated'
@@ -26,7 +26,7 @@ export default () => describe('DELETE /admin/category/:_id', () => {
 
 	it('should categories not contain testCategoryUpdated', (done) => (
 		request(app)
-			.get('/categories')
+			.get('/api/categories')
 			.set({ Authorization: process.env.adminToken })
 			.expect(200)
 			.end((error, response) => {

@@ -6,7 +6,7 @@ import app from '../../src/app'
 export default () => describe('PUT /orders/cancel/:_id', () => {
 	it('without cancellation reason', (done) => {
 		request(app)
-			.put(`/manager/orders/cancel/${JSON.parse(process.env.cancelOrder)._id}`)
+			.put(`/api/manager/orders/cancel/${JSON.parse(process.env.cancelOrder)._id}`)
 			.set({ Authorization: process.env.managerToken })
 			.expect(400)
 			.end((error, response) => {
@@ -17,7 +17,7 @@ export default () => describe('PUT /orders/cancel/:_id', () => {
 
 	it('correct', (done) => {
 		request(app)
-			.put(`/manager/orders/cancel/${JSON.parse(process.env.cancelOrder)._id}`)
+			.put(`/api/manager/orders/cancel/${JSON.parse(process.env.cancelOrder)._id}`)
 			.set({ Authorization: process.env.managerToken })
 			.send({ cancellationReason: '..Reason..' })
 			.expect(200)

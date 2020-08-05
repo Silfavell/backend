@@ -8,7 +8,7 @@ import { isTextContainsAllKeys } from '../tools'
 export default () => describe('POST /user/order', () => {
 	it('without address', (done) => (
 		request(app)
-			.post('/user/order')
+			.post('/api/user/order')
 			.set({ Authorization: process.env.token })
 			.send({
 				card: process.env.cardToken
@@ -25,7 +25,7 @@ export default () => describe('POST /user/order', () => {
 
 	it('without card', (done) => (
 		request(app)
-			.post('/user/order')
+			.post('/api/user/order')
 			.set({ Authorization: process.env.token })
 			.send({
 				address: JSON.parse(process.env.user).addresses[0]._id
@@ -42,7 +42,7 @@ export default () => describe('POST /user/order', () => {
 
 	it('with manually created cart (Products added to cart one by one in unauthorized get product by id with token)', (done) => (
 		request(app)
-			.post('/user/order')
+			.post('/api/user/order')
 			.set({ Authorization: process.env.token })
 			.send({
 				address: JSON.parse(process.env.user).addresses[0]._id,
@@ -53,7 +53,7 @@ export default () => describe('POST /user/order', () => {
 
 	it('with empty cart', (done) => (
 		request(app)
-			.post('/user/order')
+			.post('/api/user/order')
 			.set({ Authorization: process.env.token })
 			.send({
 				address: JSON.parse(process.env.user).addresses[0]._id,
@@ -68,7 +68,7 @@ export default () => describe('POST /user/order', () => {
 
 	it('POST /cart to make succesfully order', () => (
 		request(app)
-			.post('/user/cart')
+			.post('/api/user/cart')
 			.set({ Authorization: process.env.token })
 			.send([
 				{
@@ -85,7 +85,7 @@ export default () => describe('POST /user/order', () => {
 
 	it('with unknown address', (done) => (
 		request(app)
-			.post('/user/order')
+			.post('/api/user/order')
 			.set({ Authorization: process.env.token })
 			.send({
 				address: '12345',
@@ -100,7 +100,7 @@ export default () => describe('POST /user/order', () => {
 
 	it('make order 1', (done) => (
 		request(app)
-			.post('/user/order')
+			.post('/api/user/order')
 			.set({ Authorization: process.env.token })
 			.send({
 				address: JSON.parse(process.env.user).addresses[0]._id,
@@ -119,7 +119,7 @@ export default () => describe('POST /user/order', () => {
 
 	it('POST /cart to make succesfully order 2', () => (
 		request(app)
-			.post('/user/cart')
+			.post('/api/user/cart')
 			.set({ Authorization: process.env.token })
 			.send([
 				{
@@ -136,7 +136,7 @@ export default () => describe('POST /user/order', () => {
 
 	it('make order 2', (done) => (
 		request(app)
-			.post('/user/order')
+			.post('/api/user/order')
 			.set({ Authorization: process.env.token })
 			.send({
 				address: JSON.parse(process.env.user).addresses[0]._id,

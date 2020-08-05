@@ -6,7 +6,7 @@ import app from '../../src/app'
 export default () => describe('POST /admin/product', () => {
 	it('correct', (done) => (
 		request(app)
-			.post('/admin/product')
+			.post('/api/admin/product')
 			.set({ Authorization: process.env.adminToken })
 			.send({
 				brand: 'Test Marka',

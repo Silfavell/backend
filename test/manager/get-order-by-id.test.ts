@@ -6,7 +6,7 @@ import app from '../../src/app'
 export default () => describe('GET /manager/order/:_id', () => {
 	it('correct', (done) => {
 		request(app)
-			.get(`/manager/order/${JSON.parse(process.env.confirmOrder)._id}`)
+			.get(`/api/manager/order/${JSON.parse(process.env.confirmOrder)._id}`)
 			.set({ Authorization: process.env.managerToken })
 			.expect(200)
 			.end((error, response) => {

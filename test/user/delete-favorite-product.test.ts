@@ -6,14 +6,14 @@ import app from '../../src/app'
 export default () => describe('DELETE /user/favorite-product', () => {
 	it('without id', () => (
 		request(app)
-			.post('/user/favorite-product')
+			.post('/api/user/favorite-product')
 			.set({ Authorization: process.env.token })
 			.expect(400)
 	))
 
 	it('correct', (done) => (
 		request(app)
-			.delete(`/user/favorite-product/${JSON.parse(process.env.product)._id}`)
+			.delete(`/api/user/favorite-product/${JSON.parse(process.env.product)._id}`)
 			.set({ Authorization: process.env.token })
 			.expect(200)
 			.end((error, response) => {

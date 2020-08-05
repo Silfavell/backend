@@ -1,23 +1,40 @@
 import request from 'supertest'
 import { expect } from 'chai'
 
+import { isTextContainsAllKeys } from '../tools/index'
+
 import app from '../../src/app'
-import ErrorMessages from '../../src/errors/ErrorMessages'
 
 export default () => describe('DELETE /product/:_id', () => {
-	it('unknown product', (done) => {
+	it('without quantity', (done) => {
 		request(app)
-			.delete('/product/12356')
-			.expect(400)
+			.put(`/api/deduct-product/${JSON.parse(process.env.product)._id}`)
+			.expect(200)
 			.end((error, response) => {
-				expect(response.body.error).to.equal(ErrorMessages.UNKNOWN_OBJECT_ID)
+				expect(isTextContainsAllKeys(response.body.error, ['quantity', 'required'])).to.equal(true)
+				done()
+			})
+	})
+
+	it('with 0 quantity', (done) => {
+		request(app)
+			.put(`/api/deduct-product/${JSON.parse(process.env.product)._id}`)
+			.expect(200)
+			.send({
+				quantity: 0
+			})
+			.end((error, response) => {
+				expect(isTextContainsAllKeys(response.body.error, ['quantity', 'larger', 'equal'])).to.equal(true)
 				done()
 			})
 	})
 
 	it('correct', (done) => {
 		request(app)
-			.delete(`/deduct-product/${JSON.parse(process.env.product)._id}`)
+			.put(`/api/deduct-product/${JSON.parse(process.env.product)._id}`)
+			.send({
+				quantity: 1
+			})
 			.expect(200)
 			.end((error, response) => {
 				if (response.body.error) {

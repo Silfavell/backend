@@ -49,7 +49,8 @@ import {
 	validateResetPasswordRequest,
 	validatePostTicketRequest,
 	validateGetProductsFilterWithCategoriesRequest,
-	validateSetProductRequest
+	validateSetProductRequest,
+	validatePutDeductProduct
 } from '../validators/unauthorized-validator'
 
 import ActivationCodes from '../enums/activation-code-enum'
@@ -146,6 +147,7 @@ router.get('/product/:slug', (req, res, next) => {
 
 router.put('/deduct-product/:_id', (req, res, next) => {
 	validateObjectId(req.params._id)
+		.then(() => validatePutDeductProduct(req.body))
 		.then(() => getSingleProduct(req.params._id, req.user))
 		.then(({ product, cart }) => takeOffProductFromCart(product, cart || null, req.user, req.body.quantity))
 		.then((response: any) => {
@@ -180,7 +182,6 @@ router.post('/send-activation-code', (req, res, next) => {
 })
 
 router.post('/register', (req, res, next) => {
-	// isUserNonExists(req.body.user.phoneNumber)
 	validateRegisterRequest(req.body)
 		.then(() => isUserNonExists(req.body.phoneNumber))
 		.then(() => getActivationCode(req.body.phoneNumber, ActivationCodes.REGISTER_USER))
@@ -201,7 +202,6 @@ router.post('/register-manager', (req, res, next) => {
 		.then(() => getActivationCode(req.body.phoneNumber, ActivationCodes.REGISTER_MANAGER))
 		.then((activationCode) => compareActivationCode(req.body.activationCode, activationCode.toString()))
 		.then(() => registerManager({ ...req.body, ...{ verified: false } }))
-		// .then((manager) => createToken(manager).then((token) => ({ manager, token })))
 		.then(() => {
 			res.json()
 		})

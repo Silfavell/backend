@@ -52,3 +52,7 @@ export const postTicketSchema = Joi.object({
 	subject: Joi.string().required(),
 	message: Joi.string().required()
 })
+
+export const putDeductProductSchema = Joi.object({
+	quantity: Joi.number().min(1).required()
+})

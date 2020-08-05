@@ -8,7 +8,7 @@ import { CategoryDocument } from '../../src/models'
 export default () => describe('PUT /admin/category/:_id', () => {
 	it('correct', (done) => (
 		request(app)
-			.put(`/admin/category/${JSON.parse(process.env.testCategory)._id}`)
+			.put(`/api/admin/category/${JSON.parse(process.env.testCategory)._id}`)
 			.set({ Authorization: process.env.adminToken })
 			.send({
 				name: 'testCategoryUpdated'
@@ -26,7 +26,7 @@ export default () => describe('PUT /admin/category/:_id', () => {
 
 	it('should categories contain testCategoryUpdated', (done) => (
 		request(app)
-			.get('/categories')
+			.get('/api/categories')
 			.set({ Authorization: process.env.adminToken })
 			.expect(200)
 			.end((error, response) => {
