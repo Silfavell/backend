@@ -58,7 +58,7 @@ export const updateProductSchema = Joi.object({
 	brand: Joi.string().allow(null),
 	name: Joi.string().allow(null),
 	details: Joi.string().allow(null, ''),
-	type: Joi.string().required(),
+	type: Joi.string(),
 	specifications: Joi.array().min(1).items(productSpecificationsSchema).sparse(false).allow(null),
 	price: Joi.number().min(0).allow(null),
 	discountedPrice: Joi.number().min(0).allow(null),

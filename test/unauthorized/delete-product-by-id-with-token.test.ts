@@ -3,10 +3,13 @@ import { expect } from 'chai'
 
 import app from '../../src/app'
 
-export default () => describe('DELETE /product/:_id with token', () => {
+export default () => describe('PUT /deduct-product/:_id with token', () => {
 	it('correct', (done) => {
 		request(app)
-			.delete(`/api/deduct-product/${JSON.parse(process.env.product2)._id}`)
+			.put(`/api/deduct-product/${JSON.parse(process.env.product2)._id}`)
+			.send({
+				quantity: 1
+			})
 			.set({ Authorization: process.env.token })
 			.expect(200)
 			.end((error, response) => {

@@ -99,10 +99,10 @@ export const checkMakeOrderValues = (user: UserDocument, context: any) => {
 	const selectedAddress = user.addresses.find((address) => address._id.toString() === context.address)
 
 	return Cart.findOne({ userId: user._id.toString() }).then((cartObj) => {
-		if (!cartObj || !cartObj.cart) {
-			throw new ServerError(ErrorMessages.EMPTY_CART, HttpStatusCodes.BAD_REQUEST, null, false)
+		if (!cartObj || !(cartObj.cart.length > 0)) {
+			throw new ServerError(ErrorMessages.EMPTY_CART, HttpStatusCodes.BAD_REQUEST, ErrorMessages.EMPTY_CART, false)
 		} else if (!selectedAddress) {
-			throw new ServerError(ErrorMessages.NO_ADDRESS, HttpStatusCodes.BAD_REQUEST, null, false)
+			throw new ServerError(ErrorMessages.NO_ADDRESS, HttpStatusCodes.BAD_REQUEST, ErrorMessages.NO_ADDRESS, false)
 		} else {
 			return createCart(cartObj.cart).then((cart) => {
 				return ({ cart, selectedAddress, card: context.card })

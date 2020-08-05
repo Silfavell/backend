@@ -21,6 +21,10 @@ const replaceProductId = (product: ProductDocument) => (
 )
 
 export const getSeoUrl = (name: string) => {
+	if (!name) {
+		return name
+	}
+
 	return name.toString()               // Convert to string
 		.normalize('NFD')                // Change diacritics
 		.replace(/[\u0300-\u036f]/g, '') // Remove illegal characters
@@ -96,7 +100,7 @@ export const updateSubCategory = (body: any, slug: string) => ( // is category e
 
 export const isProductSlugExists = (slug: string, updateId?: string) => (
 	Product.findOne({ slug }).then((product) => {
-		if (product && updateId !== product._id.toString()) {
+		if (slug && product && updateId !== product._id.toString()) {
 			throw new ServerError(ErrorMessages.ANOTHER_PRODUCT_WITH_THE_SAME_NAME, HttpStatusCodes.BAD_REQUEST, ErrorMessages.ANOTHER_PRODUCT_WITH_THE_SAME_NAME, false)
 		}
 
@@ -169,9 +173,13 @@ export const removeProductFromSearch = (product: ProductDocument) => (
 		})
 )
 
-export const updateProduct = (productId: string, productContext: ProductDocument) => (
-	Product.findByIdAndUpdate(productId, productContext, { new: true })
-)
+export const updateProduct = (productId: string, productContext: ProductDocument, slug: string) => {
+	if (slug) {
+		productContext.slug = slug
+	}
+
+	return Product.findByIdAndUpdate(productId, productContext, { new: true })
+}
 
 export const deleteProductFromDatabase = (productId: string) => (
 	Product.findByIdAndDelete(productId)

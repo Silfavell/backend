@@ -3,10 +3,13 @@ import { expect } from 'chai'
 
 import app from '../../src/app'
 
-export default () => describe('GET /add-product/:_id with token', () => {
+export default () => describe('PUT /add-product/:_id with token', () => {
 	it('get first product firs time', (done) => {
 		request(app)
-			.get(`/api/add-product/${JSON.parse(process.env.product)._id}`)
+			.put(`/api/add-product/${JSON.parse(process.env.product)._id}`)
+			.send({
+				quantity: 1
+			})
 			.set({ Authorization: process.env.token })
 			.expect(200)
 			.end((error, response) => {
@@ -21,7 +24,10 @@ export default () => describe('GET /add-product/:_id with token', () => {
 
 	it('get first product second time - should return with quantity', (done) => {
 		request(app)
-			.get(`/api/add-product/${JSON.parse(process.env.product)._id}`)
+			.put(`/api/add-product/${JSON.parse(process.env.product)._id}`)
+			.send({
+				quantity: 1
+			})
 			.set({ Authorization: process.env.token })
 			.expect(200)
 			.end((error, response) => {
@@ -37,7 +43,10 @@ export default () => describe('GET /add-product/:_id with token', () => {
 
 	it('get second product first time - should return with quantity', (done) => {
 		request(app)
-			.get(`/api/add-product/${JSON.parse(process.env.product2)._id}`)
+			.put(`/api/add-product/${JSON.parse(process.env.product2)._id}`)
+			.send({
+				quantity: 1
+			})
 			.set({ Authorization: process.env.token })
 			.expect(200)
 			.end((error, response) => {
@@ -52,7 +61,10 @@ export default () => describe('GET /add-product/:_id with token', () => {
 
 	it('get second product second time - should return with quantity', (done) => {
 		request(app)
-			.get(`/api/add-product/${JSON.parse(process.env.product2)._id}`)
+			.put(`/api/add-product/${JSON.parse(process.env.product2)._id}`)
+			.send({
+				quantity: 1
+			})
 			.set({ Authorization: process.env.token })
 			.expect(200)
 			.end((error, response) => {
@@ -68,7 +80,10 @@ export default () => describe('GET /add-product/:_id with token', () => {
 
 	it('get second product third time - should return with quantity', (done) => {
 		request(app)
-			.get(`/api/add-product/${JSON.parse(process.env.product2)._id}`)
+			.put(`/api/add-product/${JSON.parse(process.env.product2)._id}`)
+			.send({
+				quantity: 1
+			})
 			.set({ Authorization: process.env.token })
 			.expect(200)
 			.end((error, response) => {

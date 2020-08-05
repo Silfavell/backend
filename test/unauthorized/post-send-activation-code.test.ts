@@ -14,7 +14,6 @@ export default () => describe('POST /send-activation-code', () => {
 				.send({ phoneNumber: '905555555555' })
 				.expect(400)
 				.end((error, response) => {
-					console.log(response.body)
 					expect(isTextContainsAllKeys(response.body.error, ['activationCode', 'required'])).to.equal(true)
 					done()
 				})

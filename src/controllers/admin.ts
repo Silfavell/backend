@@ -273,7 +273,7 @@ router.put('/product/:_id', (req, res, next) => {
 	validateUpdateProduct(req.body)
 		.then(() => getSeoUrl(req.body.name))
 		.then((slug) => isProductSlugExists(slug, req.params._id))
-		.then((slug) => updateProduct(req.params._id, { ...req.body, slug }))
+		.then((slug) => updateProduct(req.params._id, req.body, slug))
 		.then((product: any) => indexProduct(product).then(() => product))
 		.then((product) => {
 			if (req.files) {

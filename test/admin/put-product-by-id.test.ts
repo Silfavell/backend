@@ -9,8 +9,7 @@ export default () => describe('PUT /admin/product/:_id', () => {
 			.put(`/api/admin/product/${JSON.parse(process.env.testProduct)._id}`)
 			.set({ Authorization: process.env.adminToken })
 			.send({
-				brand: 'Test Marka 2',
-				type: JSON.parse(process.env.testType)._id
+				brand: 'Test Marka 2'
 			})
 			.expect(200)
 			.end((error, response) => {
