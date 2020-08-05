@@ -54,14 +54,6 @@ const productSchema = new Schema({
 		required: true
 	},
 	specifications: [ProductSpecification.schema],
-	//	specifications: {
-	//		form: String,
-	//		benefit: String,
-	//		colorDetail: String,
-	//		kind: String,
-	//		brushThickness: String,
-	//		feature: String
-	//	},
 	price: {
 		type: Number,
 		required: true,

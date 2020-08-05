@@ -46,10 +46,10 @@ export const setProductSchema = Joi.object({
 })
 
 export const postTicketSchema = Joi.object({
-	name: Joi.string().required(),
-	surname: Joi.string().required(),
-	email: Joi.string().required(),
-	subject: Joi.string().required(),
+	name: Joi.string(),
+	surname: Joi.string(),
+	email: Joi.string(),
+	subject: Joi.string(),
 	message: Joi.string().required()
 })
 

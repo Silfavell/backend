@@ -5,7 +5,7 @@ import { isTextContainsAllKeys } from '../tools/index'
 
 import app from '../../src/app'
 
-export default () => describe('DELETE /product/:_id', () => {
+export default () => describe('PUT /deduct-product/:_id', () => {
 	it('without quantity', (done) => {
 		request(app)
 			.put(`/api/deduct-product/${JSON.parse(process.env.product)._id}`)

@@ -13,9 +13,10 @@ import postLoginManagerTests from './post-login-manager.test'
 import getProductsWithCategoriesTests from './get-products-with-categories.test'
 import getCategoriesTests from './get-categories.test'
 import getProductBySlugTests from './get-product-by-slug.test'
-import getProductByIdWithTokenTests from './get-product-by-id-with-token.test'
-import deleteProductByIdTests from './delete-product-by-id.test'
-import deleteProductByIdWithTokenTest from './delete-product-by-id-with-token.test'
+import putAddProductByIdWithTokenTests from './put-add-product-by-id-with-token.test'
+import putDeductProductByIdTests from './put-deduct-product-by-id.test'
+import putDeductProductByIdWithTokenTest from './put-deduct-product-by-id-with-token.test'
+import postTicketTests from './post-ticket.test'
 
 export default () => describe('Unauthorized', () => {
 	postSendActivationCodeTests()
@@ -53,8 +54,9 @@ export default () => describe('Unauthorized', () => {
 	getProductsWithCategoriesTests()
 	getCategoriesTests()
 	getProductBySlugTests()
-	deleteProductByIdTests()
-	getProductByIdWithTokenTests()
-	deleteProductByIdWithTokenTest()
+	putDeductProductByIdTests()
+	putAddProductByIdWithTokenTests()
+	putDeductProductByIdWithTokenTest()
 	postLoginManagerTests()
+	postTicketTests()
 })

@@ -44,13 +44,15 @@ export const saveProductSchema = Joi.object({
 	details: Joi.string().allow(null, ''),
 	type: Joi.string().required(),
 	specifications: Joi.array().min(1).items(productSpecificationsSchema).sparse(false).allow(null),
-	price: Joi.number().min(0).required(),
-	discountedPrice: Joi.number().min(0).allow(null),
-	imageCount: Joi.number().min(0).default(0).allow(null),
+	price: Joi.number().positive().required(),
+	discountedPrice: Joi.number().positive().less(Joi.ref('price')).allow(null),
+	imageCount: Joi.number().min(0).default(0),
 	purchasable: Joi.boolean().default(true).required(),
 	colorGroup: Joi.string().allow(null),
 	color: colorSchema.allow(null)
-}).with('colorGroup', ['color']).required()
+}).with('colorGroup', ['color'])
+	.with('discountedPrice', ['price'])
+	.required()
 
 export const updateProductSchema = Joi.object({
 	categoryId: Joi.string().allow(null),
@@ -60,13 +62,15 @@ export const updateProductSchema = Joi.object({
 	details: Joi.string().allow(null, ''),
 	type: Joi.string(),
 	specifications: Joi.array().min(1).items(productSpecificationsSchema).sparse(false).allow(null),
-	price: Joi.number().min(0).allow(null),
-	discountedPrice: Joi.number().min(0).allow(null),
+	price: Joi.number().positive().allow(null),
+	discountedPrice: Joi.number().positive().less(Joi.ref('price')).allow(null),
 	imageCount: Joi.number().min(0).default(0).allow(null),
 	purchasable: Joi.boolean().allow(null),
 	colorGroup: Joi.string().allow(null),
 	color: colorSchema.allow(null)
-}).with('colorGroup', ['color']).required()
+}).with('colorGroup', ['color'])
+	.with('discountedPrice', ['price'])
+	.required()
 
 export const saveTypeSchema = Joi.object({
 	name: Joi.string().required(),
