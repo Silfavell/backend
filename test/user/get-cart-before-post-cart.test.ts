@@ -6,7 +6,7 @@ import app from '../../src/app'
 export default () => describe('GET /cart before post cart', () => {
 	it('correct', (done) => (
 		request(app)
-			.get('/user/cart')
+			.get('/api/user/cart')
 			.set({ Authorization: process.env.token })
 			.expect(200)
 			.end((error, response) => {

@@ -8,7 +8,7 @@ import ErrorMessages from '../../src/errors/ErrorMessages'
 export default () => describe('POST /login', () => {
 	it('without phoneNumber', (done) => (
 		request(app)
-			.post('/login')
+			.post('/api/login')
 			.send({
 				password: '1234'
 			})
@@ -21,7 +21,7 @@ export default () => describe('POST /login', () => {
 
 	it('without password', (done) => (
 		request(app)
-			.post('/login')
+			.post('/api/login')
 			.send({
 				phoneNumber: '905555555000'
 			})
@@ -34,7 +34,7 @@ export default () => describe('POST /login', () => {
 
 	it('wrong phoneNumber', (done) => (
 		request(app)
-			.post('/login')
+			.post('/api/login')
 			.send({
 				phoneNumber: '905555555000',
 				password: '1234'
@@ -48,7 +48,7 @@ export default () => describe('POST /login', () => {
 
 	it('wrong password', (done) => (
 		request(app)
-			.post('/login')
+			.post('/api/login')
 			.send({
 				phoneNumber: '905555555555',
 				password: '1234x'
@@ -62,7 +62,7 @@ export default () => describe('POST /login', () => {
 
 	it('correct', (done) => (
 		request(app)
-			.post('/login')
+			.post('/api/login')
 			.send({
 				phoneNumber: '905555555555',
 				password: '1234'

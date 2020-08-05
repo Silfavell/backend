@@ -6,7 +6,7 @@ import app from '../../src/app'
 export default () => describe('POST /login-manager after verified', () => {
 	it('login succesfully', (done) => (
 		request(app)
-			.post('/login-manager')
+			.post('/api/login-manager')
 			.send({
 				phoneNumber: '555 555 55 55',
 				password: '1234'

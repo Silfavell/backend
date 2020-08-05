@@ -12,7 +12,7 @@ import postLoginManagerTests from './post-login-manager.test'
 
 import getProductsWithCategoriesTests from './get-products-with-categories.test'
 import getCategoriesTests from './get-categories.test'
-import getProductByIdTests from './get-product-by-id.test'
+import getProductBySlugTests from './get-product-by-slug.test'
 import getProductByIdWithTokenTests from './get-product-by-id-with-token.test'
 import deleteProductByIdTests from './delete-product-by-id.test'
 import deleteProductByIdWithTokenTest from './delete-product-by-id-with-token.test'
@@ -25,7 +25,7 @@ export default () => describe('Unauthorized', () => {
 	describe('divider', () => {
 		it('Send code activation code for reset password', () => (
 			request(app)
-				.post('/send-activation-code')
+				.post('/api/send-activation-code')
 				.send({
 					phoneNumber: '905555555555',
 					activationCodeType: ActivationCodes.RESET_PASSWORD
@@ -39,7 +39,7 @@ export default () => describe('Unauthorized', () => {
 	describe('divider', () => {
 		it('Send code activation code for register manager', () => (
 			request(app)
-				.post('/send-activation-code')
+				.post('/api/send-activation-code')
 				.send({
 					phoneNumber: '905555555555',
 					activationCodeType: ActivationCodes.REGISTER_MANAGER
@@ -52,7 +52,7 @@ export default () => describe('Unauthorized', () => {
 
 	getProductsWithCategoriesTests()
 	getCategoriesTests()
-	getProductByIdTests()
+	getProductBySlugTests()
 	deleteProductByIdTests()
 	getProductByIdWithTokenTests()
 	deleteProductByIdWithTokenTest()

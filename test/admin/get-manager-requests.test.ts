@@ -8,7 +8,7 @@ import { ManagerDocument } from '../../src/models'
 export default () => describe('GET /admin/manager-requests', () => {
 	it('correct', (done) => {
 		request(app)
-			.get('/admin/manager-requests')
+			.get('/api/admin/manager-requests')
 			.set({ Authorization: process.env.adminToken })
 			.expect(200)
 			.end((error, response) => {

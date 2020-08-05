@@ -6,14 +6,14 @@ import app from '../../src/app'
 export default () => describe('POST /user/favorite-product', () => {
 	it('with no body', () => (
 		request(app)
-			.post('/user/favorite-product')
+			.post('/api/user/favorite-product')
 			.set({ Authorization: process.env.token })
 			.expect(400)
 	))
 
 	it('correct', (done) => (
 		request(app)
-			.post('/user/favorite-product')
+			.post('/api/user/favorite-product')
 			.set({ Authorization: process.env.token })
 			.send({
 				_id: JSON.parse(process.env.product)._id
@@ -31,7 +31,7 @@ export default () => describe('POST /user/favorite-product', () => {
 
 	it('duplicate favorite product (should\'nt contain id 2 times)', (done) => (
 		request(app)
-			.post('/user/favorite-product')
+			.post('/api/user/favorite-product')
 			.set({ Authorization: process.env.token })
 			.send({
 				_id: JSON.parse(process.env.product)._id

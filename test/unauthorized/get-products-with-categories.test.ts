@@ -6,7 +6,7 @@ import app from '../../src/app'
 export default () => describe('GET /products-with-categories', () => {
 	it('correct', (done) => {
 		request(app)
-			.get('/products-with-categories')
+			.get('/api/products-with-categories')
 			.expect(200)
 			.end((error, response) => {
 				if (response.body.error) {

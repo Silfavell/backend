@@ -8,7 +8,7 @@ import { CategoryDocument } from '../../src/models'
 export default () => describe('POST /admin/sub-category', () => {
 	it('correct', (done) => (
 		request(app)
-			.post('/admin/sub-category')
+			.post('/api/admin/sub-category')
 			.set({ Authorization: process.env.adminToken })
 			.send({
 				parentCategoryId: JSON.parse(process.env.testCategory)._id,
@@ -28,7 +28,7 @@ export default () => describe('POST /admin/sub-category', () => {
 	/*
 	it('should categories contain testCategory', (done) => (
 		request(app)
-			.get('/categories')
+			.get('/api/categories')
 			.set({ Authorization: process.env.adminToken })
 			.expect(200)
 			.end((error, response) => {

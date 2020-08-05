@@ -8,7 +8,7 @@ import { CategoryDocument } from '../../src/models'
 export default () => describe('POST /admin/category', () => {
 	it('correct', (done) => (
 		request(app)
-			.post('/admin/category')
+			.post('/api/admin/category')
 			.set({ Authorization: process.env.adminToken })
 			.send({
 				name: 'testCategory'
@@ -26,7 +26,7 @@ export default () => describe('POST /admin/category', () => {
 
 	it('should categories contain testCategory', (done) => (
 		request(app)
-			.get('/categories')
+			.get('/api/categories')
 			.set({ Authorization: process.env.adminToken })
 			.expect(200)
 			.end((error, response) => {

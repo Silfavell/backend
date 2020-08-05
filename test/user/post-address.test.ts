@@ -10,14 +10,14 @@ import { isTextContainsAllKeys } from '../tools'
 export default () => describe('POST /user/address', () => {
 	it('with no body', () => (
 		request(app)
-			.post('/user/address')
+			.post('/api/user/address')
 			.set({ Authorization: process.env.token })
 			.expect(400)
 	))
 
 	it('with null address', (done) => (
 		request(app)
-			.post('/user/address')
+			.post('/api/user/address')
 			.set({ Authorization: process.env.token })
 			.send({
 				openAddress: null
@@ -34,7 +34,7 @@ export default () => describe('POST /user/address', () => {
 
 	it('without openAddress', (done) => (
 		request(app)
-			.post('/user/address')
+			.post('/api/user/address')
 			.set({ Authorization: process.env.token })
 			.send({
 				addressTitle: 'Ev'
@@ -51,7 +51,7 @@ export default () => describe('POST /user/address', () => {
 
 	it('without addressTitle', (done) => (
 		request(app)
-			.post('/user/address')
+			.post('/api/user/address')
 			.set({ Authorization: process.env.token })
 			.send({
 				openAddress: 'Test Mah.'
@@ -68,7 +68,7 @@ export default () => describe('POST /user/address', () => {
 
 	it('correct', (done) => (
 		request(app)
-			.post('/user/address')
+			.post('/api/user/address')
 			.set({ Authorization: process.env.token })
 			.send({
 				openAddress: 'Test Mah.',

@@ -12,7 +12,7 @@ const unknownProduct = {
 export default () => describe('POST /user/cart', () => {
 	it('with unknown product', (done) => (
 		request(app)
-			.post('/user/cart')
+			.post('/api/user/cart')
 			.set({ Authorization: process.env.token })
 			.send([
 				{
@@ -34,7 +34,7 @@ export default () => describe('POST /user/cart', () => {
 
 	it('correct', (done) => (
 		request(app)
-			.post('/user/cart')
+			.post('/api/user/cart')
 			.set({ Authorization: process.env.token })
 			.send([
 				{

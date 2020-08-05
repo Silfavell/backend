@@ -8,7 +8,7 @@ import { ProductDocument } from '../../src/models'
 export default () => describe('GET /user/cart', () => {
 	it('correct', (done) => (
 		request(app)
-			.get('/user/cart')
+			.get('/api/user/cart')
 			.set({ Authorization: process.env.token })
 			.expect(200)
 			.end((error, response) => {

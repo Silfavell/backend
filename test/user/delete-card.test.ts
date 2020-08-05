@@ -6,7 +6,7 @@ import app from '../../src/app'
 export default () => describe('DELETE /user/payment-card', () => {
 	it('correct', (done) => (
 		request(app)
-			.put('/user/payment-card')
+			.put('/api/user/payment-card')
 			.set({ Authorization: process.env.token })
 			.send({
 				cardToken: process.env.cardTokenToDelete

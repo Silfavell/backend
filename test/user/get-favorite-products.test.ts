@@ -6,7 +6,7 @@ import app from '../../src/app'
 export default () => describe('GET /user/favorite-products', () => {
 	it('correct', (done) => (
 		request(app)
-			.get('/user/favorite-products')
+			.get('/api/user/favorite-products')
 			.set({ Authorization: process.env.token })
 			.send({
 				_id: JSON.parse(process.env.product)._id
