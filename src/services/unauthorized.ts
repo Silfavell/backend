@@ -1461,6 +1461,23 @@ export const getProductAndWithColorGroup = (slug: string) => (
 	])
 )
 
+export const getRelatedProducts = (slug: string) => (
+	Product.aggregate([
+		{
+			$match: {
+				slug: {
+					$ne: slug
+				}
+			}
+		},
+		{
+			$sample: {
+				size: 8
+			}
+		}
+	])
+)
+
 export const addProductToCart = (product: ProductDocument, cartObj: CartDocument, user: UserDocument, quantity: number) => (
 	new Promise((resolve) => {
 		if (user?._id.toString()) {

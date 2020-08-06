@@ -14,6 +14,7 @@ import {
 	search,
 	getSingleProduct,
 	getProductAndWithColorGroup,
+	getRelatedProducts,
 	getProductsWithCategories,
 	getBestSellerProducts,
 	getCategories,
@@ -54,6 +55,7 @@ import {
 } from '../validators/unauthorized-validator'
 
 import ActivationCodes from '../enums/activation-code-enum'
+import { ProductDocument } from '../models'
 
 const apiLimiter = rateLimit({
 	windowMs: 6 * 60 * 60 * 1000, // 6 Hours
@@ -140,8 +142,18 @@ router.get('/product/:slug', (req, res, next) => {
 		.then((response: any) => {
 			res.json(response[0])
 		})
-		.catch((reason: any) => {
+		.catch((reason) => {
 			next((handleError(reason, 'GET /product/:slug')))
+		})
+})
+
+router.get('/related-products/:slug', (req, res, next) => {
+	getRelatedProducts(req.params.slug)
+		.then((response: ProductDocument[]) => {
+			res.json(response)
+		})
+		.catch((reason) => {
+			next((handleError(reason, 'GET /related-products/:slug')))
 		})
 })
 
@@ -153,7 +165,7 @@ router.put('/deduct-product/:_id', (req, res, next) => {
 		.then((response: any) => {
 			res.json(response)
 		})
-		.catch((reason: any) => {
+		.catch((reason) => {
 			next((handleError(reason, 'PUT /deduct-product/:_id')))
 		})
 })
@@ -210,7 +222,7 @@ router.post('/register-manager', (req, res, next) => {
 		})
 })
 
-router.post('/login-manager', apiLimiter, (req: any, res: any, next: any) => {
+router.post('/login-manager', apiLimiter, (req, res, next) => {
 	validateLoginRequest(req.body)
 		.then(() => isManagerExists(req.body.phoneNumber))
 		.then((manager) => login(manager, req.body.password))
