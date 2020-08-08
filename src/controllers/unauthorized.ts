@@ -17,6 +17,7 @@ import {
 	getRelatedProducts,
 	getProductsWithCategories,
 	getBestSellerProducts,
+	getBestSellerMobileProducts,
 	getCategories,
 	addProductToCart,
 	isManagerVerified,
@@ -83,11 +84,21 @@ router.get('/products-with-categories', (req, res, next) => {
 	})
 })
 
+// FOR WEB
 router.get('/best-seller', (req, res, next) => {
 	getBestSellerProducts().then((products) => {
 		res.json(products)
 	}).catch((reason) => {
 		next(handleError(reason, 'GET /best-seller'))
+	})
+})
+
+// FOR MOBILE
+router.get('/best-seller-mobile', (req, res, next) => {
+	getBestSellerMobileProducts().then((products) => {
+		res.json(products)
+	}).catch((reason) => {
+		next(handleError(reason, 'GET /best-seller-mobile'))
 	})
 })
 

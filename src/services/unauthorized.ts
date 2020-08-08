@@ -249,6 +249,10 @@ export const getBestSellerProducts = () => (
 	])
 )
 
+export const getBestSellerMobileProducts = () => (
+	Product.find({ purchasable: true }).sort({ timesSold: -1 }).limit(20)
+)
+
 export const getFilteredProductsWithCategories = (query: any) => {
 	const match: any = [
 		{
