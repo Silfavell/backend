@@ -1275,13 +1275,16 @@ export const filterShop = (query: any, params: any) => {
 				as: 'products'
 			}
 		},
-		...getListSpecificationsStages(query),
-		...getSortSpecificationsStages(),
-		...getBrandsStages(getSpecificationFilterStages(query), query),
+		...(params.subCategory && query.type ? getListSpecificationsStages(query) : []),
+		...(params.subCategory && query.type ? getSortSpecificationsStages() : []),
+		...getBrandsStages((params.subCategory && query.type ? getSpecificationFilterStages(query) : []), query),
 		{
 			$addFields: {
 				_id: {
 					$arrayElemAt: ['$products', 0]
+				},
+				specifications: {
+					$ifNull: ['$specifications', []]
 				}
 			}
 		},
@@ -1294,7 +1297,7 @@ export const filterShop = (query: any, params: any) => {
 		{
 			$unwind: '$products'
 		},
-		...getSpecificationFilterStages(query),
+		...(params.subCategory && query.type ? getSpecificationFilterStages(query) : []),
 		{
 			$match: {
 				$expr: {
