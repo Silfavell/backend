@@ -265,7 +265,7 @@ export const getFilteredProductsWithCategories = (query: any) => {
 
 	if (query.brands) {
 		match.push({
-			$in: ['$brand', query.brands.split(',')]
+			$in: ['$brand', (typeof query.brands === 'string' ? [query.brands] : query.brands)]
 		})
 	}
 
@@ -412,7 +412,7 @@ const getSpecificationFilterStages = (query: any) => {
 											$eq: ['$specs.slug', curVal],
 										},
 										{
-											$in: ['$specs.value', query[curVal].split(',')]
+											$in: ['$specs.value', (typeof query[curVal] === 'string' ? [query[curVal]] : query[curVal])]
 										}
 									]
 								}]
@@ -452,7 +452,7 @@ const getListSpecificationsStages = (query: any) => {
 
 	const otherFilters = [] // price,brands, etc.. filters. Other than specifications.
 
-	if (query.brands && query.brands.split(',').length > 0) {
+	if (query.brands && (typeof query.brands === 'string' ? [query.brands] : query.brands).length > 0) {
 		otherFilters.push(
 			{
 				$addFields: {
@@ -461,7 +461,7 @@ const getListSpecificationsStages = (query: any) => {
 							input: '$products',
 							as: 'product',
 							cond: {
-								$in: ['$$product.brand', query.brands.split(',')]
+								$in: ['$$product.brand', (typeof query.brands === 'string' ? [query.brands] : query.brands)]
 							}
 						}
 					}
@@ -670,7 +670,7 @@ const getListSpecificationsStages = (query: any) => {
 													$eq: ['$$specification.slug', curVal],
 												},
 												{
-													$in: ['$$specification.value', query[curVal].split(',')]
+													$in: ['$$specification.value', (typeof query[curVal] === 'string' ? [query[curVal]] : query[curVal])]
 												}
 											]
 										}]
@@ -1128,13 +1128,16 @@ export const filterShop = (query: any, params: any) => {
 
 	if (query.brands) {
 		laterMatch.push({
-			$in: ['$products.brand', query.brands.split(',')]
+			$in: ['$products.brand', (typeof query.brands === 'string' ? [query.brands] : query.brands)]
 		})
 	}
 
 	if (query.productIds) {
 		match.push({
-			$in: ['$_id', query.productIds.split(',').map((productId: string) => mongoose.Types.ObjectId(productId))]
+			$in: [
+				'$_id',
+				(typeof query.productIds === 'string' ? [query.productIds] : query.productIds).map((productId: string) => mongoose.Types.ObjectId(productId))
+			]
 		})
 	}
 
