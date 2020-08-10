@@ -1374,8 +1374,49 @@ export const filterShop = (query: any, params: any) => {
 				productsLength: { $size: '$products' }
 			}
 		}
-	])
+	]).then((res) => setUnmatchedFilters(res[0], query))
+		.then((res) => setUnmatchedBrands(res, query))
 }
+
+const setUnmatchedFilters = (res: any, query: any) => (
+	new Promise((resolve, reject) => {
+		res.specifications.map((specification: { name: string, slug: string, values: { value: string, count: number }[] }) => {
+			if (query[specification.slug]) {
+				query[specification.slug] = typeof query[specification.slug] === 'string' ? [query[specification.slug]] : query[specification.slug]
+
+				specification.values.map(({ value }) => {
+					query[specification.slug].splice(query[specification.slug].indexOf(value), 1)
+				})
+
+				query[specification.slug].map((unmatchedFilter: string) => {
+					specification.values.push({
+						value: unmatchedFilter,
+						count: 0
+					})
+				})
+			}
+		})
+
+		resolve(res)
+	})
+)
+
+const setUnmatchedBrands = (res: any, query: any) => (
+	new Promise((resolve, reject) => {
+		res.brands.map((brand: { name: string, count: number }) => {
+			query.brands.splice(query.brands.indexOf(brand.name), 1)
+		})
+
+		query.brands.map((unmatchedBrand: string) => {
+			res.brands.push({
+				name: unmatchedBrand,
+				count: 0
+			})
+		})
+
+		resolve(res)
+	})
+)
 
 export const validateObjectId = (objectId: string) => (
 	new Promise((resolve, reject) => {
