@@ -1380,22 +1380,24 @@ export const filterShop = (query: any, params: any) => {
 
 const setUnmatchedFilters = (res: any, query: any) => (
 	new Promise((resolve, reject) => {
-		res.specifications.map((specification: { name: string, slug: string, values: { value: string, count: number }[] }) => {
-			if (query[specification.slug]) {
-				query[specification.slug] = typeof query[specification.slug] === 'string' ? [query[specification.slug]] : query[specification.slug]
+		if (res?.specifications) {
+			res.specifications.map((specification: { name: string, slug: string, values: { value: string, count: number }[] }) => {
+				if (query[specification.slug]) {
+					query[specification.slug] = typeof query[specification.slug] === 'string' ? [query[specification.slug]] : query[specification.slug]
 
-				specification.values.map(({ value }) => {
-					query[specification.slug].splice(query[specification.slug].indexOf(value), 1)
-				})
-
-				query[specification.slug].map((unmatchedFilter: string) => {
-					specification.values.push({
-						value: unmatchedFilter,
-						count: 0
+					specification.values.map(({ value }) => {
+						query[specification.slug].splice(query[specification.slug].indexOf(value), 1)
 					})
-				})
-			}
-		})
+
+					query[specification.slug].map((unmatchedFilter: string) => {
+						specification.values.push({
+							value: unmatchedFilter,
+							count: 0
+						})
+					})
+				}
+			})
+		}
 
 		resolve(res)
 	})
@@ -1403,16 +1405,20 @@ const setUnmatchedFilters = (res: any, query: any) => (
 
 const setUnmatchedBrands = (res: any, query: any) => (
 	new Promise((resolve, reject) => {
-		res.brands.map((brand: { name: string, count: number }) => {
-			query.brands.splice(query.brands.indexOf(brand.name), 1)
-		})
+		if (query.brands && res?.brands) {
+			query.brands = typeof query.brands === 'string' ? [query.brands] : query.brands
 
-		query.brands.map((unmatchedBrand: string) => {
-			res.brands.push({
-				name: unmatchedBrand,
-				count: 0
+			res.brands.map((brand: { name: string, count: number }) => {
+				query.brands.splice(query.brands.indexOf(brand.name), 1)
 			})
-		})
+
+			query.brands.map((unmatchedBrand: string) => {
+				res.brands.push({
+					name: unmatchedBrand,
+					count: 0
+				})
+			})
+		}
 
 		resolve(res)
 	})
