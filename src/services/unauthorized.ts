@@ -384,7 +384,8 @@ const getBlackList = () => {
 		'start',
 		'quantity',
 		'sortType',
-		'price'
+		'minPrice',
+		'maxPrice'
 	]
 }
 
@@ -483,10 +484,10 @@ const getListSpecificationsStages = (query: any) => {
 									{
 										$and: [
 											{
-												$gte: ['$$product.discountedPrice', parseInt(query.price.split('-')[0])]
+												$gte: ['$$product.discountedPrice', parseInt(query.minPrice)]
 											},
 											{
-												$lte: ['$$product.discountedPrice', parseInt(query.price.split('-')[1])]
+												$lte: ['$$product.discountedPrice', parseInt(query.maxPrice)]
 											}
 										]
 									},
@@ -496,10 +497,10 @@ const getListSpecificationsStages = (query: any) => {
 												$lt: ['$$product.discountedPrice', null]
 											},
 											{
-												$gte: ['$$product.price', parseInt(query.price.split('-')[0])]
+												$gte: ['$$product.price', parseInt(query.minPrice)]
 											},
 											{
-												$lte: ['$$product.price', parseInt(query.price.split('-')[1])]
+												$lte: ['$$product.price', parseInt(query.maxPrice)]
 											}
 										]
 									}
@@ -889,7 +890,7 @@ const getSortSpecificationsStages = (): any[] => ([
 const getBrandsStages = (filterStages: any[], query: any): any[] => {
 	const otherFilters = [...filterStages]
 
-	if (query.price) {
+	if (query.minPrice && query.maxPrice) {
 		otherFilters.unshift(
 			{
 				$match: {
@@ -898,10 +899,10 @@ const getBrandsStages = (filterStages: any[], query: any): any[] => {
 							{
 								$and: [
 									{
-										$gte: ['$products.discountedPrice', parseInt(query.price.split('-')[0])]
+										$gte: ['$products.discountedPrice', parseInt(query.minPrice)]
 									},
 									{
-										$lte: ['$products.discountedPrice', parseInt(query.price.split('-')[1])]
+										$lte: ['$products.discountedPrice', parseInt(query.maxPrice)]
 									}
 								]
 							},
@@ -911,10 +912,10 @@ const getBrandsStages = (filterStages: any[], query: any): any[] => {
 										$lt: ['$products.discountedPrice', null]
 									},
 									{
-										$gte: ['$products.price', parseInt(query.price.split('-')[0])]
+										$gte: ['$products.price', parseInt(query.minPrice)]
 									},
 									{
-										$lte: ['$products.price', parseInt(query.price.split('-')[1])]
+										$lte: ['$products.price', parseInt(query.maxPrice)]
 									}
 								]
 							}
@@ -1153,7 +1154,7 @@ export const filterShop = (query: any, params: any) => {
 		})
 	}
 
-	if (query.price) {
+	if (query.minPrice && query.maxPrice) {
 		laterExt.push(
 			{
 				$match: {
@@ -1162,10 +1163,10 @@ export const filterShop = (query: any, params: any) => {
 							{
 								$and: [
 									{
-										$gte: ['$products.discountedPrice', parseInt(query.price.split('-')[0])]
+										$gte: ['$products.discountedPrice', parseInt(query.minPrice)]
 									},
 									{
-										$lte: ['$products.discountedPrice', parseInt(query.price.split('-')[1])]
+										$lte: ['$products.discountedPrice', parseInt(query.maxPrice)]
 									}
 								]
 							},
@@ -1175,10 +1176,10 @@ export const filterShop = (query: any, params: any) => {
 										$lt: ['$products.discountedPrice', null]
 									},
 									{
-										$gte: ['$products.price', parseInt(query.price.split('-')[0])]
+										$gte: ['$products.price', parseInt(query.minPrice)]
 									},
 									{
-										$lte: ['$products.price', parseInt(query.price.split('-')[1])]
+										$lte: ['$products.price', parseInt(query.maxPrice)]
 									}
 								]
 							}
