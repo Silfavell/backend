@@ -1,8 +1,5 @@
-// eslint-disable-next-line no-unused-vars
 import mongoose, { Document, Schema } from 'mongoose'
-// eslint-disable-next-line no-unused-vars
 import SubCategory, { SubCategoryDocument } from './SubCategory'
-// eslint-disable-next-line no-unused-vars
 import Brand, { BrandDocument } from './Brand'
 
 export type CategoryDocument = Document & {

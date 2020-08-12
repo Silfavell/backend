@@ -1,8 +1,6 @@
-// eslint-disable-next-line no-unused-vars
 import mongoose, { Document, Schema } from 'mongoose'
 import bcrypt from 'bcrypt'
 
-// eslint-disable-next-line no-unused-vars
 import Address, { AddressDocument } from './Address'
 
 export type UserDocument = Document & {

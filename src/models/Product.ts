@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-unused-vars
 import mongoose, { Document, Schema } from 'mongoose'
 import ProductSpecification, { ProductSpecificationDocument } from './ProductSpecification'
 

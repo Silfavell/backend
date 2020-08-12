@@ -77,7 +77,7 @@ router.get('/categories', (req, res, next) => {
 })
 
 router.get('/products-with-categories', (req, res, next) => {
-	getProductsWithCategories().then((products) => {
+	getProductsWithCategories(req.query).then((products) => {
 		res.json(products)
 	}).catch((reason) => {
 		next(handleError(reason, 'GET /products-with-categories'))

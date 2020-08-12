@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-unused-vars
 import { HttpStatusCode } from './HttpStatusCode'
 
 class ServerError extends Error {

@@ -6,7 +6,6 @@ import ServerError from '../errors/ServerError'
 
 import {
 	User, Order,
-	// eslint-disable-next-line no-unused-vars
 	UserDocument,
 	ProductDocument,
 	Product

@@ -1,7 +1,5 @@
-// eslint-disable-next-line no-unused-vars
 import mongoose, { Document, Schema } from 'mongoose'
 
-// eslint-disable-next-line no-unused-vars
 import Product, { ProductDocument } from './Product'
 
 export type OrderDocument = Document & {

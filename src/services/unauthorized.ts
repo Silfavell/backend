@@ -8,16 +8,10 @@ import ServerError from '../errors/ServerError'
 import {
 	User,
 	Manager,
-	// eslint-disable-next-line no-unused-vars
 	UserDocument,
-	// eslint-disable-next-line no-unused-vars
 	ManagerDocument,
-	// eslint-disable-next-line no-unused-vars
 	ProductDocument,
-	// eslint-disable-next-line no-unused-vars
 	AdminDocument,
-	// eslint-disable-next-line no-unused-vars
-	CategoryDocument,
 	Category,
 	Product,
 	Ticket,
@@ -34,7 +28,6 @@ import {
 	isManagerExists
 } from '../validators'
 import ActivationCode from '../models/ActivationCode'
-// eslint-disable-next-line no-unused-vars
 import Cart, { CartDocument } from '../models/Cart'
 import ProductSort from '../enums/product-sort-enum'
 
@@ -112,8 +105,17 @@ export const getCategories = () => (
 	])
 )
 
-export const getProductsWithCategories = () => (
-	Category.aggregate([
+export const getProductsWithCategories = (query: any) => {
+	const match = []
+
+	if (query.brands) {
+		match.push({
+			$in: ['$brand', (typeof query.brands === 'string' ? [query.brands] : query.brands)]
+		})
+	}
+
+
+	return Category.aggregate([
 		{
 			$unwind: '$subCategories'
 		},
@@ -219,7 +221,7 @@ export const getProductsWithCategories = () => (
 			}
 		}
 	])
-)
+}
 
 export const getBestSellerProducts = () => (
 	Category.aggregate([

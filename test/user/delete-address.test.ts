@@ -2,8 +2,7 @@ import request from 'supertest'
 import { expect } from 'chai'
 
 import {
-	// eslint-disable-next-line no-unused-vars
-	AddressDocument
+		AddressDocument
 } from '../../src/models'
 import app from '../../src/app'
 

@@ -12,7 +12,6 @@ import {
 	favoriteProductSchema
 } from '../schemas/user-schema'
 
-// eslint-disable-next-line no-unused-vars
 import { ProductDocument } from '../models'
 
 export const validatePhoneNumber = (body: any) => phoneSchema.validate(body)

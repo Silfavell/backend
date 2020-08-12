@@ -2,7 +2,6 @@ import request from 'supertest'
 import { expect } from 'chai'
 
 import app from '../../src/app'
-// eslint-disable-next-line no-unused-vars
 import { ProductDocument } from '../../src/models'
 
 export default () => describe('GET /user/cart', () => {

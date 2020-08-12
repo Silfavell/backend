@@ -1,7 +1,9 @@
 {
 	"extends": [
 		"@ipekmuhammet/eslint-config-base-typescript",
-		"plugin:security/recommended"
+		"plugin:security/recommended",
+		"plugin:@typescript-eslint/eslint-recommended",
+		"plugin:@typescript-eslint/recommended"
 	],
 	"rules": {
 		"no-underscore-dangle": "off",

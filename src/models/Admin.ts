@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-unused-vars
 import mongoose, { Schema, Document } from 'mongoose'
 import bcrypt from 'bcrypt'
 

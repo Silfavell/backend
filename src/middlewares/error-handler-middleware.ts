@@ -1,10 +1,8 @@
 import HttpStatusCodes from 'http-status-codes'
-// eslint-disable-next-line no-unused-vars
 import { Request, Response, NextFunction } from 'express'
 import winston from 'winston'
 import ErrorMessages from '../errors/ErrorMessages'
 
-// eslint-disable-next-line no-unused-vars
 export default (error: Error | any, req: Request, res: Response, next: NextFunction) => {
 	winston.loggers.get('logger').error('', error)
 

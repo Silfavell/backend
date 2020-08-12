@@ -4,7 +4,6 @@ import HttpStatusCodes from 'http-status-codes'
 import { User, Manager } from '../models'
 import ServerError from '../errors/ServerError'
 import ErrorMessages from '../errors/ErrorMessages'
-// eslint-disable-next-line no-unused-vars
 import ActivationCodes from '../enums/activation-code-enum'
 import ActivationCode from '../models/ActivationCode'
 

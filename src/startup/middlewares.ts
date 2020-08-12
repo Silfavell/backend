@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-unused-vars
 import express, { Application } from 'express'
 import morgan from 'morgan'
 import winston from 'winston'

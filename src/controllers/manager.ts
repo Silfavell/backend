@@ -3,7 +3,6 @@ import { Router } from 'express'
 import { validateAuthority } from '../middlewares/auth-middleware'
 import Authority from '../enums/authority-enum'
 import { getOrderById, updateOrderStatus } from '../services/manager'
-// eslint-disable-next-line no-unused-vars
 import { handleError, sendSms } from '../services/unauthorized'
 import { validateCancelOrder, validateConfirmOrder } from '../validators/manager-validator'
 import { Order } from '../models'
