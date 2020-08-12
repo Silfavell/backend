@@ -166,16 +166,16 @@ export const getProductsWithCategories = () => (
 		/** MAX,MIN PRICE */
 		{
 			$sort: {
-				'products.price': 1
+				'products.price': -1
 			}
 		},
 		{
 			$addFields: {
 				minPrice: {
-					$arrayElemAt: ['$products', 0]
+					$arrayElemAt: ['$products', -1]
 				},
 				maxPrice: {
-					$arrayElemAt: ['$products', -1]
+					$arrayElemAt: ['$products', 0]
 				}
 			}
 		},
