@@ -144,6 +144,7 @@ export const getProductsWithCategories = () => (
 				name: 1,
 				imagePath: 1,
 				brands: 1,
+				subCategoryBrands: 1,
 				subCategoryName: 1,
 				subCategoryId: 1,
 				products: {
@@ -162,6 +163,38 @@ export const getProductsWithCategories = () => (
 				'products.0': { $exists: true }
 			}
 		},
+		/** MAX,MIN PRICE */
+		{
+			$sort: {
+				'products.price': 1
+			}
+		},
+		{
+			$addFields: {
+				minPrice: {
+					$arrayElemAt: ['$products', 0]
+				},
+				maxPrice: {
+					$arrayElemAt: ['$products', -1]
+				}
+			}
+		},
+		{
+			$addFields: {
+				minPrice: {
+					$floor: '$minPrice.price'
+				},
+				maxPrice: {
+					$ceil: '$maxPrice.price'
+				}
+			}
+		},
+		{
+			$sort: {
+				'products._id': 1
+			}
+		},
+		/** MAX,MIN PRICE */
 		{
 			$group: {
 				_id: '$_id',
@@ -170,9 +203,12 @@ export const getProductsWithCategories = () => (
 				brands: { $first: '$brands' },
 				subCategories: {
 					$push: {
-						name: '$subCategoryName',
 						_id: '$subCategoryId',
-						products: '$products'
+						name: '$subCategoryName',
+						brands: '$subCategoryBrands',
+						products: '$products',
+						minPrice: '$minPrice',
+						maxPrice: '$maxPrice'
 					}
 				}
 			}
