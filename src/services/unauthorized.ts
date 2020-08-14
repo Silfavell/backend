@@ -165,19 +165,36 @@ export const getProductsWithCategories = (query: any) => {
 				'products.0': { $exists: true }
 			}
 		},
+
 		/** MAX,MIN PRICE */
 		{
+			$unwind: '$products'
+		},
+		{
 			$sort: {
-				'products.price': -1
+				'products.price': 1
+			}
+		},
+		{
+			$group: {
+				_id: { categoryId: '$_id', subCategoryId: '$subCategoryId' },
+				imagePath: { $first: '$imagePath' },
+				name: { $first: '$name' },
+				brands: { $first: '$brands' },
+				subCategoryName: { $first: '$subCategoryName' },
+				subCategoryId: { $first: '$subCategoryId' },
+				subCategoryBrands: { $first: '$subCategoryBrands' },
+				products: { $push: '$products' }
 			}
 		},
 		{
 			$addFields: {
+				_id: '$_id.categoryId',
 				minPrice: {
-					$arrayElemAt: ['$products', -1]
+					$arrayElemAt: ['$products', 0]
 				},
 				maxPrice: {
-					$arrayElemAt: ['$products', 0]
+					$arrayElemAt: ['$products', -1]
 				}
 			}
 		},
@@ -191,22 +208,49 @@ export const getProductsWithCategories = (query: any) => {
 				}
 			}
 		},
+		/** MAX,MIN PRICE */
+
+
+		/** REORDER PRODUCTS TO DEFAULT */
+		{
+			$unwind: '$products'
+		},
 		{
 			$sort: {
 				'products._id': 1
 			}
 		},
-		/** MAX,MIN PRICE */
 		{
 			$group: {
-				_id: '$_id',
+				_id: { categoryId: '$_id', subCategoryId: '$subCategoryId' },
+				imagePath: { $first: '$imagePath' },
+				name: { $first: '$name' },
+				brands: { $first: '$brands' },
+				subCategoryName: { $first: '$subCategoryName' },
+				subCategoryId: { $first: '$subCategoryId' },
+				subCategoryBrands: { $first: '$subCategoryBrands' },
+				maxPrice: { $first: '$maxPrice' },
+				minPrice: { $first: '$minPrice' },
+				products: { $push: '$products' }
+			}
+		},
+		/** REORDER PRODUCTS DEFAULT */
+
+		{
+			$sort: {
+				'_id.subCategoryId': 1
+			}
+		},
+		{
+			$group: {
+				_id: '$_id.categoryId',
 				name: { $first: '$name' },
 				imagePath: { $first: '$imagePath' },
 				brands: { $first: '$brands' },
 				subCategories: {
 					$push: {
-						_id: '$subCategoryId',
-						parentCategoryId: '$_id',
+						_id: '$_id.subCategoryId',
+						parentCategoryId: '$_id.categoryId',
 						name: '$subCategoryName',
 						brands: '$subCategoryBrands',
 						products: '$products',
