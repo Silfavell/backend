@@ -1,5 +1,6 @@
 import {
 	productsFilterWithCategoriesSchema,
+	productsFilterMobileSchema,
 	sendActivationCodeSchema,
 	registerSchema,
 	registerManagerSchema,
@@ -11,6 +12,8 @@ import {
 } from '../schemas/unauthorized-schema'
 
 export const validateGetProductsFilterWithCategoriesRequest = (body: any) => productsFilterWithCategoriesSchema.validateAsync(body)
+
+export const validateGetProductsFilterMobileRequest = (body: any) => productsFilterMobileSchema.validateAsync(body)
 
 export const validateSendActivationCodeRequest = (body: any) => sendActivationCodeSchema.validateAsync(body)
 

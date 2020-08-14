@@ -29,6 +29,7 @@ import {
 	sendActivationCode,
 	filterShop,
 	getFilteredProductsWithCategories,
+	productsFilterMobile,
 	validateObjectId,
 	setProductToCart,
 	saveTicket
@@ -51,6 +52,7 @@ import {
 	validateResetPasswordRequest,
 	validatePostTicketRequest,
 	validateGetProductsFilterWithCategoriesRequest,
+	validateGetProductsFilterMobileRequest,
 	validateSetProductRequest,
 	validatePutDeductProduct
 } from '../validators/unauthorized-validator'
@@ -111,7 +113,7 @@ router.get('/filter-shop/:category?/:subCategory?', (req, res, next) => {
 	})
 })
 
-// FOR MOBILE
+// FOR MOBILE // TODO DELETE
 router.get('/products-filter-with-categories', (req, res, next) => {
 	validateObjectId(req.query.categoryId)
 		.then(() => validateGetProductsFilterWithCategoriesRequest(req.query))
@@ -120,6 +122,17 @@ router.get('/products-filter-with-categories', (req, res, next) => {
 			res.json(products[0])
 		}).catch((reason) => {
 			next(handleError(reason, 'GET /products-filter-with-categories'))
+		})
+})
+
+// FOR MOBILE
+router.get('/products-filter-mobile', (req, res, next) => {
+	validateGetProductsFilterMobileRequest(req.query)
+		.then(() => productsFilterMobile(req.query))
+		.then((result) => {
+			res.json(result[0])
+		}).catch((reason) => {
+			next(handleError(reason, 'GET /products-filter-mobile'))
 		})
 })
 

@@ -9,6 +9,20 @@ export const productsFilterWithCategoriesSchema = Joi.object({
 	sortType: Joi.string().allow('', null)
 })
 
+export const productsFilterMobileSchema = Joi.object({
+	categoryId: Joi.string().regex(/^[0-9a-fA-F]{24}$/).required(),
+	subCategoryId: Joi.string().regex(/^[0-9a-fA-F]{24}$/).required(),
+	brands: Joi.alternatives(
+		Joi.array().min(1).items(Joi.string()),
+		Joi.string()
+	).allow(null),
+	sortType: Joi.string().regex(/[0-6]/).allow(null),
+	minPrice: Joi.string().regex(/^[0-9]+$/).allow(null),
+	maxPrice: Joi.string().regex(/^[0-9]+$/).allow(null)
+})
+	.with('minPrice', ['maxPrice'])
+	.with('maxPrice', ['minPrice'])
+
 export const sendActivationCodeSchema = Joi.object({
 	phoneNumber: Joi.string().phoneNumber({ defaultCountry: 'TR', format: 'national', strict: true }).required(),
 	activationCodeType: Joi.number().min(0).max(3).required()

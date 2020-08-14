@@ -206,6 +206,7 @@ export const getProductsWithCategories = (query: any) => {
 				subCategories: {
 					$push: {
 						_id: '$subCategoryId',
+						parentCategoryId: '$_id',
 						name: '$subCategoryName',
 						brands: '$subCategoryBrands',
 						products: '$products',
@@ -406,6 +407,259 @@ export const getFilteredProductsWithCategories = (query: any) => {
 						products: '$products'
 					}
 				}
+			}
+		}
+	])
+}
+
+export const productsFilterMobile = (query: any) => {
+	const match = []
+	const productsToGetBrandFilter = []
+	const productsToGetPriceFilter = []
+	let sort = {}
+
+	if (query.brands) {
+		match.push({
+			$in: ['$$product.brand', (typeof query.brands === 'string' ? [query.brands] : query.brands)]
+		})
+
+		productsToGetPriceFilter.push({
+			$in: ['$$product.brand', (typeof query.brands === 'string' ? [query.brands] : query.brands)]
+		})
+	}
+
+	if (query.minPrice && query.maxPrice) {
+		match.push({
+			$or: [
+				{
+					$and: [
+						{
+							$gte: ['$$product.discountedPrice', parseInt(query.minPrice)]
+						},
+						{
+							$lte: ['$$product.discountedPrice', parseInt(query.maxPrice)]
+						}
+					]
+				},
+				{
+					$and: [
+						{
+							$lt: ['$$product.discountedPrice', null]
+						},
+						{
+							$gte: ['$$product.price', parseInt(query.minPrice)]
+						},
+						{
+							$lte: ['$$product.price', parseInt(query.maxPrice)]
+						}
+					]
+				}
+			]
+		})
+
+		productsToGetBrandFilter.push({
+			$or: [
+				{
+					$and: [
+						{
+							$gte: ['$$product.discountedPrice', parseInt(query.minPrice)]
+						},
+						{
+							$lte: ['$$product.discountedPrice', parseInt(query.maxPrice)]
+						}
+					]
+				},
+				{
+					$and: [
+						{
+							$lt: ['$$product.discountedPrice', null]
+						},
+						{
+							$gte: ['$$product.price', parseInt(query.minPrice)]
+						},
+						{
+							$lte: ['$$product.price', parseInt(query.maxPrice)]
+						}
+					]
+				}
+			]
+		})
+	}
+
+	if (query.sortType) {
+		switch (parseInt(query.sortType)) {
+			case ProductSort.CLASSIC: {
+				sort = {
+					$sort: {
+						'_id': 1
+					}
+				}
+				break
+			}
+
+			case ProductSort.BEST_SELLER: {
+				sort = {
+					$sort: {
+						'timesSold': 1
+					}
+				}
+				break
+			}
+
+			case ProductSort.NEWEST: {
+				sort = {
+					$sort: {
+						'_id': -1
+					}
+				}
+				break
+			}
+
+			case ProductSort.MIN_PRICE: {
+				sort = {
+					$sort: {
+						'price': 1
+					}
+				}
+				break
+			}
+
+			case ProductSort.MAX_PRICE: {
+				sort = {
+					$sort: {
+						'price': -1
+					}
+				}
+				break
+			}
+
+			default: {
+				sort = {
+					$sort: {
+						'_id': 1
+					}
+				}
+				break
+			}
+		}
+	} else {
+		sort = {
+			$sort: {
+				'_id': 1
+			}
+		}
+	}
+
+
+	return Product.aggregate([
+		{
+			$match: {
+				$and: [
+					{
+						categoryId: query.categoryId
+					},
+					{
+						subCategoryId: query.subCategoryId
+					}
+				]
+			}
+		},
+		sort,
+		{
+			$group: {
+				_id: null,
+				products: {
+					$push: '$$ROOT'
+				}
+			}
+		},
+		{
+			$addFields: {
+				productsToGetBrandFilter: {
+					$filter: {
+						input: '$products',
+						as: 'product',
+						cond: {
+							$and: productsToGetBrandFilter
+						}
+					}
+				},
+				productsToGetPriceFilter: {
+					$filter: {
+						input: '$products',
+						as: 'product',
+						cond: {
+							$and: productsToGetPriceFilter
+						}
+					}
+				},
+				products: {
+					$filter: {
+						input: '$products',
+						as: 'product',
+						cond: {
+							$and: match
+						}
+					}
+				}
+			}
+		},
+		{
+			$unwind: '$productsToGetPriceFilter'
+		},
+		{
+			$sort: {
+				'productsToGetPriceFilter.price': 1
+			}
+		},
+		{
+			$group: {
+				_id: null,
+				products: { $first: '$products' },
+				productsToGetBrandFilter: { $first: '$productsToGetBrandFilter' },
+				productsToGetPriceFilter: { $push: '$productsToGetPriceFilter' }
+			}
+		},
+		{
+			$addFields: {
+				minPrice: {
+					$arrayElemAt: ['$productsToGetPriceFilter', 0]
+				},
+				maxPrice: {
+					$arrayElemAt: ['$productsToGetPriceFilter', -1]
+				}
+			}
+		},
+		{
+			$addFields: {
+				minPrice: '$minPrice.price',
+				maxPrice: '$maxPrice.price'
+			}
+		},
+		{
+			$unwind: '$productsToGetBrandFilter'
+		},
+		{
+			$group: {
+				_id: '$productsToGetBrandFilter.brand',
+				count: { $sum: 1 },
+				products: { $first: '$products' },
+				minPrice: { $first: '$minPrice' },
+				maxPrice: { $first: '$maxPrice' }
+			}
+		},
+		{
+			$group: {
+				_id: null,
+				brands: {
+					$push: {
+						name: '$_id',
+						productQuantity: '$count'
+					}
+				},
+				products: { $first: '$products' },
+				minPrice: { $first: '$minPrice' },
+				maxPrice: { $first: '$maxPrice' }
 			}
 		}
 	])
