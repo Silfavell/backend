@@ -706,7 +706,10 @@ export const productsFilterMobile = (query: any) => {
 				maxPrice: { $first: '$maxPrice' }
 			}
 		}
-	])
+	]).then((res) => {
+		const mobile = true
+		return setUnmatchedBrands(res[0], query, mobile)
+	})
 }
 
 const getBlackList = () => {
@@ -1740,8 +1743,10 @@ const setUnmatchedFilters = (res: any, query: any) => (
 	})
 )
 
-const setUnmatchedBrands = (res: any, query: any) => (
+const setUnmatchedBrands = (res: any, query: any, isMobile?: boolean) => (
 	new Promise((resolve, reject) => {
+		const quantityKey = isMobile ? 'productQuantity' : 'count'
+
 		if (query.brands && res?.brands) {
 			query.brands = typeof query.brands === 'string' ? [query.brands] : query.brands
 
@@ -1752,7 +1757,7 @@ const setUnmatchedBrands = (res: any, query: any) => (
 			query.brands.map((unmatchedBrand: string) => {
 				res.brands.push({
 					name: unmatchedBrand,
-					count: 0
+					[quantityKey]: 0
 				})
 			})
 		}

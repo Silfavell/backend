@@ -130,7 +130,7 @@ router.get('/products-filter-mobile', (req, res, next) => {
 	validateGetProductsFilterMobileRequest(req.query)
 		.then(() => productsFilterMobile(req.query))
 		.then((result) => {
-			res.json(result[0])
+			res.json(result)
 		}).catch((reason) => {
 			next(handleError(reason, 'GET /products-filter-mobile'))
 		})
