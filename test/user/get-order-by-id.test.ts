@@ -3,10 +3,10 @@ import { expect } from 'chai'
 
 import app from '../../src/app'
 
-export default () => describe('GET /manager/order/:_id', () => {
+export default () => describe('GET /user/order/:_id', () => {
 	it('correct', (done) => {
 		request(app)
-			.get(`/api/manager/order/${JSON.parse(process.env.confirmOrder)._id}`)
+			.get(`/api/user/order/${JSON.parse(process.env.confirmOrder)._id}`)
 			.set({ Authorization: process.env.managerToken })
 			.expect(200)
 			.end((error, response) => {

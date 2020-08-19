@@ -12,6 +12,7 @@ import postFavoriteProductTests from './post-favorite-product.test'
 import deleteFavoriteProductTests from './delete-favorite-product.test'
 import getFavoriteProductsTests from './get-favorite-products.test'
 import getOrdersTests from './get-orders.test'
+import getOrderByIdTests from './get-order-by-id.test'
 
 export default () => describe('user', () => {
 	getCartBeforePostCartTests()
@@ -28,4 +29,5 @@ export default () => describe('user', () => {
 	getCartTests()
 	getOrdersTests()
 	deleteAddressTests()
+	getOrderByIdTests()
 })

@@ -365,3 +365,7 @@ export const completePayment = (user: UserDocument, cart: any, address: string, 
 		cardToken
 	)
 )
+
+export const getOrderById = (orderId: string) => (
+	Order.findById(orderId)
+)

@@ -2,7 +2,7 @@ import { Router } from 'express'
 
 import { validateAuthority } from '../middlewares/auth-middleware'
 import Authority from '../enums/authority-enum'
-import { getOrderById, updateOrderStatus } from '../services/manager'
+import { updateOrderStatus } from '../services/manager'
 import { handleError, sendSms } from '../services/unauthorized'
 import { validateCancelOrder, validateConfirmOrder } from '../validators/manager-validator'
 import { Order } from '../models'
@@ -17,16 +17,6 @@ router.get('/orders', (req, res, next) => {
 	}).catch((reason) => {
 		next(handleError(reason, 'GET /manager/orders'))
 	})
-})
-
-router.get('/order/:_id', (req, res, next) => {
-	getOrderById(req.params._id)
-		.then((order) => {
-			res.json(order)
-		})
-		.catch((reason) => {
-			next(handleError(reason, 'GET /manager/order/:_id'))
-		})
 })
 
 router.put('/orders/cancel/:_id', (req, res, next) => {

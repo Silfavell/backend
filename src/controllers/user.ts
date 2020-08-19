@@ -27,7 +27,8 @@ import {
 	deleteCard,
 	createCart,
 	clearCart,
-	validateSaveCartProducts
+	validateSaveCartProducts,
+	getOrderById
 } from '../services/user'
 
 import {
@@ -216,6 +217,16 @@ router.put('/change-password', (req, res, next) => {
 		})
 		.catch((reason) => {
 			next(handleError(reason, 'PUT /user/change-password'))
+		})
+})
+
+router.get('/order/:_id', (req, res, next) => {
+	getOrderById(req.params._id)
+		.then((order) => {
+			res.json(order)
+		})
+		.catch((reason) => {
+			next(handleError(reason, 'GET /user/order/:_id'))
 		})
 })
 
