@@ -46,7 +46,7 @@ export const createCart = (body: { _id: string, quantity: number }[]) => {
 
 			return Object.assign(json, {
 				// eslint-disable-next-line security/detect-object-injection
-				[product._id.toString()]: Object.assign(product.toObject(), { quantity: body[index].quantity })
+				[product._id.toString()]: Object.assign(product.toObject(), { quantity: body[index].quantity, paidPrice: product.discountedPrice ?? product.price })
 			})
 		}, {})
 	))
@@ -137,7 +137,7 @@ export const saveAddressToDatabase = (userId: string, address: any) => (
 )
 
 export const getOrders = (phoneNumber: string) => (
-	Order.find({ phoneNumber })
+	Order.find({ phoneNumber }).sort({ _id: -1 })
 )
 
 export const getFavoriteProductsFromDatabase = (userId: string) => (

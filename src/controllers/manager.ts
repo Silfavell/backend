@@ -13,7 +13,7 @@ const router = Router()
 router.use(validateAuthority(Authority.MANAGER))
 
 router.get('/orders', (req, res, next) => {
-	Order.find().then((orders) => {
+	Order.find().sort({ _id: -1 }).then((orders) => {
 		res.json(orders ?? {})
 	}).catch((reason) => {
 		next(handleError(reason, 'GET /manager/orders'))
