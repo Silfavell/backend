@@ -28,7 +28,8 @@ import {
 	createCart,
 	clearCart,
 	validateSaveCartProducts,
-	getOrderById
+	getOrderById,
+	returnItems
 } from '../services/user'
 
 import {
@@ -44,7 +45,8 @@ import {
 	validateMakeOrderRequest,
 	validatePostPaymentCardRequest,
 	validateDeletePaymentCardRequest,
-	validateFavoriteProductRequest
+	validateFavoriteProductRequest,
+	validatePostReturnItems
 } from '../validators/user-validator'
 
 const router = Router()
@@ -227,6 +229,17 @@ router.get('/order/:_id', (req, res, next) => {
 		})
 		.catch((reason) => {
 			next(handleError(reason, 'GET /user/order/:_id'))
+		})
+})
+
+router.post('/return-items/:orderId', (req, res, next) => {
+	validatePostReturnItems(req.body)
+		.then(() => returnItems(req.params.orderId, req.body))
+		.then((result) => {
+			res.json(result)
+		})
+		.catch((reason) => {
+			next(handleError(reason, 'POST /user/return-items/:orderId'))
 		})
 })
 

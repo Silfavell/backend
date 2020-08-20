@@ -12,7 +12,11 @@ export type OrderDocument = Document & {
 	status: boolean,
 	trackingNumber: string,
 	cancellationReason: string,
-	paidPrice: number
+	paidPrice: number,
+	returnItems: [{
+		_id: Schema.Types.ObjectId,
+		quantity: number
+	}]
 }
 
 const orderSchema = new Schema({
@@ -69,7 +73,17 @@ const orderSchema = new Schema({
 	paidPrice: {
 		type: Number,
 		required: 0
-	}
+	},
+	returnItems: [{
+		_id: {
+			type: Schema.Types.ObjectId,
+			required: true
+		},
+		quantity: {
+			type: Number,
+			required: true
+		}
+	}]
 }, {
 	timestamps: true
 })

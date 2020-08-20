@@ -369,3 +369,7 @@ export const completePayment = (user: UserDocument, cart: any, address: string, 
 export const getOrderById = (orderId: string) => (
 	Order.findById(orderId)
 )
+
+export const returnItems = (orderId: string, returnItems: any[]) => (
+	Order.findByIdAndUpdate(orderId, { returnItems }, { new: true })
+)

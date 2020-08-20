@@ -49,3 +49,10 @@ export const postPaymentCardSchema = Joi.object({
 export const deletePaymentCardSchema = Joi.object({
 	cardToken: Joi.string().required()
 })
+
+export const returnItemsSchema = Joi.array().min(1).items(
+	Joi.object({
+		_id: Joi.string().required(),
+		quantity: Joi.number().positive().required()
+	})
+).sparse(false).required()
