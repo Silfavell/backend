@@ -371,5 +371,5 @@ export const getOrderById = (orderId: string) => (
 )
 
 export const returnItems = (orderId: string, returnItems: any[]) => (
-	Order.findByIdAndUpdate(orderId, { returnItems }, { new: true })
+	Order.findByIdAndUpdate(orderId, { returnItems, returnable: false }, { new: true })
 )

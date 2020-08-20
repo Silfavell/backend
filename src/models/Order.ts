@@ -72,7 +72,12 @@ const orderSchema = new Schema({
 	},
 	paidPrice: {
 		type: Number,
-		required: 0
+		required: true
+	},
+	returnable: {
+		type: Boolean,
+		required: true,
+		default: false
 	},
 	returnItems: [{
 		_id: {
