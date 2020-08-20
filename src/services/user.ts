@@ -137,7 +137,59 @@ export const saveAddressToDatabase = (userId: string, address: any) => (
 )
 
 export const getOrders = (phoneNumber: string) => (
-	Order.find({ phoneNumber }).sort({ _id: -1 })
+	Order.aggregate([
+		{
+			$match: {
+				phoneNumber
+			}
+		},
+		{
+			$unwind: {
+				path: '$returnItems',
+				preserveNullAndEmptyArrays: true
+			}
+		},
+		{
+			$lookup: {
+				from: Product.collection.name,
+				localField: 'returnItems._id',
+				foreignField: '_id',
+				as: 'returnItems'
+			}
+		},
+		{
+			$addFields: {
+				returnItems: {
+					$arrayElemAt: ['$returnItems', 0]
+				}
+			}
+		},
+		{
+			$group: {
+				_id: '$_id',
+				root: { $first: '$$ROOT' },
+				returnItems: {
+					$push: '$returnItems'
+				}
+			}
+		},
+		{
+			$replaceRoot: {
+				newRoot: {
+					$mergeObjects: [
+						'$root', {
+							returnItems: '$returnItems'
+						}
+					]
+				}
+			}
+		},
+		{
+			$sort: {
+				_id: -1
+			}
+		}
+	])
 )
 
 export const getFavoriteProductsFromDatabase = (userId: string) => (
