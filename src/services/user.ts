@@ -150,6 +150,11 @@ export const getOrders = (phoneNumber: string) => (
 			}
 		},
 		{
+			$addFields: {
+				returnQuantity: '$returnItems.quantity'
+			}
+		},
+		{
 			$lookup: {
 				from: Product.collection.name,
 				localField: 'returnItems._id',
@@ -165,22 +170,44 @@ export const getOrders = (phoneNumber: string) => (
 			}
 		},
 		{
-			$group: {
-				_id: '$_id',
-				root: { $first: '$$ROOT' },
-				returnItems: {
-					$push: '$returnItems'
+			$addFields: {
+				products: {
+					$filter: {
+						input: '$products',
+						as: 'product',
+						cond: {
+							$eq: ['$$product._id', '$returnItems._id']
+						}
+					}
 				}
 			}
 		},
 		{
-			$replaceRoot: {
-				newRoot: {
-					$mergeObjects: [
-						'$root', {
-							returnItems: '$returnItems'
-						}
-					]
+			$addFields: {
+				currentProduct: {
+					$arrayElemAt: ['$products', 0]
+				}
+			}
+		},
+		{
+			$addFields: {
+				returnItems: {
+					quantity: '$returnQuantity',
+					paidPrice: '$currentProduct.paidPrice'
+				}
+			}
+		},
+		{
+			$group: {
+				_id: '$_id',
+				products: { $first: '$products' },
+				returnItemsTotalPayback: {
+					$sum: {
+						$multiply: ['$returnItems.paidPrice', '$returnItems.quantity']
+					}
+				},
+				returnItems: {
+					$push: '$returnItems'
 				}
 			}
 		},
