@@ -200,6 +200,11 @@ export const getOrders = (phoneNumber: string) => (
 		{
 			$group: {
 				_id: '$_id',
+				status: { $first: '$status' },
+				date: { $first: '$date' },
+				trackingNumber: { $first: '$trackingNumber' },
+				returnable: { $first: '$returnable' },
+				paidPrice: { $first: '$paidPrice' },
 				products: { $first: '$products' },
 				returnItemsTotalPayback: {
 					$sum: {
