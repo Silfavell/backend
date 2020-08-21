@@ -12,6 +12,7 @@ import {
 	Product
 } from '../models'
 import Cart from '../models/Cart'
+import OrderStatus from '../enums/order-status-enum'
 
 const iyzipay = new Iyzipay({
 	apiKey: 'sandbox-hbjzTU7CZDxarIUKVMhWLvHOIMIb3Z40',
@@ -204,7 +205,6 @@ export const getOrders = (phoneNumber: string) => (
 				status: { $first: '$status' },
 				date: { $first: '$date' },
 				trackingNumber: { $first: '$trackingNumber' },
-				returnable: { $first: '$returnable' },
 				paidPrice: { $first: '$paidPrice' },
 				products: { $first: '$products' },
 				returnItemsTotalPayback: {
@@ -518,7 +518,6 @@ export const getOrderById = (orderId: string) => (
 				status: { $first: '$status' },
 				date: { $first: '$date' },
 				trackingNumber: { $first: '$trackingNumber' },
-				returnable: { $first: '$returnable' },
 				paidPrice: { $first: '$paidPrice' },
 				products: { $first: '$products' },
 				returnItemsTotalPayback: {
@@ -540,5 +539,5 @@ export const getOrderById = (orderId: string) => (
 )
 
 export const returnItems = (orderId: string, returnItems: any[]) => (
-	Order.findByIdAndUpdate(orderId, { returnItems, returnable: false }, { new: true })
+	Order.findByIdAndUpdate(orderId, { returnItems, status: OrderStatus.RETURNED }, { new: true })
 )

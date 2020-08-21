@@ -7,6 +7,7 @@ import { handleError, sendSms } from '../services/unauthorized'
 import { validateCancelOrder, validateConfirmOrder } from '../validators/manager-validator'
 import { Order } from '../models'
 import { getOrderById } from '../services/user'
+import OrderStatus from '../enums/order-status-enum'
 
 const router = Router()
 
@@ -32,7 +33,7 @@ router.get('/order/:_id', (req, res, next) => {
 
 router.put('/orders/cancel/:_id', (req, res, next) => {
 	validateCancelOrder(req.body)
-		.then(() => updateOrderStatus(req.params._id, false, req.body.cancellationReason))
+		.then(() => updateOrderStatus(req.params._id, OrderStatus.CANCELED, req.body.cancellationReason))
 		.then((order) => {
 			sendSms(`9${order.phoneNumber.split(' ').join('')}`, `${order.date} Tarihinde verdiğiniz sipariş, ${req.body.cancellationReason} nedeniyle iptal edilmiştir. Ödemeniz en kısa sürece hesabına geri aktarılacaktır. Anlayışınız için teşekkürler.`)
 			res.json(order)
@@ -44,7 +45,7 @@ router.put('/orders/cancel/:_id', (req, res, next) => {
 
 router.put('/orders/confirm/:_id', (req, res, next) => {
 	validateConfirmOrder(req.body)
-		.then(() => updateOrderStatus(req.params._id, true, req.body.trackingNumber))
+		.then(() => updateOrderStatus(req.params._id, OrderStatus.APPROVED, req.body.trackingNumber))
 		.then((order) => {
 			sendSms(`9${order.phoneNumber.split(' ').join('')}`, `${order.date} Tarihinde verdiğiniz sipariş, Yurtiçi Kargoya verilmiştir, Kargo takip numarası : ${req.body.trackingNumber}`)
 			res.json(order)
