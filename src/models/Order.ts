@@ -77,7 +77,7 @@ const orderSchema = new Schema({
 	returnable: {
 		type: Boolean,
 		required: true,
-		default: false
+		default: null
 	},
 	returnItems: [{
 		_id: {
