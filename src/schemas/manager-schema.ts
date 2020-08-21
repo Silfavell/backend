@@ -13,5 +13,5 @@ export const cancelReturnSchema = Joi.object({
 })
 
 export const confirmReturnSchema = Joi.object({
-	message: Joi.string().required()
+	
 })

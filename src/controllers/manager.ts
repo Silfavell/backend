@@ -62,7 +62,7 @@ router.put('/orders/confirm/:_id', (req, res, next) => {
 
 router.put('/orders/cancel-return/:_id', (req, res, next) => {
 	validateCancelReturn(req.body)
-		.then(() => updateOrderStatus(req.params._id, OrderStatus.RETURN_DENIED))
+		.then(() => updateOrderStatus(req.params._id, OrderStatus.RETURN_DENIED, req.body.message))
 		.then((order) => {
 			sendSms(`9${order.phoneNumber.split(' ').join('')}`, `${order.date} Tarihinde verdiğiniz sipariş, ${req.body.message} nedeniyle iptal edilmiştir. Ödemeniz en kısa sürece hesabına geri aktarılacaktır. Anlayışınız için teşekkürler.`) // TODO PUSH NOTIFICATION
 			res.json(order)
@@ -72,7 +72,7 @@ router.put('/orders/cancel-return/:_id', (req, res, next) => {
 		})
 })
 
-router.put('/orders/confirm-return/:_id', (req, res, next) => {
+router.put('/orders/accept-return/:_id', (req, res, next) => {
 	validateConfirmReturn(req.body)
 		.then(() => updateOrderStatus(req.params._id, OrderStatus.RETURN_ACCEPTED))
 		.then((order) => {
