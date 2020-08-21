@@ -4,7 +4,12 @@ import { validateAuthority } from '../middlewares/auth-middleware'
 import Authority from '../enums/authority-enum'
 import { updateOrderStatus } from '../services/manager'
 import { handleError, sendSms } from '../services/unauthorized'
-import { validateCancelOrder, validateConfirmOrder } from '../validators/manager-validator'
+import {
+	validateCancelOrder,
+	validateConfirmOrder,
+	validateCancelReturn,
+	validateConfirmReturn
+} from '../validators/manager-validator'
 import { Order } from '../models'
 import { getOrderById } from '../services/user'
 import OrderStatus from '../enums/order-status-enum'
@@ -33,9 +38,9 @@ router.get('/order/:_id', (req, res, next) => {
 
 router.put('/orders/cancel/:_id', (req, res, next) => {
 	validateCancelOrder(req.body)
-		.then(() => updateOrderStatus(req.params._id, OrderStatus.CANCELED, req.body.cancellationReason))
-		.then((order) => {
-			sendSms(`9${order.phoneNumber.split(' ').join('')}`, `${order.date} Tarihinde verdiğiniz sipariş, ${req.body.cancellationReason} nedeniyle iptal edilmiştir. Ödemeniz en kısa sürece hesabına geri aktarılacaktır. Anlayışınız için teşekkürler.`)
+		.then(() => updateOrderStatus(req.params._id, OrderStatus.CANCELED, req.body.message))
+		.then((order) => {// TODO PUSH NOTIFICATION
+			sendSms(`9${order.phoneNumber.split(' ').join('')}`, `${order.date} Tarihinde verdiğiniz sipariş, ${req.body.message} nedeniyle iptal edilmiştir. Ödemeniz en kısa sürece hesabına geri aktarılacaktır. Anlayışınız için teşekkürler.`)
 			res.json(order)
 		})
 		.catch((reason) => {
@@ -45,13 +50,37 @@ router.put('/orders/cancel/:_id', (req, res, next) => {
 
 router.put('/orders/confirm/:_id', (req, res, next) => {
 	validateConfirmOrder(req.body)
-		.then(() => updateOrderStatus(req.params._id, OrderStatus.APPROVED, req.body.trackingNumber))
-		.then((order) => {
-			sendSms(`9${order.phoneNumber.split(' ').join('')}`, `${order.date} Tarihinde verdiğiniz sipariş, Yurtiçi Kargoya verilmiştir, Kargo takip numarası : ${req.body.trackingNumber}`)
+		.then(() => updateOrderStatus(req.params._id, OrderStatus.APPROVED, req.body.message))
+		.then((order) => {// TODO PUSH NOTIFICATION
+			sendSms(`9${order.phoneNumber.split(' ').join('')}`, `${order.date} Tarihinde verdiğiniz sipariş, Yurtiçi Kargoya verilmiştir, Kargo takip numarası : ${req.body.message}`)
 			res.json(order)
 		})
 		.catch((reason) => {
 			next(handleError(reason, 'PUT /manager/orders/confirm/:_id'))
+		})
+})
+
+router.put('/orders/cancel-return/:_id', (req, res, next) => {
+	validateCancelReturn(req.body)
+		.then(() => updateOrderStatus(req.params._id, OrderStatus.RETURN_DENIED))
+		.then((order) => {
+			sendSms(`9${order.phoneNumber.split(' ').join('')}`, `${order.date} Tarihinde verdiğiniz sipariş, ${req.body.message} nedeniyle iptal edilmiştir. Ödemeniz en kısa sürece hesabına geri aktarılacaktır. Anlayışınız için teşekkürler.`) // TODO PUSH NOTIFICATION
+			res.json(order)
+		})
+		.catch((reason) => {
+			next(handleError(reason, 'PUT /manager/orders/cancel-return/:_id'))
+		})
+})
+
+router.put('/orders/confirm-return/:_id', (req, res, next) => {
+	validateConfirmReturn(req.body)
+		.then(() => updateOrderStatus(req.params._id, OrderStatus.RETURN_ACCEPTED))
+		.then((order) => {
+			sendSms(`9${order.phoneNumber.split(' ').join('')}`, `${order.date} Tarihinde verdiğiniz sipariş, Yurtiçi Kargoya verilmiştir, Kargo takip numarası : ${req.body.message}`) // TODO PUSH NOTIFICATION
+			res.json(order)
+		})
+		.catch((reason) => {
+			next(handleError(reason, 'PUT /manager/orders/confirm-return/:_id'))
 		})
 })
 

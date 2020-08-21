@@ -2,9 +2,10 @@ import request from 'supertest'
 import { expect } from 'chai'
 
 import app from '../../src/app'
+import OrderStatus from '../../src/enums/order-status-enum'
 
 export default () => describe('PUT /orders/cancel/:_id', () => {
-	it('without cancellation reason', (done) => {
+	it('without cancellation (message) reason', (done) => {
 		request(app)
 			.put(`/api/manager/orders/cancel/${JSON.parse(process.env.cancelOrder)._id}`)
 			.set({ Authorization: process.env.managerToken })
@@ -19,7 +20,7 @@ export default () => describe('PUT /orders/cancel/:_id', () => {
 		request(app)
 			.put(`/api/manager/orders/cancel/${JSON.parse(process.env.cancelOrder)._id}`)
 			.set({ Authorization: process.env.managerToken })
-			.send({ cancellationReason: '..Reason..' })
+			.send({ message: '..Reason..' })
 			.expect(200)
 			.end((error, response) => {
 				if (response.body.error) {
@@ -28,7 +29,7 @@ export default () => describe('PUT /orders/cancel/:_id', () => {
 
 				expect(response.body.customer).to.equal('testUser')
 				expect(response.body.address).to.equal(JSON.parse(process.env.cancelOrder).address)
-				expect(response.body.status).to.equal(false)
+				expect(response.body.status).to.equal(OrderStatus.CANCELED)
 				done()
 			})
 	})

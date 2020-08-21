@@ -204,7 +204,7 @@ export const getOrders = (phoneNumber: string) => (
 				_id: '$_id',
 				status: { $first: '$status' },
 				date: { $first: '$date' },
-				trackingNumber: { $first: '$trackingNumber' },
+				message: { $first: '$message' },
 				paidPrice: { $first: '$paidPrice' },
 				products: { $first: '$products' },
 				returnItemsTotalPayback: {
@@ -517,7 +517,9 @@ export const getOrderById = (orderId: string) => (
 				_id: '$_id',
 				status: { $first: '$status' },
 				date: { $first: '$date' },
-				trackingNumber: { $first: '$trackingNumber' },
+				customer: { $first: '$customer' },
+				address: { $first: '$address' },
+				message: { $first: '$message' },
 				paidPrice: { $first: '$paidPrice' },
 				products: { $first: '$products' },
 				returnItemsTotalPayback: {

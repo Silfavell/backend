@@ -11,8 +11,7 @@ export type OrderDocument = Document & {
 	date: Date,
 	products: ProductDocument[],
 	status: OrderStatus,
-	trackingNumber: string,
-	cancellationReason: string,
+	message: string,
 	paidPrice: number,
 	returnItems: [{
 		_id: Schema.Types.ObjectId,
@@ -64,11 +63,7 @@ const orderSchema = new Schema({
 		enum: [0, 1, 2, 3, 4, 5],
 		default: 0
 	},
-	trackingNumber: {
-		type: String,
-		default: null
-	},
-	cancellationReason: {
+	message: {
 		type: String,
 		default: null
 	},

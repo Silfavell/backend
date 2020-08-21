@@ -1,9 +1,10 @@
 import { Order } from '../models'
+import OrderStatus from '../enums/order-status-enum';
 
-export const updateOrderStatus = (orderId: string, status: number, result: string) => {
-	if (status) {
-		return Order.findByIdAndUpdate(orderId, { status, trackingNumber: result }, { new: true })
-	} else {
-		return Order.findByIdAndUpdate(orderId, { status, cancellationReason: result }, { new: true })
+export const updateOrderStatus = (orderId: string, status: number, message?: string) => {
+	switch (status) {
+		case OrderStatus.APPROVED: return Order.findByIdAndUpdate(orderId, { status, message }, { new: true })
+		case OrderStatus.CANCELED: return Order.findByIdAndUpdate(orderId, { status, message }, { new: true })
+		default: return Order.findByIdAndUpdate(orderId, { status }, { new: true })
 	}
 }

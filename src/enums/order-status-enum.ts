@@ -4,7 +4,9 @@ enum OrderStatus {
     CANCELED,
     RETURNABLE,
     CAN_NOT_RETURNABLE,
-    RETURNED
+    RETURNED,
+    RETURN_ACCEPTED,
+    RETURN_DENIED
 }
 
 export default OrderStatus
