@@ -1,3 +1,4 @@
+import mongoose from 'mongoose'
 import HttpStatusCodes from 'http-status-codes'
 import Iyzipay from 'iyzipay'
 
@@ -451,7 +452,91 @@ export const completePayment = (user: UserDocument, cart: any, address: string, 
 )
 
 export const getOrderById = (orderId: string) => (
-	Order.findById(orderId)
+	Order.aggregate([
+		{
+			$match: {
+				_id: mongoose.Types.ObjectId(orderId)
+			}
+		},
+		{
+			$unwind: {
+				path: '$returnItems',
+				preserveNullAndEmptyArrays: true
+			}
+		},
+		{
+			$addFields: {
+				returnQuantity: '$returnItems.quantity'
+			}
+		},
+		{
+			$lookup: {
+				from: Product.collection.name,
+				localField: 'returnItems._id',
+				foreignField: '_id',
+				as: 'returnItems'
+			}
+		},
+		{
+			$addFields: {
+				returnItems: {
+					$arrayElemAt: ['$returnItems', 0]
+				}
+			}
+		},
+		{
+			$addFields: {
+				products: {
+					$filter: {
+						input: '$products',
+						as: 'product',
+						cond: {
+							$eq: ['$$product._id', '$returnItems._id']
+						}
+					}
+				}
+			}
+		},
+		{
+			$addFields: {
+				currentProduct: {
+					$arrayElemAt: ['$products', 0]
+				}
+			}
+		},
+		{
+			$addFields: {
+				returnItems: {
+					quantity: '$returnQuantity',
+					paidPrice: '$currentProduct.paidPrice'
+				}
+			}
+		},
+		{
+			$group: {
+				_id: '$_id',
+				status: { $first: '$status' },
+				date: { $first: '$date' },
+				trackingNumber: { $first: '$trackingNumber' },
+				returnable: { $first: '$returnable' },
+				paidPrice: { $first: '$paidPrice' },
+				products: { $first: '$products' },
+				returnItemsTotalPayback: {
+					$sum: {
+						$multiply: ['$returnItems.paidPrice', '$returnItems.quantity']
+					}
+				},
+				returnItems: {
+					$push: '$returnItems'
+				}
+			}
+		},
+		{
+			$sort: {
+				_id: -1
+			}
+		}
+	])
 )
 
 export const returnItems = (orderId: string, returnItems: any[]) => (

@@ -14,7 +14,7 @@ router.use(validateAuthority(Authority.MANAGER))
 
 router.get('/orders', (req, res, next) => {
 	Order.find().sort({ _id: -1 }).then((orders) => {
-		res.json(orders ?? {})
+		res.json(orders ?? [])
 	}).catch((reason) => {
 		next(handleError(reason, 'GET /manager/orders'))
 	})
@@ -23,7 +23,7 @@ router.get('/orders', (req, res, next) => {
 router.get('/order/:_id', (req, res, next) => {
 	getOrderById(req.params._id)
 		.then((order) => {
-			res.json(order)
+			res.json(order[0])
 		})
 		.catch((reason) => {
 			next(handleError(reason, 'GET /manager/order/:_id'))
