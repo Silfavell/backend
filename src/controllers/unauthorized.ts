@@ -70,6 +70,10 @@ const router = Router()
 router.use(validateAuthority(Authority.ANONIM))
 router.use(validatePhone())
 
+router.get('/version', (req, res, next) => {
+	res.json('1.0.0')
+})
+
 router.get('/categories', (req, res, next) => {
 	getCategories().then((categories) => {
 		res.json(categories)
