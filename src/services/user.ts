@@ -173,7 +173,7 @@ export const getOrders = (phoneNumber: string) => (
 		},
 		{
 			$addFields: {
-				products: {
+				currentProduct: {
 					$filter: {
 						input: '$products',
 						as: 'product',
@@ -187,7 +187,7 @@ export const getOrders = (phoneNumber: string) => (
 		{
 			$addFields: {
 				currentProduct: {
-					$arrayElemAt: ['$products', 0]
+					$arrayElemAt: ['$currentProduct', 0]
 				}
 			}
 		},
@@ -214,6 +214,19 @@ export const getOrders = (phoneNumber: string) => (
 				},
 				returnItems: {
 					$push: '$returnItems'
+				}
+			}
+		},
+		{
+			$addFields: {
+				returnItems: {
+					$filter: {
+						input: '$returnItems',
+						as: 'returnItem',
+						cond: {
+							$gt: ['$$returnItem._id', null]
+						}
+					}
 				}
 			}
 		},
