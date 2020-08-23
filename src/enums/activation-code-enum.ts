@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-
 enum ActivationCodes {
     REGISTER_USER,
     RESET_PASSWORD,

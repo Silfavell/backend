@@ -58,7 +58,7 @@ export const getCategories = () => (
 		{
 			$lookup: {
 				from: ProductType.collection.name,
-				let: { 'types': '$subCategories.types' },
+				let: { types: '$subCategories.types' },
 				pipeline: [
 					{
 						$match: {
@@ -283,7 +283,7 @@ export const getBestSellerProducts = () => (
 		{
 			$lookup: {
 				from: Product.collection.name,
-				let: { 'categoryId': '$_id' },
+				let: { categoryId: '$_id' },
 				pipeline: [
 					{
 						$match: {

@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-
 enum Categories {
     FOOD,
     NON_FOOD,

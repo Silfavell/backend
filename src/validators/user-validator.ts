@@ -9,7 +9,8 @@ import {
 	makeOrderSchema,
 	postPaymentCardSchema,
 	deletePaymentCardSchema,
-	favoriteProductSchema
+	favoriteProductSchema,
+	returnItemsSchema
 } from '../schemas/user-schema'
 
 import { ProductDocument } from '../models'
@@ -33,3 +34,5 @@ export const validateMakeOrderRequest = (body: any) => makeOrderSchema.validateA
 export const validatePostPaymentCardRequest = (card: any) => postPaymentCardSchema.validateAsync(card)
 
 export const validateDeletePaymentCardRequest = (card: any) => deletePaymentCardSchema.validateAsync(card)
+
+export const validatePostReturnItems = (returnItems: any[]) => returnItemsSchema.validateAsync(returnItems)
