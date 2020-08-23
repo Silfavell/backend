@@ -60,7 +60,7 @@ const orderSchema = new Schema({
 	},
 	status: {
 		type: Number,
-		enum: [0, 1, 2, 3, 4, 5],
+		enum: Object.values(OrderStatus).filter((status) => typeof status === 'number'),
 		default: 0
 	},
 	message: {
