@@ -153,24 +153,26 @@ export const saveProductImages = (product: ProductDocument, images: any[]) => {
 	})
 }
 
-export const indexProduct = (product: ProductDocument) => (
-	Elasticsearch.getClient
-		.index({
+export const indexProduct = (product: ProductDocument) => {
+	if (product.purchasable) {
+		return Elasticsearch.getClient.index({
 			index: 'doc',
 			type: 'doc',
 			id: product._id,
 			// refresh: true,
 			body: replaceProductId(product)
 		})
-)
+	} else {
+		return removeProductFromSearch(product)
+	}
+}
 
 export const removeProductFromSearch = (product: ProductDocument) => (
-	Elasticsearch.getClient
-		.delete({
-			index: 'doc',
-			type: 'doc',
-			id: product._id
-		})
+	Elasticsearch.getClient.delete({
+		index: 'doc',
+		type: 'doc',
+		id: product._id
+	})
 )
 
 export const updateProduct = (productId: string, productContext: ProductDocument, slug: string) => {
