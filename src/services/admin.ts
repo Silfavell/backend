@@ -118,11 +118,11 @@ export const isCategorySlugExists = (slug: string, updateId?: string) => (
 	})
 )
 
-export const saveProductToDatabase = (productBody: any) => (
+export const saveProductToDatabase = (productBody: ProductDocument) => (
 	new Product(productBody).save()
 )
 
-export const updateCategoryOfProduct = (product: any) => (
+export const updateCategoryOfProduct = (product: ProductDocument) => (
 	Category.findById(product.categoryId.toString()).then((category) => {
 		const productCategoryBrand = category.brands.find((brand) => brand.name === product.brand)
 		const productSubCategory = category.subCategories.find((subCategory) => subCategory._id.toString() === product.subCategoryId.toString())

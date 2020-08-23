@@ -1,5 +1,6 @@
 import mongoose, { Document, Schema } from 'mongoose'
 import ProductSpecification, { ProductSpecificationDocument } from './ProductSpecification'
+import ProductVariables, { ProductVariablesDocument } from './ProductVariables'
 
 export type ProductDocument = Document & {
 	categoryId: string,
@@ -10,12 +11,12 @@ export type ProductDocument = Document & {
 	details: string,
 	type: Schema.Types.ObjectId
 	specifications: [ProductSpecificationDocument]
+	variables: ProductVariablesDocument
 	price: number,
 	discountedPrice: number,
 	image: number,
 	imageCount: number,
 	purchasable: boolean,
-	timesSold: number,
 	color: {
 		name: string,
 		code: string
@@ -52,7 +53,20 @@ const productSchema = new Schema({
 		type: Schema.Types.ObjectId,
 		required: true
 	},
-	specifications: [ProductSpecification.schema],
+	specifications: {
+		type: [ProductSpecification.schema],
+		required: true,
+		default: []
+	},
+	variables: {
+		type: ProductVariables.schema,
+		required: true,
+		default: {
+			timesSold: 0,
+			timesSearched: 0,
+			comments: []
+		}
+	},
 	price: {
 		type: Number,
 		required: true,
@@ -77,11 +91,6 @@ const productSchema = new Schema({
 		type: Boolean,
 		required: true,
 		default: true
-	},
-	timesSold: {
-		type: Number,
-		required: true,
-		default: 0
 	},
 	color: {
 		name: {
@@ -110,6 +119,6 @@ productSchema.pre('save', function (next) {
 	}
 })
 
-const Product = mongoose.model('Product', productSchema)
+const Product = mongoose.model<ProductDocument>('Product', productSchema)
 
 export default Product

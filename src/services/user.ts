@@ -122,7 +122,7 @@ export const saveOrderToDatabase = (user: UserDocument, cart: any, address: any)
 
 export const updateProductsSoldTimes = (cart: any) => {
 	const updates = Object.values(cart).map((cartProduct: any) => (
-		Product.findByIdAndUpdate(cartProduct._id, { $inc: { timesSold: cartProduct.quantity } })
+		Product.findByIdAndUpdate(cartProduct._id, { $inc: { 'variables.timesSold': cartProduct.quantity } })
 	))
 
 	return Promise.all(updates)

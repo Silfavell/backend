@@ -4,7 +4,8 @@ import fileUpload from 'express-fileupload'
 
 import {
 	Manager,
-	Admin
+	Admin,
+	ProductDocument
 } from '../models'
 
 import { validateAuthority } from '../middlewares/auth-middleware'
@@ -172,10 +173,10 @@ router.post('/sub-category', (req, res, next) => {
 		.then(() => getSeoUrl(req.body.name))
 		.then((slug) => isSubCategorySlugExists(req.body, slug))
 		.then((slug) => saveSubCategoryToDatabase({ ...req.body, slug }))
-		.then((category: any) => {
+		.then((category) => {
 			res.json(category)
 		})
-		.catch((reason: any) => {
+		.catch((reason) => {
 			next(handleError(reason, 'POST /admin/sub-category'))
 		})
 })
@@ -183,10 +184,10 @@ router.post('/sub-category', (req, res, next) => {
 router.delete('/sub-category', (req, res, next) => {
 	validateDeleteSubCategory(req.query)
 		.then(() => deleteSubCategoryFromDatabase(req.query))
-		.then((category: any) => {
+		.then((category) => {
 			res.json(category)
 		})
-		.catch((reason: any) => {
+		.catch((reason) => {
 			next(handleError(reason, 'DELETE /admin/sub-category'))
 		})
 })
@@ -274,7 +275,7 @@ router.put('/product/:_id', (req, res, next) => {
 		.then(() => getSeoUrl(req.body.name))
 		.then((slug) => isProductSlugExists(slug, req.params._id))
 		.then((slug) => updateProduct(req.params._id, req.body, slug))
-		.then((product: any) => indexProduct(product).then(() => product))
+		.then((product) => indexProduct(product).then(() => product))
 		.then((product) => {
 			if (req.files) {
 				saveProductImages(product, Object.values(req.files))
@@ -290,7 +291,7 @@ router.put('/product/:_id', (req, res, next) => {
 router.delete('/product/:_id', (req, res, next) => {
 	validateObjectId(req.params._id)
 		.then(() => deleteProductFromDatabase(req.params._id))
-		.then((product: any) => removeProductFromSearch(product))
+		.then((product) => removeProductFromSearch(product))
 		.then(() => {
 			res.json()
 		})

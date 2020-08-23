@@ -300,7 +300,7 @@ export const getBestSellerProducts = () => (
 					},
 					{
 						$sort: {
-							timesSold: -1
+							'variables.timesSold': -1
 						}
 					},
 					{
@@ -333,7 +333,7 @@ export const getBestSellerProducts = () => (
 )
 
 export const getBestSellerMobileProducts = () => (
-	Product.find({ purchasable: true }).sort({ timesSold: -1 }).limit(20)
+	Product.find({ purchasable: true }).sort({ 'variables.timesSold': -1 }).limit(20)
 )
 
 export const getFilteredProductsWithCategories = (query: any) => {
@@ -544,7 +544,7 @@ export const productsFilterMobile = (query: any) => {
 			case ProductSort.BEST_SELLER: {
 				sort = {
 					$sort: {
-						'timesSold': 1
+						'variables.timesSold': 1
 					}
 				}
 				break
@@ -1543,7 +1543,7 @@ export const filterShop = (query: any, params: any) => {
 			case ProductSort.BEST_SELLER: {
 				laterExt.push({
 					$sort: {
-						'products.timesSold': 1
+						'products.variables.timesSold': 1
 					}
 				})
 				break
