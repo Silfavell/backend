@@ -7,8 +7,9 @@ export type ProductVariablesDocument = Document & {
     comments: [{
         ownerId: mongoose.Types.ObjectId,
         ownerName: string,
+        title: string,
         comment: string,
-        score: number,
+        rate: number,
         date: Date
     }]
 }
@@ -29,31 +30,37 @@ const productVariables = new Schema({
         default: 0
     },
     comments: {
-        type: [{
-            ownerId: {
-                type: mongoose.Types.ObjectId,
-                required: true
-            },
-            ownerAlias: {
-                type: String,
-                required: true
-            },
-            comment: {
-                type: String,
-                required: true
-            },
-            score: {
-                type: Number,
-                min: 1,
-                max: 10,
-                required: true
-            },
-            date: {
-                type: Date,
-                required: true,
-                default: Date.now()
-            }
-        }],
+        type: [
+            new Schema({
+                ownerId: {
+                    type: mongoose.Types.ObjectId,
+                    required: true
+                },
+                ownerAlias: {
+                    type: String,
+                    required: true
+                },
+                title: {
+                    type: String,
+                    required: true
+                },
+                comment: {
+                    type: String,
+                    required: true
+                },
+                rate: {
+                    type: Number,
+                    min: 1,
+                    max: 10,
+                    required: true
+                },
+                date: {
+                    type: Date,
+                    required: true,
+                    default: Date.now()
+                }
+            })
+        ],
         required: true,
         default: []
     }

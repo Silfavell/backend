@@ -44,7 +44,8 @@ import {
 	validateMakeOrderRequest,
 	validatePostPaymentCardRequest,
 	validateDeletePaymentCardRequest,
-	validateFavoriteProductRequest
+	validateFavoriteProductRequest,
+	validateSaveComment
 } from '../validators/user-validator'
 
 const router = Router()
@@ -231,7 +232,8 @@ router.get('/order/:_id', (req, res, next) => {
 })
 
 router.post('/save-comment', (req, res, next) => {
-	saveComment(req.user, req.body)
+	validateSaveComment(req.body)
+		.then(() => saveComment(req.user, req.body))
 		.then((variables) => {
 			res.json(variables.comments)
 		})

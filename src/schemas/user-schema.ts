@@ -49,3 +49,11 @@ export const postPaymentCardSchema = Joi.object({
 export const deletePaymentCardSchema = Joi.object({
 	cardToken: Joi.string().required()
 })
+
+export const saveCommentSchema = Joi.object({
+	productId: Joi.string().regex(/^[0-9a-fA-F]{24}$/).required(),
+	title: Joi.string().required(),
+	comment: Joi.string().required(),
+	rate: Joi.number().min(1).max(10).required(),
+	alias: Joi.string().allow(null),
+})
