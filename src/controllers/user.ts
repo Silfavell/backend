@@ -25,10 +25,10 @@ import {
 	checkMakeOrderValues,
 	saveAddressToDatabase,
 	deleteCard,
-	createCart,
 	clearCart,
 	validateSaveCartProducts,
-	getOrderById
+	getOrderById,
+	saveComment
 } from '../services/user'
 
 import {
@@ -227,6 +227,16 @@ router.get('/order/:_id', (req, res, next) => {
 		})
 		.catch((reason) => {
 			next(handleError(reason, 'GET /user/order/:_id'))
+		})
+})
+
+router.post('/save-comment', (req, res, next) => {
+	saveComment(req.user, req.body)
+		.then((variables) => {
+			res.json(variables.comments)
+		})
+		.catch((reason) => {
+			next(handleError(reason, 'POST /user/save-comment'))
 		})
 })
 

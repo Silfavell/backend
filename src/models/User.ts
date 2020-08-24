@@ -6,6 +6,7 @@ import Address, { AddressDocument } from './Address'
 export type UserDocument = Document & {
 	phoneNumber: string,
 	nameSurname: string,
+	alias?: string,
 	email: string,
 	password: string,
 	favoriteProducts: string[],
@@ -22,6 +23,9 @@ const userSchema = new Schema({
 	nameSurname: {
 		type: String,
 		required: true
+	},
+	alias: {
+		type: String
 	},
 	email: {
 		type: String,

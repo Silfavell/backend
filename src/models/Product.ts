@@ -11,7 +11,6 @@ export type ProductDocument = Document & {
 	details: string,
 	type: Schema.Types.ObjectId
 	specifications: [ProductSpecificationDocument]
-	variables: ProductVariablesDocument
 	price: number,
 	discountedPrice: number,
 	image: number,
@@ -57,15 +56,6 @@ const productSchema = new Schema({
 		type: [ProductSpecification.schema],
 		required: true,
 		default: []
-	},
-	variables: {
-		type: ProductVariables.schema,
-		required: true,
-		default: {
-			timesSold: 0,
-			timesSearched: 0,
-			comments: []
-		}
 	},
 	price: {
 		type: Number,
@@ -114,7 +104,10 @@ productSchema.pre('save', function (next) {
 		// eslint-disable-next-line no-use-before-define
 		Product.find().sort({ image: -1 }).limit(1).then((total: ProductDocument[]) => {
 			product.image = total.length === 0 ? 1 : total[0].image + 1
-			next()
+		}).then(() => {
+			new ProductVariables({ productId: product._id }).save().then(() => {
+				next()
+			})
 		})
 	}
 })

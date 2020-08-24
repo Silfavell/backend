@@ -15,7 +15,8 @@ import {
 	Category,
 	Product,
 	Ticket,
-	ProductType
+	ProductType,
+	ProductVariables
 } from '../models'
 import ErrorMessages from '../errors/ErrorMessages'
 import ActivationCodes from '../enums/activation-code-enum'
@@ -299,6 +300,21 @@ export const getBestSellerProducts = () => (
 						}
 					},
 					{
+						$lookup: {
+							from: ProductVariables.collection.name,
+							localField: '_id',
+							foreignField: 'productId',
+							as: 'variables'
+						}
+					},
+					{
+						$addFields: {
+							variables: {
+								$arrayElemAt: ['$variables', 0]
+							}
+						}
+					},
+					{
 						$sort: {
 							'variables.timesSold': -1
 						}
@@ -333,7 +349,36 @@ export const getBestSellerProducts = () => (
 )
 
 export const getBestSellerMobileProducts = () => (
-	Product.find({ purchasable: true }).sort({ 'variables.timesSold': -1 }).limit(20)
+	Product.aggregate([
+		{
+			$match: {
+				purchasable: true
+			}
+		},
+		{
+			$lookup: {
+				from: ProductVariables.collection.name,
+				localField: '_id',
+				foreignField: 'productId',
+				as: 'variables'
+			}
+		},
+		{
+			$addFields: {
+				variables: {
+					$arrayElemAt: ['$variables', 0]
+				}
+			}
+		},
+		{
+			$sort: {
+				'variables.timesSold': -1
+			}
+		},
+		{
+			$limit: 20
+		}
+	])
 )
 
 export const getFilteredProductsWithCategories = (query: any) => {
@@ -535,7 +580,7 @@ export const productsFilterMobile = (query: any) => {
 			case ProductSort.CLASSIC: {
 				sort = {
 					$sort: {
-						'_id': 1
+						_id: 1
 					}
 				}
 				break
@@ -544,7 +589,7 @@ export const productsFilterMobile = (query: any) => {
 			case ProductSort.BEST_SELLER: {
 				sort = {
 					$sort: {
-						'variables.timesSold': 1
+						'variables.timesSold': -1
 					}
 				}
 				break
@@ -553,7 +598,7 @@ export const productsFilterMobile = (query: any) => {
 			case ProductSort.NEWEST: {
 				sort = {
 					$sort: {
-						'_id': -1
+						_id: -1
 					}
 				}
 				break
@@ -562,7 +607,7 @@ export const productsFilterMobile = (query: any) => {
 			case ProductSort.MIN_PRICE: {
 				sort = {
 					$sort: {
-						'price': 1
+						price: 1
 					}
 				}
 				break
@@ -571,7 +616,7 @@ export const productsFilterMobile = (query: any) => {
 			case ProductSort.MAX_PRICE: {
 				sort = {
 					$sort: {
-						'price': -1
+						price: -1
 					}
 				}
 				break
@@ -580,7 +625,7 @@ export const productsFilterMobile = (query: any) => {
 			default: {
 				sort = {
 					$sort: {
-						'_id': 1
+						_id: 1
 					}
 				}
 				break
@@ -589,7 +634,7 @@ export const productsFilterMobile = (query: any) => {
 	} else {
 		sort = {
 			$sort: {
-				'_id': 1
+				_id: 1
 			}
 		}
 	}
@@ -606,6 +651,21 @@ export const productsFilterMobile = (query: any) => {
 						subCategoryId: query.subCategoryId
 					}
 				]
+			}
+		},
+		{
+			$lookup: {
+				from: ProductVariables.collection.name,
+				localField: '_id',
+				foreignField: 'productId',
+				as: 'variables'
+			}
+		},
+		{
+			$addFields: {
+				variables: {
+					$arrayElemAt: ['$variables', 0]
+				}
 			}
 		},
 		sort,
@@ -1543,7 +1603,7 @@ export const filterShop = (query: any, params: any) => {
 			case ProductSort.BEST_SELLER: {
 				laterExt.push({
 					$sort: {
-						'products.variables.timesSold': 1
+						'products.variables.timesSold': -1
 					}
 				})
 				break
@@ -1610,6 +1670,21 @@ export const filterShop = (query: any, params: any) => {
 						$match: {
 							$expr: {
 								$and: match
+							}
+						}
+					},
+					{
+						$lookup: {
+							from: ProductVariables.collection.name,
+							localField: '_id',
+							foreignField: 'productId',
+							as: 'variables'
+						}
+					},
+					{
+						$addFields: {
+							variables: {
+								$arrayElemAt: ['$variables', 0]
 							}
 						}
 					},
@@ -2107,9 +2182,9 @@ export const saveTicket = (body: any) => (
 export const handleError = (error: any, path: string): Error => {
 	if (error.httpCode) {
 		return error
-	}
-	if (error.isJoi) {
+	} else if (error.isJoi) {
 		return new ServerError(error.message, HttpStatusCodes.BAD_REQUEST, path, false)
 	}
+
 	return new ServerError(error.message, HttpStatusCodes.INTERNAL_SERVER_ERROR, path, true)
 }

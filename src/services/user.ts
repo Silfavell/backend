@@ -8,7 +8,8 @@ import {
 	User, Order,
 	UserDocument,
 	ProductDocument,
-	Product
+	Product,
+	ProductVariables
 } from '../models'
 import Cart from '../models/Cart'
 
@@ -122,7 +123,7 @@ export const saveOrderToDatabase = (user: UserDocument, cart: any, address: any)
 
 export const updateProductsSoldTimes = (cart: any) => {
 	const updates = Object.values(cart).map((cartProduct: any) => (
-		Product.findByIdAndUpdate(cartProduct._id, { $inc: { 'variables.timesSold': cartProduct.quantity } })
+		ProductVariables.findOneAndUpdate({ productId: cartProduct._id }, { $inc: { timesSold: cartProduct.quantity } })
 	))
 
 	return Promise.all(updates)
@@ -369,3 +370,31 @@ export const completePayment = (user: UserDocument, cart: any, address: string, 
 export const getOrderById = (orderId: string) => (
 	Order.findById(orderId)
 )
+
+export const saveComment = (user: UserDocument, body: { alias?: string, productId: string, comment: string, score: number }) => {
+	if (body.alias) {
+		return User.findOneAndUpdate(user._id, { alias: body.alias }).then(() => {
+			return ProductVariables.findOneAndUpdate({ productId: body.productId }, {
+				$push: {
+					comments: {
+						ownerId: user._id,
+						ownerAlias: body.alias,
+						comment: body.comment,
+						score: body.score
+					}
+				}
+			}, { new: true })
+		})
+	} else {
+		return ProductVariables.findOneAndUpdate({ productId: body.productId }, {
+			$push: {
+				comments: {
+					ownerId: user._id,
+					ownerAlias: user.alias,
+					comment: body.comment,
+					score: body.score
+				}
+			}
+		}, { new: true })
+	}
+}
