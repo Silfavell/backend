@@ -208,6 +208,10 @@ export const getTypes = () => (
 	ProductType.find()
 )
 
+export const getWaitingComments = () => (
+	Comment.find({ verified: false })
+)
+
 export const verifyComment = (_id: string) => (
 	Comment.findByIdAndUpdate(_id, { verified: true }, { new: true })
 )

@@ -46,6 +46,7 @@ import {
 	isSubCategorySlugExists,
 	saveType,
 	updateType,
+	getWaitingComments,
 	verifyComment,
 	deleteComment,
 	getTypes,
@@ -337,6 +338,14 @@ router.put('/update-type/:_id', (req, res, next) => {
 		.catch((reason) => {
 			next(handleError(reason, 'PUT /admin/update-type/:_id'))
 		})
+})
+
+router.get('/waiting-comments', (req, res, next) => {
+	getWaitingComments().then((comments) => {
+		res.json(comments)
+	}).catch((reason) => {
+		next(handleError(reason, 'GET /admin/waiting-comments'))
+	})
 })
 
 router.put('/verify-comment/:_id', (req, res, next) => {
