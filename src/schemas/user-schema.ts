@@ -55,5 +55,5 @@ export const saveCommentSchema = Joi.object({
 	title: Joi.string().required(),
 	comment: Joi.string().required(),
 	rate: Joi.number().min(1).max(10).required(),
-	alias: Joi.string().allow(null),
+	ownerAlias: Joi.string().allow(null)
 })

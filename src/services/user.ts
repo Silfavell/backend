@@ -371,14 +371,14 @@ export const getOrderById = (orderId: string) => (
 	Order.findById(orderId)
 )
 
-export const saveComment = (user: UserDocument, body: { alias?: string, productId: string, comment: string, title: string, rate: number }) => {
-	if (body.alias) {
-		return User.findOneAndUpdate(user._id, { alias: body.alias }).then(() => {
+export const saveComment = (user: UserDocument, body: { ownerAlias?: string, productId: string, comment: string, title: string, rate: number }) => {
+	if (body.ownerAlias) {
+		return User.findByIdAndUpdate(user._id, { alias: body.ownerAlias }).then(() => {
 			return ProductVariables.findOneAndUpdate({ productId: body.productId }, {
 				$push: {
 					comments: {
 						ownerId: user._id,
-						ownerAlias: body.alias,
+						ownerAlias: body.ownerAlias,
 						title: body.title,
 						comment: body.comment,
 						rate: body.rate

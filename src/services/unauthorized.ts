@@ -1931,6 +1931,34 @@ export const getProductAndWithColorGroup = (slug: string) => (
 					]
 				}
 			}
+		},
+		{
+			$lookup: {
+				from: ProductVariables.collection.name,
+				localField: '_id',
+				foreignField: 'productId',
+				as: 'variables'
+			}
+		},
+		{
+			$addFields: {
+				variables: {
+					$arrayElemAt: ['$variables', 0]
+				}
+			}
+		},
+		{
+			$addFields: {
+				'variables.comments': {
+					$filter: {
+						input: '$variables.comments',
+						as: 'comment',
+						cond: {
+							$eq: ['$$comment.verified', true]
+						}
+					}
+				}
+			}
 		}
 	])
 )
