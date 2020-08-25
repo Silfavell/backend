@@ -16,7 +16,8 @@ import {
 	Product,
 	Ticket,
 	ProductType,
-	ProductVariables
+	ProductVariables,
+	Comment
 } from '../models'
 import ErrorMessages from '../errors/ErrorMessages'
 import ActivationCodes from '../enums/activation-code-enum'
@@ -1934,24 +1935,17 @@ export const getProductAndWithColorGroup = (slug: string) => (
 		},
 		{
 			$lookup: {
-				from: ProductVariables.collection.name,
+				from: Comment.collection.name,
 				localField: '_id',
 				foreignField: 'productId',
-				as: 'variables'
+				as: 'comments'
 			}
 		},
 		{
 			$addFields: {
-				variables: {
-					$arrayElemAt: ['$variables', 0]
-				}
-			}
-		},
-		{
-			$addFields: {
-				'variables.comments': {
+				comments: {
 					$filter: {
-						input: '$variables.comments',
+						input: '$comments',
 						as: 'comment',
 						cond: {
 							$eq: ['$$comment.verified', true]

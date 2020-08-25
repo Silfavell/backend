@@ -10,7 +10,8 @@ import {
 	ProductTypeDocument,
 	ProductDocument,
 	CategoryDocument,
-	Ticket
+	Ticket,
+	Comment
 } from '../models'
 import Brand from '../models/Brand'
 import ServerError from '../errors/ServerError'
@@ -205,4 +206,12 @@ export const updateType = (id: string, body: ProductTypeDocument) => (
 
 export const getTypes = () => (
 	ProductType.find()
+)
+
+export const verifyComment = (_id: string) => (
+	Comment.findByIdAndUpdate(_id, { verified: true }, { new: true })
+)
+
+export const deleteComment = (_id: string) => (
+	Comment.findByIdAndDelete(_id)
 )

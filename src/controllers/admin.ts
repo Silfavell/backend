@@ -46,6 +46,8 @@ import {
 	isSubCategorySlugExists,
 	saveType,
 	updateType,
+	verifyComment,
+	deleteComment,
 	getTypes,
 	isTypeSlugExists
 } from '../services/admin'
@@ -335,6 +337,22 @@ router.put('/update-type/:_id', (req, res, next) => {
 		.catch((reason) => {
 			next(handleError(reason, 'PUT /admin/update-type/:_id'))
 		})
+})
+
+router.put('/verify-comment/:_id', (req, res, next) => {
+	verifyComment(req.params._id).then((comment) => {
+		res.json(comment)
+	}).catch((reason) => {
+		next(handleError(reason, 'PUT /admin/verify-comment/:_id'))
+	})
+})
+
+router.delete('/delete-comment/:_id', (req, res, next) => {
+	deleteComment(req.params._id).then((comment) => {
+		res.json(comment)
+	}).catch((reason) => {
+		next(handleError(reason, 'DELETE /admin/delete-comment/:_id'))
+	})
 })
 
 export default router

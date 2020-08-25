@@ -234,8 +234,8 @@ router.get('/order/:_id', (req, res, next) => {
 router.post('/save-comment', (req, res, next) => {
 	validateSaveComment(req.body)
 		.then(() => saveComment(req.user, req.body))
-		.then((variables) => {
-			res.json(variables.comments)
+		.then((comment) => {
+			res.json(comment)
 		})
 		.catch((reason) => {
 			next(handleError(reason, 'POST /user/save-comment'))

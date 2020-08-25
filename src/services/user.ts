@@ -9,7 +9,8 @@ import {
 	UserDocument,
 	ProductDocument,
 	Product,
-	ProductVariables
+	ProductVariables,
+	Comment
 } from '../models'
 import Cart from '../models/Cart'
 
@@ -374,29 +375,23 @@ export const getOrderById = (orderId: string) => (
 export const saveComment = (user: UserDocument, body: { ownerAlias?: string, productId: string, comment: string, title: string, rate: number }) => {
 	if (body.ownerAlias) {
 		return User.findByIdAndUpdate(user._id, { alias: body.ownerAlias }).then(() => {
-			return ProductVariables.findOneAndUpdate({ productId: body.productId }, {
-				$push: {
-					comments: {
-						ownerId: user._id,
-						ownerAlias: body.ownerAlias,
-						title: body.title,
-						comment: body.comment,
-						rate: body.rate
-					}
-				}
-			}, { new: true })
+			return new Comment({
+				productId: body.productId,
+				ownerId: user._id,
+				ownerAlias: body.ownerAlias,
+				title: body.title,
+				comment: body.comment,
+				rate: body.rate
+			}).save()
 		})
 	} else {
-		return ProductVariables.findOneAndUpdate({ productId: body.productId }, {
-			$push: {
-				comments: {
-					ownerId: user._id,
-					ownerAlias: user.alias,
-					title: body.title,
-					comment: body.comment,
-					rate: body.rate
-				}
-			}
-		}, { new: true })
+		return new Comment({
+			productId: body.productId,
+			ownerId: user._id,
+			ownerAlias: user.alias,
+			title: body.title,
+			comment: body.comment,
+			rate: body.rate
+		}).save()
 	}
 }
