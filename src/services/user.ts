@@ -372,7 +372,15 @@ export const getOrderById = (orderId: string) => (
 	Order.findById(orderId)
 )
 
-export const saveComment = (user: UserDocument, body: { ownerAlias?: string, productId: string, comment: string, title: string, rate: number }) => {
+export const saveComment = (user: UserDocument, body: {
+	ownerAlias?: string,
+	productId: string,
+	comment: string,
+	title: string,
+	generalRate: number,
+	qualityRate: number,
+	priceRate: number
+}) => {
 	if (body.ownerAlias) {
 		return User.findByIdAndUpdate(user._id, { alias: body.ownerAlias }).then(() => {
 			return new Comment({
@@ -381,7 +389,9 @@ export const saveComment = (user: UserDocument, body: { ownerAlias?: string, pro
 				ownerAlias: body.ownerAlias,
 				title: body.title,
 				comment: body.comment,
-				rate: body.rate
+				generalRate: body.generalRate,
+				qualityRate: body.qualityRate,
+				priceRate: body.priceRate
 			}).save()
 		})
 	} else {
@@ -391,7 +401,9 @@ export const saveComment = (user: UserDocument, body: { ownerAlias?: string, pro
 			ownerAlias: user.alias,
 			title: body.title,
 			comment: body.comment,
-			rate: body.rate
+			generalRate: body.generalRate,
+			qualityRate: body.qualityRate,
+			priceRate: body.priceRate
 		}).save()
 	}
 }

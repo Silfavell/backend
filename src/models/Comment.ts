@@ -6,7 +6,9 @@ export type CommentDocument = Document & {
     ownerAlias: string,
     title: string,
     comment: string,
-    rate: number,
+    generalRate: number,
+    qualityRate: number,
+    priceRate: number,
     date: Date,
     verified: boolean
 }
@@ -32,10 +34,22 @@ const commentSchema = new Schema({
         type: String,
         required: true
     },
-    rate: {
+    generalRate: {
         type: Number,
         min: 1,
-        max: 10,
+        max: 5,
+        required: true
+    },
+    qualityRate: {
+        type: Number,
+        min: 1,
+        max: 5,
+        required: true
+    },
+    priceRate: {
+        type: Number,
+        min: 1,
+        max: 5,
         required: true
     },
     date: {
