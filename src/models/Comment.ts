@@ -9,6 +9,8 @@ export type CommentDocument = Document & {
     generalRate: number,
     qualityRate: number,
     priceRate: number,
+    likes: [mongoose.Types.ObjectId],
+    dislikes: [mongoose.Types.ObjectId],
     date: Date,
     verified: boolean
 }
@@ -51,6 +53,16 @@ const commentSchema = new Schema({
         min: 1,
         max: 5,
         required: true
+    },
+    likes: {
+        type: [mongoose.Types.ObjectId],
+        required: true,
+        default: []
+    },
+    dislikes: {
+        type: [mongoose.Types.ObjectId],
+        required: true,
+        default: []
     },
     date: {
         type: Date,

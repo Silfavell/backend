@@ -407,3 +407,35 @@ export const saveComment = (user: UserDocument, body: {
 		}).save()
 	}
 }
+
+export const likeComment = (user: UserDocument, commentId: string) => (
+	Comment.findByIdAndUpdate(commentId, {
+		$addToSet: {
+			likes: user._id
+		}
+	}, { new: true })
+)
+
+export const removeLikeComment = (user: UserDocument, commentId: string) => (
+	Comment.findByIdAndUpdate(commentId, {
+		$pull: {
+			likes: user._id
+		}
+	}, { new: true })
+)
+
+export const dislikeComment = (user: UserDocument, commentId: string) => (
+	Comment.findByIdAndUpdate(commentId, {
+		$addToSet: {
+			dislikes: user._id
+		}
+	}, { new: true })
+)
+
+export const removeDislikeComment = (user: UserDocument, commentId: string) => (
+	Comment.findByIdAndUpdate(commentId, {
+		$pull: {
+			dislikes: user._id
+		}
+	}, { new: true })
+)

@@ -10,7 +10,8 @@ import {
 	postPaymentCardSchema,
 	deletePaymentCardSchema,
 	favoriteProductSchema,
-	saveCommentSchema
+	saveCommentSchema,
+	likeSchema
 } from '../schemas/user-schema'
 
 import { ProductDocument } from '../models'
@@ -36,3 +37,5 @@ export const validatePostPaymentCardRequest = (card: any) => postPaymentCardSche
 export const validateDeletePaymentCardRequest = (card: any) => deletePaymentCardSchema.validateAsync(card)
 
 export const validateSaveComment = (body: any) => saveCommentSchema.validateAsync(body)
+
+export const validateLike = (body: any) => likeSchema.validateAsync(body)

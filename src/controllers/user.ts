@@ -28,7 +28,11 @@ import {
 	clearCart,
 	validateSaveCartProducts,
 	getOrderById,
-	saveComment
+	saveComment,
+	likeComment,
+	dislikeComment,
+	removeLikeComment,
+	removeDislikeComment
 } from '../services/user'
 
 import {
@@ -45,7 +49,8 @@ import {
 	validatePostPaymentCardRequest,
 	validateDeletePaymentCardRequest,
 	validateFavoriteProductRequest,
-	validateSaveComment
+	validateSaveComment,
+	validateLike
 } from '../validators/user-validator'
 
 const router = Router()
@@ -239,6 +244,50 @@ router.post('/save-comment', (req, res, next) => {
 		})
 		.catch((reason) => {
 			next(handleError(reason, 'POST /user/save-comment'))
+		})
+})
+
+router.put('/like-comment/:_id', (req, res, next) => {
+	validateLike(req.params._id)
+		.then(() => likeComment(req.user, req.params._id))
+		.then((comment) => {
+			res.json(comment)
+		})
+		.catch((reason) => {
+			next(handleError(reason, 'PUT /user/like-comment/:_id'))
+		})
+})
+
+router.put('/remove-like-comment/:_id', (req, res, next) => {
+	validateLike(req.params._id)
+		.then(() => removeLikeComment(req.user, req.params._id))
+		.then((comment) => {
+			res.json(comment)
+		})
+		.catch((reason) => {
+			next(handleError(reason, 'PUT /user/remove-like-comment/:_id'))
+		})
+})
+
+router.put('/dislike-comment/:_id', (req, res, next) => {
+	validateLike(req.params._id)
+		.then(() => dislikeComment(req.user, req.params._id))
+		.then((comment) => {
+			res.json(comment)
+		})
+		.catch((reason) => {
+			next(handleError(reason, 'PUT /user/dislike-comment/:_id'))
+		})
+})
+
+router.put('/remove-dislike-comment/:_id', (req, res, next) => {
+	validateLike(req.params._id)
+		.then(() => removeDislikeComment(req.user, req.params._id))
+		.then((comment) => {
+			res.json(comment)
+		})
+		.catch((reason) => {
+			next(handleError(reason, 'PUT /user/remove-dislike-comment/:_id'))
 		})
 })
 
