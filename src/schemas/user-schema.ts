@@ -57,7 +57,7 @@ export const saveCommentSchema = Joi.object({
 	generalRate: Joi.number().min(1).max(5).required(),
 	qualityRate: Joi.number().min(1).max(5).required(),
 	priceRate: Joi.number().min(1).max(5).required(),
-	ownerAlias: Joi.string().allow(null)
+	ownerAlias: Joi.string().allow(null, '')
 })
 
 export const likeSchema = Joi.string().regex(/^[0-9a-fA-F]{24}$/).required()
