@@ -412,6 +412,9 @@ export const likeComment = (user: UserDocument, commentId: string) => (
 	Comment.findByIdAndUpdate(commentId, {
 		$addToSet: {
 			likes: user._id
+		},
+		$pull: {
+			dislikes: user._id
 		}
 	}, { new: true })
 )
@@ -428,6 +431,9 @@ export const dislikeComment = (user: UserDocument, commentId: string) => (
 	Comment.findByIdAndUpdate(commentId, {
 		$addToSet: {
 			dislikes: user._id
+		},
+		$pull: {
+			likes: user._id
 		}
 	}, { new: true })
 )
