@@ -1,3 +1,4 @@
+import mongoose from 'mongoose'
 import HttpStatusCodes from 'http-status-codes'
 import Iyzipay from 'iyzipay'
 
@@ -13,6 +14,7 @@ import {
 	Comment
 } from '../models'
 import Cart from '../models/Cart'
+import OrderStatus from '../enums/order-status-enum'
 
 const iyzipay = new Iyzipay({
 	apiKey: 'sandbox-hbjzTU7CZDxarIUKVMhWLvHOIMIb3Z40',
@@ -139,7 +141,103 @@ export const saveAddressToDatabase = (userId: string, address: any) => (
 )
 
 export const getOrders = (phoneNumber: string) => (
-	Order.find({ phoneNumber }).sort({ _id: -1 })
+	Order.aggregate([
+		{
+			$match: {
+				phoneNumber
+			}
+		},
+		{
+			$unwind: {
+				path: '$returnItems',
+				preserveNullAndEmptyArrays: true
+			}
+		},
+		{
+			$addFields: {
+				returnQuantity: '$returnItems.quantity'
+			}
+		},
+		{
+			$lookup: {
+				from: Product.collection.name,
+				localField: 'returnItems._id',
+				foreignField: '_id',
+				as: 'returnItems'
+			}
+		},
+		{
+			$addFields: {
+				returnItems: {
+					$arrayElemAt: ['$returnItems', 0]
+				}
+			}
+		},
+		{
+			$addFields: {
+				currentProduct: {
+					$filter: {
+						input: '$products',
+						as: 'product',
+						cond: {
+							$eq: ['$$product._id', '$returnItems._id']
+						}
+					}
+				}
+			}
+		},
+		{
+			$addFields: {
+				currentProduct: {
+					$arrayElemAt: ['$currentProduct', 0]
+				}
+			}
+		},
+		{
+			$addFields: {
+				returnItems: {
+					quantity: '$returnQuantity',
+					paidPrice: '$currentProduct.paidPrice'
+				}
+			}
+		},
+		{
+			$group: {
+				_id: '$_id',
+				status: { $first: '$status' },
+				date: { $first: '$date' },
+				message: { $first: '$message' },
+				paidPrice: { $first: '$paidPrice' },
+				products: { $first: '$products' },
+				returnItemsTotalPayback: {
+					$sum: {
+						$multiply: ['$returnItems.paidPrice', '$returnItems.quantity']
+					}
+				},
+				returnItems: {
+					$push: '$returnItems'
+				}
+			}
+		},
+		{
+			$addFields: {
+				returnItems: {
+					$filter: {
+						input: '$returnItems',
+						as: 'returnItem',
+						cond: {
+							$gt: ['$$returnItem._id', null]
+						}
+					}
+				}
+			}
+		},
+		{
+			$sort: {
+				_id: -1
+			}
+		}
+	])
 )
 
 export const getFavoriteProductsFromDatabase = (userId: string) => (
@@ -369,7 +467,109 @@ export const completePayment = (user: UserDocument, cart: any, address: string, 
 )
 
 export const getOrderById = (orderId: string) => (
-	Order.findById(orderId)
+	Order.aggregate([
+		{
+			$match: {
+				_id: mongoose.Types.ObjectId(orderId)
+			}
+		},
+		{
+			$unwind: {
+				path: '$returnItems',
+				preserveNullAndEmptyArrays: true
+			}
+		},
+		{
+			$addFields: {
+				returnQuantity: '$returnItems.quantity'
+			}
+		},
+		{
+			$lookup: {
+				from: Product.collection.name,
+				localField: 'returnItems._id',
+				foreignField: '_id',
+				as: 'returnItems'
+			}
+		},
+		{
+			$addFields: {
+				returnItems: {
+					$arrayElemAt: ['$returnItems', 0]
+				}
+			}
+		},
+		{
+			$addFields: {
+				currentProduct: {
+					$filter: {
+						input: '$products',
+						as: 'product',
+						cond: {
+							$eq: ['$$product._id', '$returnItems._id']
+						}
+					}
+				}
+			}
+		},
+		{
+			$addFields: {
+				currentProduct: {
+					$arrayElemAt: ['$currentProduct', 0]
+				}
+			}
+		},
+		{
+			$addFields: {
+				returnItems: {
+					quantity: '$returnQuantity',
+					paidPrice: '$currentProduct.paidPrice'
+				}
+			}
+		},
+		{
+			$group: {
+				_id: '$_id',
+				status: { $first: '$status' },
+				date: { $first: '$date' },
+				customer: { $first: '$customer' },
+				address: { $first: '$address' },
+				message: { $first: '$message' },
+				paidPrice: { $first: '$paidPrice' },
+				products: { $first: '$products' },
+				returnItemsTotalPayback: {
+					$sum: {
+						$multiply: ['$returnItems.paidPrice', '$returnItems.quantity']
+					}
+				},
+				returnItems: {
+					$push: '$returnItems'
+				}
+			}
+		},
+		{
+			$addFields: {
+				returnItems: {
+					$filter: {
+						input: '$returnItems',
+						as: 'returnItem',
+						cond: {
+							$gt: ['$$returnItem._id', null]
+						}
+					}
+				}
+			}
+		},
+		{
+			$sort: {
+				_id: -1
+			}
+		}
+	])
+)
+
+export const returnItems = (orderId: string, returnItems: any[]) => (
+	Order.findByIdAndUpdate(orderId, { returnItems, status: OrderStatus.RETURNED }, { new: true })
 )
 
 export const saveComment = (user: UserDocument, body: {

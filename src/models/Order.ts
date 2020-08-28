@@ -1,6 +1,7 @@
 import mongoose, { Document, Schema } from 'mongoose'
 
 import Product, { ProductDocument } from './Product'
+import OrderStatus from '../enums/order-status-enum'
 
 export type OrderDocument = Document & {
 	id: string,
@@ -9,10 +10,13 @@ export type OrderDocument = Document & {
 	address: string,
 	date: Date,
 	products: ProductDocument[],
-	status: boolean,
-	trackingNumber: string,
-	cancellationReason: string,
-	paidPrice: number
+	status: OrderStatus,
+	message: string,
+	paidPrice: number,
+	returnItems: [{
+		_id: Schema.Types.ObjectId,
+		quantity: number
+	}]
 }
 
 const orderSchema = new Schema({
@@ -55,21 +59,28 @@ const orderSchema = new Schema({
 		required: true
 	},
 	status: {
-		type: Boolean,
-		default: null
+		type: Number,
+		enum: Object.values(OrderStatus).filter((status) => typeof status === 'number'),
+		default: 0
 	},
-	trackingNumber: {
-		type: String,
-		default: null
-	},
-	cancellationReason: {
+	message: {
 		type: String,
 		default: null
 	},
 	paidPrice: {
 		type: Number,
-		required: 0
-	}
+		required: true
+	},
+	returnItems: [{
+		_id: {
+			type: Schema.Types.ObjectId,
+			required: true
+		},
+		quantity: {
+			type: Number,
+			required: true
+		}
+	}]
 }, {
 	timestamps: true
 })

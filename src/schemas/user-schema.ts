@@ -61,3 +61,10 @@ export const saveCommentSchema = Joi.object({
 })
 
 export const likeSchema = Joi.string().regex(/^[0-9a-fA-F]{24}$/).required()
+
+export const returnItemsSchema = Joi.array().min(1).items(
+	Joi.object({
+		_id: Joi.string().required(),
+		quantity: Joi.number().positive().required()
+	})
+).sparse(false).required()

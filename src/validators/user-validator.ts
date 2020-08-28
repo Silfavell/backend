@@ -11,7 +11,8 @@ import {
 	deletePaymentCardSchema,
 	favoriteProductSchema,
 	saveCommentSchema,
-	likeSchema
+	likeSchema,
+	returnItemsSchema
 } from '../schemas/user-schema'
 
 import { ProductDocument } from '../models'
@@ -39,3 +40,5 @@ export const validateDeletePaymentCardRequest = (card: any) => deletePaymentCard
 export const validateSaveComment = (body: any) => saveCommentSchema.validateAsync(body)
 
 export const validateLike = (body: any) => likeSchema.validateAsync(body)
+
+export const validatePostReturnItems = (returnItems: any[]) => returnItemsSchema.validateAsync(returnItems)

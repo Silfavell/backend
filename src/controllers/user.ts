@@ -32,7 +32,8 @@ import {
 	likeComment,
 	dislikeComment,
 	removeLikeComment,
-	removeDislikeComment
+	removeDislikeComment,
+	returnItems
 } from '../services/user'
 
 import {
@@ -50,7 +51,8 @@ import {
 	validateDeletePaymentCardRequest,
 	validateFavoriteProductRequest,
 	validateSaveComment,
-	validateLike
+	validateLike,
+	validatePostReturnItems
 } from '../validators/user-validator'
 
 const router = Router()
@@ -229,7 +231,7 @@ router.put('/change-password', (req, res, next) => {
 router.get('/order/:_id', (req, res, next) => {
 	getOrderById(req.params._id)
 		.then((order) => {
-			res.json(order)
+			res.json(order[0])
 		})
 		.catch((reason) => {
 			next(handleError(reason, 'GET /user/order/:_id'))
@@ -288,6 +290,17 @@ router.put('/remove-dislike-comment/:_id', (req, res, next) => {
 		})
 		.catch((reason) => {
 			next(handleError(reason, 'PUT /user/remove-dislike-comment/:_id'))
+		})
+})
+
+router.post('/return-items/:orderId', (req, res, next) => {
+	validatePostReturnItems(req.body)
+		.then(() => returnItems(req.params.orderId, req.body))
+		.then((result) => {
+			res.json(result)
+		})
+		.catch((reason) => {
+			next(handleError(reason, 'POST /user/return-items/:orderId'))
 		})
 })
 
