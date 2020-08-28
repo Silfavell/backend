@@ -382,6 +382,39 @@ export const getBestSellerMobileProducts = () => (
 	])
 )
 
+export const getMostSearchedMobileProducts = () => (
+	Product.aggregate([
+		{
+			$match: {
+				purchasable: true
+			}
+		},
+		{
+			$lookup: {
+				from: ProductVariables.collection.name,
+				localField: '_id',
+				foreignField: 'productId',
+				as: 'variables'
+			}
+		},
+		{
+			$addFields: {
+				variables: {
+					$arrayElemAt: ['$variables', 0]
+				}
+			}
+		},
+		{
+			$sort: {
+				'variables.timesSearched': -1
+			}
+		},
+		{
+			$limit: 20
+		}
+	])
+)
+
 export const getFilteredProductsWithCategories = (query: any) => {
 	const match: any = [
 		{
@@ -2200,6 +2233,18 @@ export const changePassword = (user: UserDocument, newPassword: string) => {
 export const saveTicket = (body: any) => (
 	new Ticket(body).save()
 )
+
+export const updateProductsSearchTimes = (productId: string, fromSearch: string) => {
+	if (fromSearch === 'true') {
+		return ProductVariables.findOneAndUpdate({ productId }, {
+			$inc: {
+				timesSearched: 1
+			}
+		})
+	}
+
+	return
+}
 
 export const handleError = (error: any, path: string): Error => {
 	if (error.httpCode) {

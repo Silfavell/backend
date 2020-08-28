@@ -18,6 +18,7 @@ import {
 	getProductsWithCategories,
 	getBestSellerProducts,
 	getBestSellerMobileProducts,
+	getMostSearchedMobileProducts,
 	getCategories,
 	addProductToCart,
 	isManagerVerified,
@@ -32,7 +33,8 @@ import {
 	productsFilterMobile,
 	validateObjectId,
 	setProductToCart,
-	saveTicket
+	saveTicket,
+	updateProductsSearchTimes
 } from '../services/unauthorized'
 
 import {
@@ -108,6 +110,15 @@ router.get('/best-seller-mobile', (req, res, next) => {
 	})
 })
 
+// FOR MOBILE
+router.get('/most-searched-mobile', (req, res, next) => {
+	getMostSearchedMobileProducts().then((products) => {
+		res.json(products)
+	}).catch((reason) => {
+		next(handleError(reason, 'GET /most-searched-mobile'))
+	})
+})
+
 // FOR WEB
 router.get('/filter-shop/:category?/:subCategory?', (req, res, next) => {
 	filterShop(req.query, req.params).then((shop) => {
@@ -167,7 +178,8 @@ router.put('/set-product/:_id', (req, res, next) => {
 
 router.get('/product/:slug', (req, res, next) => {
 	getProductAndWithColorGroup(req.params.slug)
-		.then((response: any) => {
+		.then((response: any) => updateProductsSearchTimes(response[0]?._id, req.query.fromSearch).then(() => response))
+		.then((response) => {
 			res.json(response[0])
 		})
 		.catch((reason) => {
