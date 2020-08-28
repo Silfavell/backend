@@ -107,17 +107,8 @@ export const getCategories = () => (
 	])
 )
 
-export const getProductsWithCategories = (query: any) => {
-	const match = []
-
-	if (query.brands) {
-		match.push({
-			$in: ['$brand', (typeof query.brands === 'string' ? [query.brands] : query.brands)]
-		})
-	}
-
-
-	return Category.aggregate([
+export const getProductsWithCategories = () => (
+	Category.aggregate([
 		{
 			$unwind: '$subCategories'
 		},
@@ -268,7 +259,7 @@ export const getProductsWithCategories = (query: any) => {
 			}
 		}
 	])
-}
+)
 
 export const getBestSellerProducts = () => (
 	Category.aggregate([
@@ -2243,7 +2234,7 @@ export const updateProductsSearchTimes = (productId: string, fromSearch: string)
 		})
 	}
 
-	return
+	return Promise.resolve()
 }
 
 export const handleError = (error: any, path: string): Error => {

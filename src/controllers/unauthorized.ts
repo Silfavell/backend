@@ -61,6 +61,7 @@ import {
 
 import ActivationCodes from '../enums/activation-code-enum'
 import { ProductDocument } from '../models'
+import { getCart, listCards } from '../services/user'
 
 const apiLimiter = rateLimit({
 	windowMs: 6 * 60 * 60 * 1000, // 6 Hours
@@ -76,6 +77,39 @@ router.get('/version', (req, res, next) => {
 	res.json('1.0.0')
 })
 
+router.get('/mobile-initializer', (req, res, next) => {
+	const arr: any = [getCategories(), getProductsWithCategories(), getBestSellerMobileProducts(), getMostSearchedMobileProducts()]
+
+	if (req.user) {
+		arr.push(
+			getCart(req.user._id.toString()),
+			listCards(req.user.cardUserKey)
+		)
+	}
+
+	Promise.all(arr).then((results) => {
+		if (req.user) {
+			res.json({
+				categories: results[0],
+				products: results[1],
+				bestSeller: results[2],
+				mostSearched: results[3],
+				cart: results[4],
+				cards: results[5]
+			})
+		} else {
+			res.json({
+				categories: results[0],
+				products: results[1],
+				bestSeller: results[2],
+				mostSearched: results[3]
+			})
+		}
+	}).catch((reason) => {
+		next(handleError(reason, 'GET /mobile-initializer'))
+	})
+})
+
 router.get('/categories', (req, res, next) => {
 	getCategories().then((categories) => {
 		res.json(categories)
@@ -85,7 +119,7 @@ router.get('/categories', (req, res, next) => {
 })
 
 router.get('/products-with-categories', (req, res, next) => {
-	getProductsWithCategories(req.query).then((products) => {
+	getProductsWithCategories().then((products) => {
 		res.json(products)
 	}).catch((reason) => {
 		next(handleError(reason, 'GET /products-with-categories'))
@@ -178,6 +212,7 @@ router.put('/set-product/:_id', (req, res, next) => {
 
 router.get('/product/:slug', (req, res, next) => {
 	getProductAndWithColorGroup(req.params.slug)
+		// @ts-ignore
 		.then((response: any) => updateProductsSearchTimes(response[0]?._id, req.query.fromSearch).then(() => response))
 		.then((response) => {
 			res.json(response[0])
