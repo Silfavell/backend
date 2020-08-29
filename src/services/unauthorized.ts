@@ -164,8 +164,20 @@ export const getProductsWithCategories = () => (
 			$unwind: '$products'
 		},
 		{
+			$addFields: {
+				'products.sortPrice': '$products.discountedPrice'
+			}
+		},
+		{
+			$addFields: {
+				'products.sortPrice': {
+					$ifNull: ['$products.sortPrice', '$products.price']
+				}
+			}
+		},
+		{
 			$sort: {
-				'products.price': 1
+				'products.sortPrice': 1
 			}
 		},
 		{
@@ -194,11 +206,16 @@ export const getProductsWithCategories = () => (
 		{
 			$addFields: {
 				minPrice: {
-					$floor: '$minPrice.price'
+					$floor: '$minPrice.sortPrice'
 				},
 				maxPrice: {
-					$ceil: '$maxPrice.price'
+					$ceil: '$maxPrice.sortPrice'
 				}
+			}
+		},
+		{
+			$project: {
+				'products.sortPrice': 0
 			}
 		},
 		/** MAX,MIN PRICE */
@@ -737,8 +754,20 @@ export const productsFilterMobile = (query: any) => {
 			$unwind: '$productsToGetPriceFilter'
 		},
 		{
+			$addFields: {
+				'productsToGetPriceFilter.sortPrice': '$productsToGetPriceFilter.discountedPrice'
+			}
+		},
+		{
+			$addFields: {
+				'productsToGetPriceFilter.sortPrice': {
+					$ifNull: ['$productsToGetPriceFilter.sortPrice', '$productsToGetPriceFilter.price']
+				}
+			}
+		},
+		{
 			$sort: {
-				'productsToGetPriceFilter.price': 1
+				'productsToGetPriceFilter.sortPrice': 1
 			}
 		},
 		{
@@ -761,8 +790,13 @@ export const productsFilterMobile = (query: any) => {
 		},
 		{
 			$addFields: {
-				minPrice: '$minPrice.price',
-				maxPrice: '$maxPrice.price'
+				minPrice: '$minPrice.sortPrice',
+				maxPrice: '$maxPrice.sortPrice'
+			}
+		},
+		{
+			$project: {
+				'productsToGetPriceFilter.sortPrice': 0
 			}
 		},
 		{
@@ -1758,8 +1792,20 @@ export const filterShop = (query: any, params: any) => {
 
 		/** MAX,MIN PRICE */
 		{
+			$addFields: {
+				'products.sortPrice': '$products.discountedPrice'
+			}
+		},
+		{
+			$addFields: {
+				'products.sortPrice': {
+					$ifNull: ['$products.sortPrice', '$products.price']
+				}
+			}
+		},
+		{
 			$sort: {
-				'products.price': 1
+				'products.sortPrice': 1
 			}
 		},
 		{
@@ -1785,11 +1831,16 @@ export const filterShop = (query: any, params: any) => {
 		{
 			$addFields: {
 				minPrice: {
-					$floor: '$minPrice.price'
+					$floor: '$minPrice.sortPrice'
 				},
 				maxPrice: {
-					$ceil: '$maxPrice.price'
+					$ceil: '$maxPrice.sortPrice'
 				}
+			}
+		},
+		{
+			$project: {
+				'products.sortPrice': 0
 			}
 		},
 		/** MAX,MIN PRICE */
