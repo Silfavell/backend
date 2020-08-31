@@ -4,8 +4,7 @@ import fileUpload from 'express-fileupload'
 
 import {
 	Manager,
-	Admin,
-	ProductDocument
+	Admin
 } from '../models'
 
 import { validateAuthority } from '../middlewares/auth-middleware'
@@ -34,6 +33,8 @@ import {
 	saveCategoryToDatabase,
 	deleteCategoryFromDatabase,
 	verifyManager,
+	unverifyManager,
+	deleteManager,
 	indexProduct,
 	saveSubCategoryToDatabase,
 	deleteSubCategoryFromDatabase,
@@ -145,6 +146,26 @@ router.put('/verify-manager/:_id', (req, res, next) => {
 		})
 		.catch((reason) => {
 			next(handleError(reason, 'PUT /admin/verify-manager/:_id'))
+		})
+})
+
+router.put('/unverify-manager/:_id', (req, res, next) => {
+	unverifyManager(req.params._id)
+		.then((manager) => {
+			res.json(manager)
+		})
+		.catch((reason) => {
+			next(handleError(reason, 'PUT /admin/unverify-manager/:_id'))
+		})
+})
+
+router.delete('/delete-manager/:_id', (req, res, next) => {
+	deleteManager(req.params._id)
+		.then((manager) => {
+			res.json(manager)
+		})
+		.catch((reason) => {
+			next(handleError(reason, 'DELETE /admin/delete-manager/:_id'))
 		})
 })
 

@@ -47,6 +47,14 @@ export const verifyManager = (managerId: string) => (
 	Manager.findByIdAndUpdate(managerId, { verified: true }, { new: true })
 )
 
+export const unverifyManager = (managerId: string) => (
+	Manager.findByIdAndUpdate(managerId, { verified: false }, { new: true })
+)
+
+export const deleteManager = (managerId: string) => (
+	Manager.findByIdAndDelete(managerId)
+)
+
 export const saveCategoryToDatabase = (categoryContext: CategoryDocument) => (
 	new Category(categoryContext).save()
 )
