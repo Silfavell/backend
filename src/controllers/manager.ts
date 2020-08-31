@@ -73,7 +73,7 @@ router.put('/orders/cancel-return/:_id', (req, res, next) => {
 	validateCancelReturn(req.body)
 		.then(() => updateOrderStatus(req.params._id, OrderStatus.RETURN_DENIED, req.body.message))
 		.then((order) => {
-			sendSms(`9${order.phoneNumber.split(' ').join('')}`, `${getLocalDate(order.date)} Tarihinde verdiginiz siparis iadesi, ${req.body.message} nedeniyle iptal edilmistir. Anlayisiniz icin tesekkurler.`) // TODO PUSH NOTIFICATION
+			sendSms(`9${order.phoneNumber.split(' ').join('')}`, `${getLocalDate(order.date)} Tarihinde verdiginiz iade talebi, ${req.body.message} nedeniyle reddedilmistir edilmistir. Anlayisiniz icin tesekkurler.`) // TODO PUSH NOTIFICATION
 			res.json(order)
 		})
 		.catch((reason) => {
@@ -85,7 +85,7 @@ router.put('/orders/accept-return/:_id', (req, res, next) => {
 	validateConfirmReturn(req.body)
 		.then(() => updateOrderStatus(req.params._id, OrderStatus.RETURN_ACCEPTED))
 		.then((order) => {
-			sendSms(`9${order.phoneNumber.split(' ').join('')}`, `${getLocalDate(order.date)} Tarihinde verdiginiz siparis, Yurtici Kargoya verilmistir, Kargo takip numarası : ${req.body.message}`) // TODO PUSH NOTIFICATION
+			sendSms(`9${order.phoneNumber.split(' ').join('')}`, `${getLocalDate(order.date)} Tarihinde verdiginiz iade talebi onaylanmistir. Iade en kisa sure icerisinde hesabiniza aktarilacaktir.`) // TODO PUSH NOTIFICATION
 			res.json(order)
 		})
 		.catch((reason) => {
