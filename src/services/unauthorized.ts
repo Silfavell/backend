@@ -1241,7 +1241,14 @@ const getListSpecificationsStages = (query: any) => {
 		{
 			$match: {
 				$expr: {
-					$eq: ['$specifications.name', '$_id']
+					$or: [
+						{
+							$eq: ['$specifications.name', '$_id']
+						},
+						{
+							$lte: ['$specifications.name', null]
+						}
+					]
 				}
 			}
 		},
@@ -1274,6 +1281,19 @@ const getListSpecificationsStages = (query: any) => {
 						name: '$_id',
 						slug: '$slug',
 						values: '$values'
+					}
+				}
+			}
+		},
+		{
+			$addFields: {
+				specifications: {
+					$filter: {
+						input: '$specifications',
+						as: 'specification',
+						cond: {
+							$gt: ['$$specification.name', null]
+						}
 					}
 				}
 			}
@@ -1334,7 +1354,15 @@ const getSortSpecificationsStages = (): any[] => ([
 	{
 		$addFields: {
 			root: {
-				specifications: '$specifications'
+				specifications: {
+					$filter: {
+						input: '$specifications',
+						as: 'specification',
+						cond: {
+							$gt: ['$specification.values.0', null]
+						}
+					}
+				}
 			}
 		}
 	},
