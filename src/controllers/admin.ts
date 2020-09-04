@@ -243,8 +243,8 @@ router.put('/sub-category', (req, res, next) => {
 })
 
 router.post('/product', (req, res, next) => {
-	if (req.files) {
-		req.body.imageCount = Object.keys(req.files).length
+	if (req.files.images) {
+		req.body.imageCount = Object.keys(req.files.images).length
 	}
 
 	if (req.body.color) {
@@ -267,8 +267,8 @@ router.post('/product', (req, res, next) => {
 		.then((product) => updateCategoryOfProduct(product))
 		.then((product) => indexProduct(product).then(() => product))
 		.then((product) => {
-			if (req.files) {
-				saveProductImages(product, Object.values(req.files))
+			if (req.files.images) {
+				saveProductImages(product, Object.values(req.files.images))
 			}
 			res.json(product)
 		})

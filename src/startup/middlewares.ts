@@ -9,7 +9,7 @@ import path from 'path'
 import 'winston-daily-rotate-file'
 
 export default (app: Application) => {
-	app.use('/api',express.static(path.join(__dirname, '../../public')))
+	app.use('/api', express.static(path.join(__dirname, '../../public')))
 	app.use(cors())
 	app.use(helmet())
 	app.use(compression())
