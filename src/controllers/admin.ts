@@ -312,17 +312,19 @@ router.put('/product/:_id', (req, res, next) => {
 		})
 })
 
-router.delete('/product/:_id', (req, res, next) => {
-	validateObjectId(req.params._id)
-		.then(() => deleteProductFromDatabase(req.params._id))
-		.then((product) => removeProductFromSearch(product))
-		.then(() => {
-			res.json()
-		})
-		.catch((reason) => {
-			next(handleError(reason, 'DELETE /admin/product/:_id'))
-		})
-})
+/*
+	router.delete('/product/:_id', (req, res, next) => {
+		validateObjectId(req.params._id)
+			.then(() => deleteProductFromDatabase(req.params._id))
+			.then((product) => removeProductFromSearch(product))
+			.then(() => {
+				res.json()
+			})
+			.catch((reason) => {
+				next(handleError(reason, 'DELETE /admin/product/:_id'))
+			})
+	})
+*/
 
 router.get('/types', (req, res, next) => {
 	getTypes()

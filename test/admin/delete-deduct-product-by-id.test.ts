@@ -2,7 +2,7 @@ import request from 'supertest'
 
 import app from '../../src/app'
 
-export default () => describe('DELETE /admin/product/:_id', () => {
+export default () => describe('DELETE /admin/deduct-product/:_id', () => {
 	it('correct', (done) => (
 		request(app)
 			.delete(`/api/admin/deduct-product/${JSON.parse(process.env.testProduct)._id}`)

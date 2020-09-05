@@ -6,7 +6,7 @@ import postProductTests from './post-product.test'
 import putProductByIdTests from './put-product-by-id.test'
 import putVerifyManagerTests from './put-verify-manager.test'
 import deleteCategoryByIdTests from './delete-category-by-id.test'
-import deleteProductByIdTests from './delete-product-by-id.test'
+import deleteDeductProductByIdTests from './delete-deduct-product-by-id.test'
 import postSubCategoryTests from './post-sub-category.test'
 import getTicketsTests from './get-tickets.test'
 
@@ -19,7 +19,7 @@ export default () => describe('admin', () => {
 	postProductTests()
 	deleteCategoryByIdTests()
 	putProductByIdTests()
-	deleteProductByIdTests()
+	deleteDeductProductByIdTests()
 	putVerifyManagerTests()
 	getTicketsTests()
 })
