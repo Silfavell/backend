@@ -2012,6 +2012,11 @@ export const getProductAndWithColorGroup = (slug: string) => (
 			}
 		},
 		{
+			$sort: {
+				'group.color.name': 1
+			}
+		},
+		{
 			$group: {
 				_id: '$_id',
 				root: { $first: '$$ROOT' },
