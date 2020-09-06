@@ -1,6 +1,6 @@
 import mongoose, { Document, Schema } from 'mongoose'
 import ProductSpecification, { ProductSpecificationDocument } from './ProductSpecification'
-import ProductVariables, { ProductVariablesDocument } from './ProductVariables'
+import ProductVariables from './ProductVariables'
 
 export type ProductDocument = Document & {
 	categoryId: string,
@@ -91,9 +91,7 @@ const productSchema = new Schema({
 		}
 	},
 	colorGroup: {
-		type: Schema.Types.ObjectId,
-		required: true,
-		default: mongoose.Types.ObjectId()
+		type: Schema.Types.ObjectId
 	}
 })
 
@@ -104,6 +102,7 @@ productSchema.pre('save', function (next) {
 		// eslint-disable-next-line no-use-before-define
 		Product.find().sort({ image: -1 }).limit(1).then((total: ProductDocument[]) => {
 			product.image = total.length === 0 ? 1 : total[0].image + 1
+			product.colorGroup = product._id
 		}).then(() => {
 			new ProductVariables({ productId: product._id }).save().then(() => {
 				next()
