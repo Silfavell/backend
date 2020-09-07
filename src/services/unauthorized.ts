@@ -1984,11 +1984,80 @@ export const getProductAndWithColorGroup = (slug: string) => (
 				slug
 			}
 		},
+
+		/** SORT SPECS */
+		{
+			$unwind: '$specifications'
+		},
+		{
+			$sort: {
+				'specifications.slug': 1
+			}
+		},
+		{
+			$group: {
+				_id: '$_id',
+				root: { $first: '$$ROOT' },
+				specifications: {
+					$push: '$specifications'
+				}
+			}
+		},
+		{
+			$addFields: {
+				'root.specifications': '$specifications'
+			}
+		},
+		{
+			$replaceRoot: {
+				newRoot: '$root'
+			}
+		},
+		/** SORT SPECS */
+
 		{
 			$lookup: {
 				from: Product.collection.name,
-				localField: 'colorGroup',
-				foreignField: 'colorGroup',
+				let: { colorGroup: '$colorGroup' },
+				pipeline: [
+					{
+						$match: {
+							$expr: {
+								$eq: ['$colorGroup', '$$colorGroup']
+							}
+						}
+					},
+
+					/** SORT SPECS */
+					{
+						$unwind: '$specifications'
+					},
+					{
+						$sort: {
+							'specifications.slug': 1
+						}
+					},
+					{
+						$group: {
+							_id: '$_id',
+							root: { $first: '$$ROOT' },
+							specifications: {
+								$push: '$specifications'
+							}
+						}
+					},
+					{
+						$addFields: {
+							'root.specifications': '$specifications'
+						}
+					},
+					{
+						$replaceRoot: {
+							newRoot: '$root'
+						}
+					}
+					/** SORT SPECS */
+				],
 				as: 'group'
 			}
 		},
