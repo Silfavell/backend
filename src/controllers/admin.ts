@@ -244,6 +244,9 @@ router.put('/sub-category', (req, res, next) => {
 
 router.post('/product', (req, res, next) => {
 	if (req.files?.images) {
+		if(!Array.isArray(req.files.images)){
+			req.files.images = [req.files.images]
+		}
 		req.body.imageCount = Object.keys(req.files.images).length
 	}
 
