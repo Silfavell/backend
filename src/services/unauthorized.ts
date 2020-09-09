@@ -1,7 +1,7 @@
 import mongoose from 'mongoose'
 import jwt from 'jsonwebtoken'
 import HttpStatusCodes from 'http-status-codes'
-import Nexmo from 'nexmo'
+import axios from 'axios'
 
 import { Elasticsearch } from '../startup'
 import ServerError from '../errors/ServerError'
@@ -34,14 +34,13 @@ import Cart, { CartDocument } from '../models/Cart'
 import ProductSort from '../enums/product-sort-enum'
 
 export const sendSms = (to: string, message: string) => {
-	const smsManager: any = new Nexmo({
-		apiKey: '14efe668',
-		apiSecret: 'ivcyJQr7tWmvT4yP',
-	})
+	const xml = 'data=<sms><kno>' + process.env.SMS_USER_NO + '</kno><kulad>' + process.env.SMS_USERNAME + '</kulad><sifre>' + process.env.SMS_API_KEY + '</sifre>' +
+		'<gonderen>' + process.env.SMS_SENDER_PHONE + '</gonderen>' +
+		'<mesaj>' + message + '</mesaj>' +
+		'<numaralar>' + to + '</numaralar>' +
+		'<tur>' + 'Normal' + '</tur></sms>'
 
-	const from = 'Silfavell'
-
-	smsManager.message.sendSms(from, to, message)
+	axios.post(process.env.SMS_URL, xml, { headers: { 'content-type': 'application/x-www-form-urlencoded' } })
 }
 
 export const getCategories = () => (
@@ -2314,7 +2313,7 @@ export const createActivationCode = (phoneNumber: string, activationCodeType: Ac
 
 export const sendActivationCode = (phoneNumber: string, activationCode: number) => (
 	new Promise((resolve) => {
-		sendSms(`9${phoneNumber.split(' ').join('')}`, `Onay kodu: ${activationCode}`)
+		sendSms(`9${phoneNumber.split(' ').join('')}`, `Silfavell Onay kodunuz: ${activationCode}`)
 		resolve()
 	})
 )
