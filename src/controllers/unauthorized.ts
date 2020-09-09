@@ -74,7 +74,7 @@ router.use(validateAuthority(Authority.ANONIM))
 router.use(validatePhone())
 
 router.get('/version', (req, res, next) => {
-	res.json('1.0.0')
+	res.json('1.0.1')
 })
 
 router.get('/mobile-initializer', (req, res, next) => {
