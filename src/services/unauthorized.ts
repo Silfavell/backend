@@ -1986,7 +1986,10 @@ export const getProductAndWithColorGroup = (slug: string) => (
 
 		/** SORT SPECS */
 		{
-			$unwind: '$specifications'
+			$unwind: {
+				path: '$specifications',
+				preserveNullAndEmptyArrays: true
+			}
 		},
 		{
 			$sort: {
@@ -2061,7 +2064,17 @@ export const getProductAndWithColorGroup = (slug: string) => (
 			}
 		},
 		{
-			$unwind: '$group'
+			$addFields: {
+				groupSize: {
+					$size: '$group'
+				}
+			}
+		},
+		{
+			$unwind: {
+				path: '$group',
+				preserveNullAndEmptyArrays: true
+			}
 		},
 		{
 			$match: {
@@ -2074,6 +2087,11 @@ export const getProductAndWithColorGroup = (slug: string) => (
 					{
 						'group.slug': { // TODO Test
 							$eq: slug
+						}
+					},
+					{
+						'groupSize': {
+							$eq: 0
 						}
 					}
 				]
@@ -2128,6 +2146,11 @@ export const getProductAndWithColorGroup = (slug: string) => (
 						}
 					}
 				}
+			}
+		},
+		{
+			$project: {
+				groupSize: 0
 			}
 		}
 	])
