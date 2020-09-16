@@ -1,7 +1,7 @@
 import fs from 'fs'
-import { Elasticsearch } from '../startup'
 import HttpStatusCodes from 'http-status-codes'
 
+import { Elasticsearch } from '../startup'
 import {
 	Product,
 	Category,
@@ -16,6 +16,7 @@ import {
 import Brand from '../models/Brand'
 import ServerError from '../errors/ServerError'
 import ErrorMessages from '../errors/ErrorMessages'
+import { search } from './unauthorized'
 
 const replaceProductId = (product: ProductDocument) => (
 	JSON.parse(JSON.stringify(product).split('"_id":').join('"id":')) // TODO ??
@@ -26,17 +27,18 @@ export const getSeoUrl = (name: string) => {
 		return name
 	}
 
-	return name.toString()               // Convert to string
-		.normalize('NFD')                // Change diacritics
+	return name.toString() // Convert to string
+		.normalize('NFD') // Change diacritics
 		.replace(/[\u0300-\u036f]/g, '') // Remove illegal characters
-		.replace(/\s+/g, '-')            // Change whitespace to dashes
-		.split('ı').join('i')
-		.toLowerCase()                   // Change to lowercase
-		.replace(/&/g, '-and-')          // Replace ampersand
-		.replace(/[^a-z0-9\-]/g, '')     // Remove anything that is not a letter, number or dash
-		.replace(/-+/g, '-')             // Remove duplicate dashes
-		.replace(/^-*/, '')              // Remove starting dashes
-		.replace(/-*$/, '')             // Remove trailing dashes
+		.replace(/\s+/g, '-') // Change whitespace to dashes
+		.split('ı')
+		.join('i')
+		.toLowerCase() // Change to lowercase
+		.replace(/&/g, '-and-') // Replace ampersand
+		.replace(/[^a-z0-9\-]/g, '') // Remove anything that is not a letter, number or dash
+		.replace(/-+/g, '-') // Remove duplicate dashes
+		.replace(/^-*/, '') // Remove starting dashes
+		.replace(/-*$/, '') // Remove trailing dashes
 }
 
 export const getTickets = () => (
@@ -171,9 +173,13 @@ export const indexProduct = (product: ProductDocument) => {
 			// refresh: true,
 			body: replaceProductId(product)
 		})
-	} else {
-		return removeProductFromSearch(product)
 	}
+	
+	return search(product.name).then((result) => {
+		if (result.body.hits.total > 0) {
+			return removeProductFromSearch(product)
+		}
+	})
 }
 
 export const removeProductFromSearch = (product: ProductDocument) => (

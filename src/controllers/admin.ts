@@ -244,7 +244,7 @@ router.put('/sub-category', (req, res, next) => {
 
 router.post('/product', (req, res, next) => {
 	if (req.files?.images) {
-		if(!Array.isArray(req.files.images)){
+		if (!Array.isArray(req.files.images)) {
 			req.files.images = [req.files.images]
 		}
 		req.body.imageCount = Object.keys(req.files.images).length
@@ -252,6 +252,10 @@ router.post('/product', (req, res, next) => {
 
 	if (req.body.color) {
 		req.body.color = JSON.parse(req.body.color)
+	}
+
+	if (req.body.purchasable) {
+		req.body.purchasable = req.body.purchasable === 'true'
 	}
 
 	if (req.body.specifications) {
