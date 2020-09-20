@@ -1358,7 +1358,7 @@ const getSortSpecificationsStages = (): any[] => ([
 						input: '$specifications',
 						as: 'specification',
 						cond: {
-							$gt: ['$$specification.values.0', null]
+							$gt: ['$$specification.name', null]
 						}
 					}
 				}
