@@ -2033,7 +2033,10 @@ export const getProductAndWithColorGroup = (slug: string) => (
 
 					/** SORT SPECS */
 					{
-						$unwind: '$specifications'
+						$unwind: {
+							path: '$specifications',
+							preserveNullAndEmptyArrays: true
+						}
 					},
 					{
 						$sort: {
