@@ -1358,7 +1358,7 @@ const getSortSpecificationsStages = (): any[] => ([
 						input: '$specifications',
 						as: 'specification',
 						cond: {
-							$gt: ['$specification.values.0', null]
+							$gt: ['$$specification.values.0', null]
 						}
 					}
 				}
@@ -1870,6 +1870,11 @@ export const filterShop = (query: any, params: any) => {
 				'products.sortPrice': 0
 			}
 		},
+		{
+			$addFields: {
+				productsLength: { $size: '$products' }
+			}
+		},
 		/** MAX,MIN PRICE */
 
 		{
@@ -1884,12 +1889,8 @@ export const filterShop = (query: any, params: any) => {
 				specifications: { $first: '$specifications' },
 				brands: { $first: '$brands' },
 				minPrice: { $first: '$minPrice' },
-				maxPrice: { $first: '$maxPrice' }
-			}
-		},
-		{
-			$addFields: {
-				productsLength: { $size: '$products' }
+				maxPrice: { $first: '$maxPrice' },
+				productsLength: { $first: '$productsLength' }
 			}
 		}
 	]).then((res) => setUnmatchedFilters(res[0], query))
@@ -2032,7 +2033,10 @@ export const getProductAndWithColorGroup = (slug: string) => (
 
 					/** SORT SPECS */
 					{
-						$unwind: '$specifications'
+						$unwind: {
+							path: '$specifications',
+							preserveNullAndEmptyArrays: true
+						}
 					},
 					{
 						$sort: {
