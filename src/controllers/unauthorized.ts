@@ -15,6 +15,7 @@ import {
 	getSingleProduct,
 	getProductAndWithColorGroup,
 	getRelatedProducts,
+	getProducts,
 	getProductsWithCategories,
 	getBestSellerProducts,
 	getBestSellerMobileProducts,
@@ -115,6 +116,14 @@ router.get('/categories', (req, res, next) => {
 		res.json(categories)
 	}).catch((reason) => {
 		next(handleError(reason, 'GET /categories'))
+	})
+})
+
+router.get('/products', (req, res, next) => {
+	getProducts().then((products) => {
+		res.json(products)
+	}).catch((reason) => {
+		next(handleError(reason, 'GET /products'))
 	})
 })
 
