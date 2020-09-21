@@ -106,6 +106,10 @@ export const getCategories = () => (
 	])
 )
 
+export const getProducts = () => (
+	Product.find()
+)
+
 export const getProductsWithCategories = () => (
 	Category.aggregate([
 		{
