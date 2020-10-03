@@ -1,5 +1,6 @@
 import fs from 'fs'
 import HttpStatusCodes from 'http-status-codes'
+import sharp from 'sharp'
 
 import { Elasticsearch } from '../startup'
 import {
@@ -157,10 +158,10 @@ export const updateCategoryOfProduct = (product: ProductDocument) => (
 )
 
 export const saveProductImages = (product: ProductDocument, images: any[]) => {
+	sharp(images[0].data).resize(300, 300).toFile(`./public/assets/products/${product.slug}_300x300.webp`)
+
 	images.map((image, index) => {
-		fs.writeFile(`./public/assets/products/${product.image}-${index}.webp`, image.data, 'binary', (err) => {
-			if (err) throw err
-		})
+		sharp(image.data).toFile(`./public/assets/products/${product.slug}_${index}_940x940.webp`)
 	})
 }
 
@@ -174,7 +175,7 @@ export const indexProduct = (product: ProductDocument) => {
 			body: replaceProductId(product)
 		})
 	}
-	
+
 	return search(product.name).then((result) => {
 		if (result.body.hits.total > 0) {
 			return removeProductFromSearch(product)
