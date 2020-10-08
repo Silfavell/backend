@@ -1,10 +1,10 @@
 import mongoose from 'mongoose'
 import HttpStatusCodes from 'http-status-codes'
-import Iyzipay from 'iyzipay'
-
 import ErrorMessages from '../errors/ErrorMessages'
 import ServerError from '../errors/ServerError'
+import Iyzipay from 'iyzipay'
 
+import PaymentProvider from './payment-provider'
 import {
 	User, Order,
 	UserDocument,
@@ -15,12 +15,6 @@ import {
 } from '../models'
 import Cart from '../models/Cart'
 import OrderStatus from '../enums/order-status-enum'
-
-const iyzipay = new Iyzipay({
-	apiKey: 'sandbox-hbjzTU7CZDxarIUKVMhWLvHOIMIb3Z40',
-	secretKey: 'sandbox-F01xQT4VMHAdFDB4RFNgo2l0kMImhCPX',
-	uri: 'https://sandbox-api.iyzipay.com'
-})
 
 export const updateUser = (userId: string, userContext: any) => (
 	User.findByIdAndUpdate(userId, userContext, { new: true })
@@ -308,7 +302,7 @@ export const removeFavoriteProductFromDatabase = (userId: string, _id: string) =
 
 export const createPaymentUserWithCard = (user: UserDocument, card: any) => (
 	new Promise((resolve, reject) => {
-		iyzipay.card.create({
+		PaymentProvider.getClient().card.create({
 			locale: Iyzipay.LOCALE.TR,
 			email: user.email,
 			gsmNumber: user.phoneNumber,
@@ -326,7 +320,7 @@ export const createPaymentUserWithCard = (user: UserDocument, card: any) => (
 
 export const addNewCard = (cardUserKey: string, card: any) => (
 	new Promise((resolve, reject) => {
-		iyzipay.card.create({
+		PaymentProvider.getClient().card.create({
 			locale: Iyzipay.LOCALE.TR,
 			cardUserKey,
 			card
@@ -351,7 +345,7 @@ export const addCardToUser = (user: UserDocument, card: any) => {
 
 export const deleteCard = (user: UserDocument, cardToken: string) => (
 	new Promise((resolve, reject) => {
-		iyzipay.card.delete({
+		PaymentProvider.getClient().card.delete({
 			locale: Iyzipay.LOCALE.TR,
 			cardUserKey: user.cardUserKey,
 			cardToken
@@ -371,7 +365,7 @@ export const listCards = (cardUserKey: string) => (
 		if (!cardUserKey) {
 			resolve([])
 		}
-		iyzipay.cardList.retrieve({
+		PaymentProvider.getClient().cardList.retrieve({
 			locale: Iyzipay.LOCALE.TR,
 			cardUserKey
 		}, (error: any, result: any) => {
@@ -433,7 +427,7 @@ export const createPaymentWithRegisteredCard = (user: UserDocument, price: strin
 			basketItems
 		}
 
-		iyzipay.payment.create(request, (error: any, result: any) => {
+		PaymentProvider.getClient().payment.create(request, (error: any, result: any) => {
 			if (error) {
 				reject(error)
 			} if (result.status === 'failure') {

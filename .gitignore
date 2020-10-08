@@ -3,3 +3,5 @@
 /coverage
 /dist
 /public/assets/products
+# .env.production
+# .env.development

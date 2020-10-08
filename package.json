@@ -4,14 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "env NODE_ENV=prod npm run serve",
-    "start:dev": "set NODE_ENV=dev & ts-node-dev src/server.ts",
+    "start": "env NODE_ENV=production npm run serve",
+    "start:dev": "set NODE_ENV=development & ts-node-dev src/server.ts",
     "build": "npm run build-ts",
     "serve": "node dist/server.js",
     "build-ts": "tsc",
     "watch-ts": "tsc -w",
     "lint": "tsc --noEmit && eslint \"**/*.{js,ts}\" --quiet --fix",
-    "test": "set NODE_ENV=dev & jest -i test/index.test.ts --forceExit --coverage --verbose",
+    "test": "set NODE_ENV=development & jest -i test/index.test.ts --forceExit --coverage --verbose",
     "watch-test": "npm run test -- --watchAll"
   },
   "keywords": [],
