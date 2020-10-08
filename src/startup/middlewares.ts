@@ -62,7 +62,7 @@ export default (app: Application) => {
 		exitOnError: false
 	}
 
-	const logger = winston.createLogger(loggerOptions)
+	const Logger = winston.createLogger(loggerOptions)
 
 	winston.loggers.add('logger', loggerOptions)
 	winston.loggers.add('error-logger', errorLoggerOptions)
@@ -71,7 +71,7 @@ export default (app: Application) => {
 		morgan('combined', {
 			stream: {
 				write(message: string) {
-					logger.info(message)
+					Logger.info(message)
 				}
 			}
 		})

@@ -3,16 +3,14 @@ import dotenv from 'dotenv'
 import path from 'path'
 
 import {
-	middlewares, Mongo, Elasticsearch
+	middlewares,
+	Mongo,
+	Elasticsearch
 } from './startup'
 import controller from './controllers'
 import errorHandlerMiddleware from './middlewares/error-handler-middleware'
 
-if (process.env.NODE_ENV.trim() === 'dev') {
-	dotenv.config({ path: path.join(__dirname, '../.env') })
-} else {
-	dotenv.config({ path: path.join(__dirname, '../.production.env') })
-}
+dotenv.config({ path: path.join(__dirname, `../.env.${process.env.NODE_ENV.trim()}`) })
 
 const app = express()
 
