@@ -10,7 +10,9 @@ import 'winston-daily-rotate-file'
 
 export default (app: Application) => {
 	app.use('/api', express.static(path.join(__dirname, '../../public')))
-	app.use(cors())
+	app.use(cors({
+		origin: process.env.HOST
+	}))
 	app.use(helmet())
 	app.use(compression())
 	app.use(bodyParser.json())
