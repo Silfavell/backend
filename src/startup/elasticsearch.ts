@@ -74,6 +74,7 @@ class ElasticSearch {
 
 	private static putMapping = () => (
 		ElasticSearch.client.indices.putMapping({
+			include_type_name: true,
 			index,
 			type,
 			body: {
@@ -88,7 +89,7 @@ class ElasticSearch {
 		})
 	)
 
-	private static bootstrap = () => (
+	private static bootstrap = () => {
 		ElasticSearch.createIndex()
 			.then(ElasticSearch.closeIndex)
 			.then(ElasticSearch.putSettings)
@@ -98,7 +99,7 @@ class ElasticSearch {
 				winston.loggers.get('error-logger').error('ElasticSearch: Error', reason)
 				process.exit(2)
 			})
-	)
+	}
 
 	static connect(url: string) {
 		this.client = new Client({ node: url })
