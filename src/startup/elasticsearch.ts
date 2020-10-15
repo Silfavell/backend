@@ -23,13 +23,7 @@ class ElasticSearch {
 	private static createIndex = () => (
 		ElasticSearch.client.indices.exists({ index }).then((result) => {
 			if (!result.body) {
-				ElasticSearch.client.indices.create({
-					index,
-					body: {
-						number_of_shards: 4,
-						number_of_replicas: 3
-					}
-				})
+				return ElasticSearch.client.indices.create({ index })
 			}
 		})
 	)

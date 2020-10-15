@@ -2,7 +2,7 @@ version: "3"
 
 services:
   elasticsearch:
-    image: elasticsearch:6.5.0
+    image: elasticsearch:7.6.2
     ports:
       - 9200:9200
       - 9300:9300
@@ -12,15 +12,16 @@ services:
          hard: 65536
     environment:
       ES_JAVA_OPTS: "-Xms750m -Xmx750m"
-#    volumes:
-#      - esdata
+      discovery.type: single-node
+    volumes:
+      - esdata
 
   mongo:
     image: mongo:latest
     ports:
       - 27017:27017
-#    volumes:
-#      - mongo
+    volumes:
+      - mongo
 
   #backend:
   #  depends_on:
@@ -30,7 +31,7 @@ services:
   #    - 3000:3000
 
 
-#volumes:
-#  esdata:
-#
-#  mongo:
+volumes:
+  esdata:
+
+  mongo:
