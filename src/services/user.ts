@@ -538,6 +538,7 @@ export const getOrderById = (orderId: string) => (
 				address: { $first: '$address' },
 				message: { $first: '$message' },
 				paidPrice: { $first: '$paidPrice' },
+				cargoPrice: { $first: '$cargoPrice' },
 				products: { $first: '$products' },
 				returnItemsTotalPayback: {
 					$sum: {
