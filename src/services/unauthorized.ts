@@ -2328,7 +2328,6 @@ export const checkConvenientOfActivationCodeRequest = (phoneNumber: string, acti
 
 export const createActivationCode = (phoneNumber: string, activationCodeType: ActivationCodes) => {
 	const activationCode = parseInt(Math.floor(1000 + Math.random() * 9000).toString(), 10)
-	console.log(activationCode, activationCodeType) // TODO
 
 	return ActivationCode.findOneAndDelete({
 		userPhoneNumber: phoneNumber,
