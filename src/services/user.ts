@@ -108,15 +108,18 @@ export const checkMakeOrderValues = (user: UserDocument, context: any) => {
 	})
 }
 
-export const saveOrderToDatabase = (user: UserDocument, cart: any, address: any) => (
-	new Order({
+export const saveOrderToDatabase = (user: UserDocument, cart: any, address: any) => {
+	const paidPrice = Object.values(cart).reduce((previousValue: number, currentValue: any) => previousValue + parseFloat(currentValue.discountedPrice || currentValue.price) * currentValue.quantity, 0) as number
+
+	return new Order({
 		customer: user.nameSurname,
 		phoneNumber: user.phoneNumber,
 		address: address.openAddress,
 		products: Object.values(cart),
-		paidPrice: (Object.values(cart).reduce((previousValue: number, currentValue: any) => previousValue + parseFloat(currentValue.discountedPrice || currentValue.price) * currentValue.quantity, 0) as Number).toFixed(2)
+		paidPrice: paidPrice.toFixed(2),
+		cargoPrice: paidPrice < 85 ? 15 : 0
 	}).save()
-)
+}
 
 export const updateProductsSoldTimes = (cart: any) => {
 	const updates = Object.values(cart).map((cartProduct: any) => (
@@ -202,6 +205,7 @@ export const getOrders = (phoneNumber: string) => (
 				date: { $first: '$date' },
 				message: { $first: '$message' },
 				paidPrice: { $first: '$paidPrice' },
+				cargoPrice: { $first: '$cargoPrice' },
 				products: { $first: '$products' },
 				returnItemsTotalPayback: {
 					$sum: {
@@ -379,13 +383,13 @@ export const listCards = (cardUserKey: string) => (
 	})
 )
 
-export const createPaymentWithRegisteredCard = (user: UserDocument, price: string, basketItems: any[], address: string, cardToken: string) => (
+export const createPaymentWithRegisteredCard = (user: UserDocument, price: number, cargoPrice: number, basketItems: any[], address: string, cardToken: string) => (
 	new Promise((resolve, reject) => {
 		const request = {
 			locale: Iyzipay.LOCALE.TR,
 			// conversationId: '123456789',
-			price: price.toString(),
-			paidPrice: price.toString(),
+			price: price.toFixed(2),
+			paidPrice: (price + cargoPrice).toFixed(2),
 			currency: Iyzipay.CURRENCY.TRY,
 			installment: '1',
 			basketId: 'B67832',
@@ -439,10 +443,14 @@ export const createPaymentWithRegisteredCard = (user: UserDocument, price: strin
 )
 
 
-export const completePayment = (user: UserDocument, cart: any, address: string, cardToken: string) => (
-	createPaymentWithRegisteredCard(
+export const completePayment = (user: UserDocument, cart: any, address: string, cardToken: string) => {
+	const paidPrice = Object.values(cart).reduce((previousValue: number, currentValue: any) => previousValue + (currentValue.price * currentValue.quantity), 0) as number
+	const cargoPrice = paidPrice < 85 ? 15 : 0
+
+	return createPaymentWithRegisteredCard(
 		user,
-		(Object.values(cart).reduce((previousValue: number, currentValue: any) => previousValue + (currentValue.price * currentValue.quantity), 0) as Number).toFixed(2),
+		paidPrice,
+		cargoPrice,
 		Object.values(cart).map(({
 			_id,
 			name,
@@ -458,7 +466,7 @@ export const completePayment = (user: UserDocument, cart: any, address: string, 
 		address,
 		cardToken
 	)
-)
+}
 
 export const getOrderById = (orderId: string) => (
 	Order.aggregate([
