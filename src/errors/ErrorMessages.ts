@@ -41,6 +41,15 @@ class ErrorMessages {
     static MANAGER_IS_NOT_EXISTS = 'Telefon numarasına ait yönetici bulunamadı'
 
     static MANAGER_IS_NOT_VERIFIED = 'Yönetici henüz onaylanmamış'
+
+
+    static CATEGORY_IS_NOT_EXISTS = 'Kategori mevcut değil.'
+
+    static CAN_NOT_DELETE_CATEGORY = 'This Category can not be deletable since there are SubCategories belongs to this Category.'
+
+    static CAN_NOT_DELETE_SUB_CATEGORY = 'This SubCategory can not be deletable since there are products belongs to this SubCategory.'
+
+    static CAN_NOT_DELETE_TYPE = 'This Type can not be deletable since there are products belongs to this Type.'
 }
 
 export default ErrorMessages
