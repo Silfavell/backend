@@ -80,9 +80,15 @@ export const deleteSubCategoryFromDatabase = (body: any) => (
 	}, { new: true })
 )
 
-export const deleteCategoryFromDatabase = (categoryId: string) => (
-	Category.findByIdAndDelete(categoryId)
-)
+export const deleteCategoryFromDatabase = async (categoryId: string) => {
+	const category = await Category.findById(categoryId)
+
+	if (category) {
+		return await category.remove()
+	} else {
+		throw new ServerError(ErrorMessages.CATEGORY_IS_NOT_EXISTS, HttpStatusCodes.BAD_REQUEST, ErrorMessages.CATEGORY_IS_NOT_EXISTS, false)
+	}
+}
 
 export const updateCategory = (categoryId: string, categoryContext: CategoryDocument) => (
 	Category.findByIdAndUpdate(categoryId, categoryContext)
@@ -220,6 +226,12 @@ export const saveType = (body: ProductTypeDocument) => (
 export const updateType = (id: string, body: ProductTypeDocument) => (
 	ProductType.findByIdAndUpdate(id, body, { new: true })
 )
+
+export const deleteType = async (id: string) => {
+	const type = await ProductType.findById(id)
+
+	return await type.remove()
+}
 
 export const getTypes = () => (
 	ProductType.find()

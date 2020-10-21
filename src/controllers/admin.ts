@@ -20,7 +20,8 @@ import {
 	validatePostSubCategory,
 	validateDeleteSubCategory,
 	validateSaveTypeRequest,
-	validateUpdateTypeRequest
+	validateUpdateTypeRequest,
+	validateDeleteTypeRequest
 } from '../validators/admin-validator'
 
 import {
@@ -47,6 +48,7 @@ import {
 	isSubCategorySlugExists,
 	saveType,
 	updateType,
+	deleteType,
 	getWaitingComments,
 	verifyComment,
 	deleteComment,
@@ -367,6 +369,17 @@ router.put('/update-type/:_id', (req, res, next) => {
 		})
 		.catch((reason) => {
 			next(handleError(reason, 'PUT /admin/update-type/:_id'))
+		})
+})
+
+router.delete('/type/:_id', (req, res, next) => {
+	validateDeleteTypeRequest(req.params)
+		.then(() => deleteType(req.params._id))
+		.then((type) => {
+			res.json(type)
+		})
+		.catch((reason) => {
+			next(handleError(reason, 'DELETE /admin/type/:_id'))
 		})
 })
 
