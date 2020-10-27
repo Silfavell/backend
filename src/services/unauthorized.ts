@@ -2322,6 +2322,8 @@ export const checkConvenientOfActivationCodeRequest = (phoneNumber: string, acti
 
 		case ActivationCodes.RESET_MANAGER_PASSWORD: return isManagerExists(phoneNumber)
 
+		case ActivationCodes.UPDATE_PHONE_NUMBER: return isUserNonExists(phoneNumber)
+
 		default: throw new ServerError(ErrorMessages.UNKNOWN_TYPE_OF_ACTIVATION_CODE, HttpStatusCodes.BAD_REQUEST, null, false)
 	}
 }

@@ -60,9 +60,13 @@ export const getActivationCode = (phoneNumber: string, activationCodeType: Activ
 	ActivationCode.findOne({
 		userPhoneNumber: phoneNumber,
 		activationCodeType
-	}).then((res) => (
-		res.activationCode
-	))
+	}).then((res) => {
+		if (res) {
+			return res.activationCode
+		}
+
+		throw new ServerError(ErrorMessages.UNKNOWN_ACTIVATION_CODE, HttpStatusCodes.BAD_REQUEST, ErrorMessages.UNKNOWN_ACTIVATION_CODE, false)
+	})
 )
 
 /** Tests equality of activationCode from request and from Redis */

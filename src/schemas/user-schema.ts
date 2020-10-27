@@ -32,6 +32,11 @@ export const changePasswordSchema = Joi.object({
 	newPassword: Joi.string().min(4).required()
 })
 
+export const updatePhoneNumberSchema = Joi.object({
+	newPhoneNumber: Joi.string().phoneNumber({ defaultCountry: 'TR', format: 'national', strict: true }).required(),
+	activationCode: Joi.number().min(1000).max(9999).required()
+})
+
 export const makeOrderSchema = Joi.object({
 	address: Joi.string().required(),
 	card: Joi.string().required()

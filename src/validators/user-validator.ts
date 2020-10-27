@@ -5,6 +5,7 @@ import {
 	productSchema,
 	saveAddressSchema,
 	changePasswordSchema,
+	updatePhoneNumberSchema,
 	phoneSchema,
 	makeOrderSchema,
 	postPaymentCardSchema,
@@ -30,6 +31,8 @@ export const validateSaveAddressRequest = (body: any) => saveAddressSchema.valid
 export const validateFavoriteProductRequest = (body: any) => favoriteProductSchema.validateAsync(body)
 
 export const validateChangePasswordRequest = (body: any) => changePasswordSchema.validateAsync(body)
+
+export const validateUpdatePhoneNumberRequest = (body: any) => updatePhoneNumberSchema.validateAsync(body)
 
 export const validateMakeOrderRequest = (body: any) => makeOrderSchema.validateAsync(body)
 
