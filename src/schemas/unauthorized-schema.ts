@@ -25,7 +25,7 @@ export const productsFilterMobileSchema = Joi.object({
 
 export const sendActivationCodeSchema = Joi.object({
 	phoneNumber: Joi.string().phoneNumber({ defaultCountry: 'TR', format: 'national', strict: true }).required(),
-	activationCodeType: Joi.number().min(0).max(3).required()
+	activationCodeType: Joi.number().min(0).max(4).required()
 })
 
 export const registerSchema = Joi.object({

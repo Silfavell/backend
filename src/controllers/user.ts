@@ -33,11 +33,14 @@ import {
 	dislikeComment,
 	removeLikeComment,
 	removeDislikeComment,
-	returnItems
+	returnItems,
+	updatePhoneNumber
 } from '../services/user'
 
 import {
+	compareActivationCode,
 	comparePasswords,
+	getActivationCode,
 	isUserExists
 } from '../validators'
 
@@ -46,6 +49,7 @@ import {
 	validateSaveCartRequest,
 	validateSaveAddressRequest,
 	validateChangePasswordRequest,
+	validateUpdatePhoneNumberRequest,
 	validateMakeOrderRequest,
 	validatePostPaymentCardRequest,
 	validateDeletePaymentCardRequest,
@@ -54,6 +58,7 @@ import {
 	validateLike,
 	validatePostReturnItems
 } from '../validators/user-validator'
+import ActivationCodes from '../enums/activation-code-enum'
 
 const router = Router()
 
@@ -226,6 +231,19 @@ router.put('/change-password', (req, res, next) => {
 		.catch((reason) => {
 			next(handleError(reason, 'PUT /user/change-password'))
 		})
+})
+
+router.put('/update-phone-number', async (req, res, next) => {
+	try {
+		const { newPhoneNumber } = await validateUpdatePhoneNumberRequest(req.body)
+		const activationCode = await getActivationCode(newPhoneNumber, ActivationCodes.UPDATE_PHONE_NUMBER)
+
+		await compareActivationCode(req.body.activationCode.toString(), activationCode.toString())
+		await updatePhoneNumber(req.user.phoneNumber, newPhoneNumber)
+		res.json()
+	} catch (reason) {
+		next(handleError(reason, 'PUT /user/update-phone-number'))
+	}
 })
 
 router.get('/order/:_id', (req, res, next) => {

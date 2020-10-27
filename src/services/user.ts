@@ -575,6 +575,10 @@ export const returnItems = (orderId: string, returnItems: any[]) => (
 	Order.findByIdAndUpdate(orderId, { returnItems, status: OrderStatus.RETURNED }, { new: true })
 )
 
+export const updatePhoneNumber = (oldPhoneNumber: string, newPhoneNumber: string) => (
+	User.findOneAndUpdate({ phoneNumber: oldPhoneNumber }, { phoneNumber: newPhoneNumber }, { new: true })
+)
+
 export const saveComment = (user: UserDocument, body: {
 	ownerAlias?: string,
 	productId: string,
