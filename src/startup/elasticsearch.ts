@@ -7,8 +7,6 @@ const type = 'doc'
 class ElasticSearch {
 	private static client: Client
 
-	/* eslint-disable no-useless-constructor */
-	// eslint-disable-next-line no-empty-function
 	private constructor() { }
 
 	private static deleteIndex = () => (
@@ -91,7 +89,7 @@ class ElasticSearch {
 			.then(ElasticSearch.openIndex)
 			.catch((reason) => {
 				winston.loggers.get('error-logger').error('ElasticSearch: Error', reason)
-				process.exit(2)
+				// process.exit(2)
 			})
 	}
 
@@ -104,6 +102,7 @@ class ElasticSearch {
 		if (!this.client) {
 			throw new Error('Elasticsearch not connected!')
 		}
+
 		return this.client
 	}
 }
