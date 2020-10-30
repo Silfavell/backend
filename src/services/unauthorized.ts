@@ -118,39 +118,78 @@ export const getProductsWithCategories = () => (
 		{
 			$project: {
 				name: 1,
-				brands: 1,
 				imagePath: 1,
+				types: '$subCategories.types',
 				subCategoryName: {
 					$toString: '$subCategories.name'
 				},
 				subCategoryId: {
 					$toString: '$subCategories._id'
-				},
-				subCategoryBrands: '$subCategories.brands'
+				}
+			}
+		},
+		{
+			$unwind: '$types'
+		},
+		{
+			$lookup: {
+				from: ProductType.collection.name,
+				foreignField: '_id',
+				localField: 'types',
+				as: 'type'
 			}
 		},
 		{
 			$lookup: {
 				from: Product.collection.name,
-				localField: 'subCategoryId',
-				foreignField: 'subCategoryId',
-				as: 'products'
+				let: { typeId: '$types', subCategoryId: '$subCategoryId' },
+				as: 'products',
+				pipeline: [
+					{
+						$match: {
+							$expr: {
+								$and: [
+									{
+										$eq: ['$$typeId', '$type']
+									},
+									{
+										$eq: ['$$subCategoryId', '$subCategoryId']
+									}
+								]
+							}
+						}
+					}
+				]
+			}
+		},
+		{
+			$addFields: {
+				'type.products': '$products'
+			}
+		},
+		{
+			$addFields: {
+				type: {
+					$arrayElemAt: ['$type', 0]
+				}
 			}
 		},
 		{
 			$project: {
 				name: 1,
 				imagePath: 1,
-				brands: 1,
-				subCategoryBrands: 1,
 				subCategoryName: 1,
+				categoryId: '$_id',
 				subCategoryId: 1,
-				products: {
-					$filter: {
-						input: '$products',
-						as: 'product',
-						cond: {
-							$eq: ['$$product.purchasable', true]
+				type: {
+					name: '$type.name',
+					products: {
+						$filter: {
+							input: '$type.products',
+							as: 'product',
+							cond: {
+								$eq: ['$$product.purchasable', true]
+							}
 						}
 					}
 				}
@@ -158,117 +197,30 @@ export const getProductsWithCategories = () => (
 		},
 		{
 			$match: {
-				'products.0': { $exists: true }
-			}
-		},
-
-		/** MAX,MIN PRICE */
-		{
-			$unwind: '$products'
-		},
-		{
-			$addFields: {
-				'products.sortPrice': '$products.discountedPrice'
-			}
-		},
-		{
-			$addFields: {
-				'products.sortPrice': {
-					$ifNull: ['$products.sortPrice', '$products.price']
-				}
-			}
-		},
-		{
-			$sort: {
-				'products.sortPrice': 1
+				'type.products.0': { $exists: true }
 			}
 		},
 		{
 			$group: {
-				_id: { categoryId: '$_id', subCategoryId: '$subCategoryId' },
+				_id: '$subCategoryId',
+				categoryId: { $first: '$categoryId' },
 				imagePath: { $first: '$imagePath' },
 				name: { $first: '$name' },
-				brands: { $first: '$brands' },
 				subCategoryName: { $first: '$subCategoryName' },
-				subCategoryId: { $first: '$subCategoryId' },
-				subCategoryBrands: { $first: '$subCategoryBrands' },
-				products: { $push: '$products' }
-			}
-		},
-		{
-			$addFields: {
-				_id: '$_id.categoryId',
-				minPrice: {
-					$arrayElemAt: ['$products', 0]
-				},
-				maxPrice: {
-					$arrayElemAt: ['$products', -1]
-				}
-			}
-		},
-		{
-			$addFields: {
-				minPrice: {
-					$floor: '$minPrice.sortPrice'
-				},
-				maxPrice: {
-					$ceil: '$maxPrice.sortPrice'
-				}
-			}
-		},
-		{
-			$project: {
-				'products.sortPrice': 0
-			}
-		},
-		/** MAX,MIN PRICE */
-
-
-		/** REORDER PRODUCTS TO DEFAULT */
-		{
-			$unwind: '$products'
-		},
-		{
-			$sort: {
-				'products._id': 1
+				types: { $push: '$type' }
 			}
 		},
 		{
 			$group: {
-				_id: { categoryId: '$_id', subCategoryId: '$subCategoryId' },
-				imagePath: { $first: '$imagePath' },
-				name: { $first: '$name' },
-				brands: { $first: '$brands' },
-				subCategoryName: { $first: '$subCategoryName' },
-				subCategoryId: { $first: '$subCategoryId' },
-				subCategoryBrands: { $first: '$subCategoryBrands' },
-				maxPrice: { $first: '$maxPrice' },
-				minPrice: { $first: '$minPrice' },
-				products: { $push: '$products' }
-			}
-		},
-		/** REORDER PRODUCTS DEFAULT */
-
-		{
-			$sort: {
-				'_id.subCategoryId': 1
-			}
-		},
-		{
-			$group: {
-				_id: '$_id.categoryId',
+				_id: '$categoryId',
 				name: { $first: '$name' },
 				imagePath: { $first: '$imagePath' },
-				brands: { $first: '$brands' },
 				subCategories: {
 					$push: {
-						_id: '$_id.subCategoryId',
-						parentCategoryId: '$_id.categoryId',
+						_id: '$subCategoryId',
+						parentCategoryId: '$categoryId',
 						name: '$subCategoryName',
-						brands: '$subCategoryBrands',
-						products: '$products',
-						minPrice: '$minPrice',
-						maxPrice: '$maxPrice'
+						types: '$types'
 					}
 				}
 			}
