@@ -1,0 +1,10 @@
+[core]
+	autocrlf = input
+	safecrlf = warn
+	editor = nano
+	eol = lf
+	filemode = false
+[push]
+	default = current
+[pull]
+	rebase = false
