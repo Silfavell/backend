@@ -201,6 +201,11 @@ export const getProductsWithCategories = () => (
 			}
 		},
 		{
+			$sort: {
+				name: 1
+			}
+		},
+		{
 			$group: {
 				_id: '$subCategoryId',
 				categoryId: { $first: '$categoryId' },
@@ -208,6 +213,11 @@ export const getProductsWithCategories = () => (
 				name: { $first: '$name' },
 				subCategoryName: { $first: '$subCategoryName' },
 				types: { $push: '$type' }
+			}
+		},
+		{
+			$sort: {
+				_id: 1
 			}
 		},
 		{
