@@ -140,7 +140,7 @@ router.get('/search-product', async (req, res) => {
     res.json(result.body.hits.hits)
 })
 
-router.post('/', async (req, res) => {
+router.post('/', validateAuthority(Authority.ADMIN), async (req, res) => {
     if (req.files?.images) {
         if (!Array.isArray(req.files.images)) {
             req.files.images = [req.files.images]

@@ -18,6 +18,8 @@ import {
     updateSubCategory
 } from './category.service'
 import { getSeoUrl } from '../../utils/seo-url'
+import { validateAuthority } from '../../middlewares/auth-middleware'
+import Authority from '../../enums/authority-enum'
 
 const router = Router()
 
@@ -27,7 +29,7 @@ router.get('/', async (_, res) => {
     res.json(categories)
 })
 
-router.post('/category', async (req, res) => {
+router.post('/category', validateAuthority(Authority.ADMIN), async (req, res) => {
     await categorySchema.validateAsync(req.body)
     const slug = getSeoUrl(req.body.name)
     await isCategorySlugExists(slug)
@@ -36,13 +38,13 @@ router.post('/category', async (req, res) => {
     res.json(category)
 })
 
-router.delete('/:_id', async (req, res) => {
+router.delete('/:_id', validateAuthority(Authority.ADMIN), async (req, res) => {
     const category = await deleteCategoryFromDatabase(req.params._id)
 
     res.json(category)
 })
 
-router.put('/:_id', async (req, res) => {
+router.put('/:_id', validateAuthority(Authority.ADMIN), async (req, res) => {
     await categorySchema.validateAsync(req.body)
     const slug = getSeoUrl(req.body.name)
     await isCategorySlugExists(slug, req.params._id)
@@ -51,7 +53,7 @@ router.put('/:_id', async (req, res) => {
     res.json(category)
 })
 
-router.post('/sub-category', async (req, res) => {
+router.post('/sub-category', validateAuthority(Authority.ADMIN), async (req, res) => {
     await saveSubCategorySchema.validateAsync(req.body)
     const slug = getSeoUrl(req.body.name)
     await isSubCategorySlugExists(req.body, slug)
@@ -60,14 +62,14 @@ router.post('/sub-category', async (req, res) => {
     res.json(category)
 })
 
-router.delete('/sub-category/:parentCategoryId/:_id', async (req, res) => {
+router.delete('/sub-category/:parentCategoryId/:_id', validateAuthority(Authority.ADMIN), async (req, res) => {
     await deleteSubCategorySchema.validateAsync(req.params)
     const category = await deleteSubCategoryFromDatabase(req.query)
 
     res.json(category)
 })
 
-router.put('/sub-category', async (req, res) => {
+router.put('/sub-category', validateAuthority(Authority.ADMIN), async (req, res) => {
     await updateSubCategorySchema.validateAsync(req.body)
     const slug = getSeoUrl(req.body.name)
     await isSubCategorySlugExists(req.body, slug)

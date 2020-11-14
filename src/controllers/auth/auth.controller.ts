@@ -2,8 +2,6 @@ import { Router } from 'express'
 import HttpStatusCodes from 'http-status-codes'
 import rateLimit from 'express-rate-limit'
 
-import { validatePhone } from '../../middlewares/auth-middleware'
-
 import {
     registerUser,
     registerManager,
@@ -37,8 +35,6 @@ const apiLimiter = rateLimit({
 })
 
 const router = Router()
-
-router.use(validatePhone())
 
 router.post('/send-activation-code', async (req, res) => {
     await Promise.all([
