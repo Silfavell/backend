@@ -5,21 +5,21 @@
 import { Router } from 'express'
 
 import {
-    validateSaveTypeRequest,
-    validateUpdateTypeRequest,
-    validateDeleteTypeRequest
-} from '../../validators/admin-validator'
+    saveTypeSchema,
+    updateTypeSchema,
+    deleteTypeSchema
+} from './type.validator'
 
 import {
-    getSeoUrl,
     saveType,
     updateType,
     deleteType,
     getTypes,
     isTypeSlugExists
-} from '../../services/admin'
+} from './type.service'
 import { validateAuthority } from '../../middlewares/auth-middleware'
 import Authority from '../../enums/authority-enum'
+import { getSeoUrl } from '../../utils/seo-url'
 
 const router = Router()
 
@@ -32,7 +32,7 @@ router.get('/', async (_, res) => {
 })
 
 router.post('/', async (req, res) => {
-    await validateSaveTypeRequest(req.body)
+    await saveTypeSchema.validateAsync(req.body)
     const slug = await getSeoUrl(req.body.name)
     await isTypeSlugExists(slug)
     const type = await saveType({ ...req.body, slug })
@@ -41,7 +41,7 @@ router.post('/', async (req, res) => {
 })
 
 router.put('/:_id', async (req, res) => {
-    await validateUpdateTypeRequest(req.body)
+    await updateTypeSchema.validateAsync(req.body)
     const slug = await getSeoUrl(req.body.name)
     await isTypeSlugExists(slug)
     const type = await updateType(req.params._id, { ...req.body, slug })
@@ -50,7 +50,7 @@ router.put('/:_id', async (req, res) => {
 })
 
 router.delete('/:_id', async (req, res) => {
-    await validateDeleteTypeRequest(req.params)
+    await deleteTypeSchema.validateAsync(req.params)
     const type = await deleteType(req.params._id)
 
     res.json(type)

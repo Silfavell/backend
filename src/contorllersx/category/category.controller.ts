@@ -1,4 +1,5 @@
 import { Router } from 'express'
+
 import {
     deleteSubCategorySchema,
     categorySchema,
@@ -9,7 +10,6 @@ import {
     getCategories,
     deleteCategoryFromDatabase,
     deleteSubCategoryFromDatabase,
-    getSeoUrl,
     isCategorySlugExists,
     isSubCategorySlugExists,
     saveCategoryToDatabase,
@@ -17,6 +17,7 @@ import {
     updateCategory,
     updateSubCategory
 } from './category.service'
+import { getSeoUrl } from '../../utils/seo-url'
 
 const router = Router()
 
