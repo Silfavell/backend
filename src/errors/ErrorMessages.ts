@@ -1,4 +1,6 @@
 class ErrorMessages {
+    static NO_PERMISSION = 'Bu veriye ulaşmak için yetkiniz yok'
+
     static WRONG_ACTIVATION_CODE = 'Hatalı aktivasyon kodu'
 
     static UNEXPECTED_ERROR = 'Beklenmedik bir hata oluştu, lütfen daha sonra tekrar deneyiniz'

@@ -1,4 +1,19 @@
 import Joi from '@hapi/joi'
+import HttpStatusCodes from 'http-status-codes'
+
+import ErrorMessages from '../../errors/ErrorMessages'
+import ServerError from '../../errors/ServerError'
+import { Order } from '../../models'
+
+export const isOrderBelongsToUser = async (orderId: string, userPhone: string) => {
+	const { phoneNumber } = await Order.findById(orderId)
+
+	if (phoneNumber !== userPhone) {
+		throw new ServerError(ErrorMessages.NO_PERMISSION, HttpStatusCodes.FORBIDDEN, ErrorMessages.NO_PERMISSION, false)
+	}
+
+	return
+}
 
 export const confirmOrderSchema = Joi.object({
 	message: Joi.string().length(12).required()
@@ -13,7 +28,7 @@ export const cancelReturnSchema = Joi.object({
 })
 
 export const confirmReturnSchema = Joi.object({
-	
+
 })
 
 export const makeOrderSchema = Joi.object({
