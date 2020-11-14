@@ -1,49 +1,37 @@
 import { Router } from 'express'
 
-import {
-    Manager
-} from '../../models'
-
 import { validateAuthority } from '../../middlewares/auth-middleware'
 import Authority from '../../enums/authority-enum'
 import {
     verifyManager,
     unverifyManager,
-    deleteManager
-} from '../../services/admin'
+    deleteManager,
+    allManagers,
+    managerRequests
+} from './manager.service'
 
 const router = Router()
 
 router.use(validateAuthority(Authority.ADMIN))
 
 router.get('/requests', async (_, res) => {
-    const managerRequests = await Manager.find({ verified: false })
-
-    res.json(managerRequests)
+    res.json(await managerRequests())
 })
 
 router.get('/', async (_, res) => {
-    const allManagers = await Manager.find()
-
-    res.json(allManagers)
+    res.json(await allManagers())
 })
 
 router.put('/verify-manager/:_id', async (req, res) => {
-    const manager = await verifyManager(req.params._id)
-
-    res.json(manager)
+    res.json(await verifyManager(req.params._id))
 })
 
 router.put('/unverify-manager/:_id', async (req, res) => {
-    const manager = await unverifyManager(req.params._id)
-
-    res.json(manager)
+    res.json(await unverifyManager(req.params._id))
 })
 
 router.delete('/delete-manager/:_id', async (req, res) => {
-    const manager = await deleteManager(req.params._id)
-
-    res.json(manager)
+    res.json(await deleteManager(req.params._id))
 })
 
 export default router
