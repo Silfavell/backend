@@ -1,51 +1,53 @@
 import { Router } from 'express'
-import { verifyComment, deleteComment, getWaitingComments } from '../../services/admin'
 
 import {
+    verifyComment,
+    deleteComment,
+    getWaitingComments,
     saveComment,
     likeComment,
     dislikeComment,
     removeLikeComment,
     removeDislikeComment
-} from '../../services/user'
+} from './comment.service'
 
 import {
-    validateSaveComment,
-    validateLike
-} from '../../validators/user-validator'
+    saveCommentSchema,
+    likeSchema
+} from './comment.validator'
 
 const router = Router()
 
 router.post('/save', async (req, res) => {
-    await validateSaveComment(req.body)
+    await saveCommentSchema.validateAsync(req.body)
     const comment = await saveComment(req.user, req.body)
 
     res.json(comment)
 })
 
 router.put('/like/:_id', async (req, res) => {
-    await validateLike(req.params._id)
+    await likeSchema.validateAsync(req.params._id)
     const response = await likeComment(req.user, req.params._id)
 
     res.json(response)
 })
 
 router.put('/remove-like/:_id', async (req, res) => {
-    await validateLike(req.params._id)
+    await likeSchema.validateAsync(req.params._id)
     const response = await removeLikeComment(req.user, req.params._id)
 
     res.json(response)
 })
 
 router.put('/dislike/:_id', async (req, res) => {
-    await validateLike(req.params._id)
+    await likeSchema.validateAsync(req.params._id)
     const response = await dislikeComment(req.user, req.params._id)
 
     res.json(response)
 })
 
 router.put('/remove-dislike/:_id', async (req, res) => {
-    await validateLike(req.params._id)
+    await likeSchema.validateAsync(req.params._id)
     const response = await removeDislikeComment(req.user, req.params._id)
 
     res.json(response)
