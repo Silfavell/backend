@@ -15,23 +15,20 @@ import {
     checkMakeOrderValues,
     clearCart,
     getOrderById,
-    returnItems
-} from '../../services/user'
+    returnItems,
+    updateOrderStatus
+} from './order.service'
 
-import { updateOrderStatus } from '../../services/manager'
-import { handleError, sendSms } from '../../services/unauthorized'
-
-import {
-    validateMakeOrderRequest,
-    validatePostReturnItems
-} from '../../validators/user-validator'
+import { sendSms } from '../../utils/send-sms'
 
 import {
-    validateCancelOrder,
-    validateConfirmOrder,
-    validateCancelReturn,
-    validateConfirmReturn
-} from '../../validators/manager-validator'
+    cancelOrderSchema,
+    confirmOrderSchema,
+    cancelReturnSchema,
+    confirmReturnSchema,
+    makeOrderSchema,
+    returnItemsSchema
+} from './order.validator'
 
 import { Order } from '../../models'
 import OrderStatus from '../../enums/order-status-enum'
@@ -54,7 +51,7 @@ router.get('/', validateAuthority(Authority.ADMIN), async (req, res) => {
 })
 
 router.post('/own', validateAuthority(Authority.USER), async (req, res) => {
-    await validateMakeOrderRequest(req.body)
+    await makeOrderSchema.validateAsync(req.body)
     const { cart, card, selectedAddress } = await checkMakeOrderValues(req.user, req.body)
     const result = await completePayment(req.user, cart, selectedAddress.openAddress, card)
     const order = await saveOrderToDatabase(req.user, cart, selectedAddress)
@@ -70,8 +67,8 @@ router.get('/:_id', validateAuthority(Authority.USER), async (req, res) => {// T
     res.json(order)
 })
 
-router.post('/return-items/:orderId', validateAuthority(Authority.USER), async (req, res, next) => {// TODO validate is order belongs to user by phoneNumber ?
-    await validatePostReturnItems(req.body)
+router.post('/return-items/:orderId', validateAuthority(Authority.USER), async (req, res) => {// TODO validate is order belongs to user by phoneNumber ?
+    await returnItemsSchema.validateAsync(req.body)
     const response = await returnItems(req.params.orderId, req.body)
 
     res.json(response)
@@ -90,7 +87,7 @@ router.get('/:_id', validateAuthority(Authority.ADMIN), async (req, res) => {
 })
 
 router.put('/cancel/:_id', validateAuthority(Authority.ADMIN), async (req, res) => {
-    await validateCancelOrder(req.body)
+    await cancelOrderSchema.validateAsync(req.body)
     const order = await updateOrderStatus(req.params._id, OrderStatus.CANCELED, req.body.message)
 
     // TODO PUSH NOTIFICATION
@@ -99,7 +96,7 @@ router.put('/cancel/:_id', validateAuthority(Authority.ADMIN), async (req, res) 
 })
 
 router.put('/confirm/:_id', validateAuthority(Authority.ADMIN), async (req, res, next) => {
-    await validateConfirmOrder(req.body)
+    await confirmOrderSchema.validateAsync(req.body)
     const order = await updateOrderStatus(req.params._id, OrderStatus.APPROVED, req.body.message)
 
     // TODO PUSH NOTIFICATION
@@ -108,7 +105,7 @@ router.put('/confirm/:_id', validateAuthority(Authority.ADMIN), async (req, res,
 })
 
 router.put('/cancel-return/:_id', validateAuthority(Authority.ADMIN), async (req, res) => {
-    await validateCancelReturn(req.body)
+    await cancelReturnSchema.validateAsync(req.body)
     const order = await updateOrderStatus(req.params._id, OrderStatus.RETURN_DENIED, req.body.message)
 
     // TODO PUSH NOTIFICATION
@@ -117,7 +114,7 @@ router.put('/cancel-return/:_id', validateAuthority(Authority.ADMIN), async (req
 })
 
 router.put('/accept-return/:_id', validateAuthority(Authority.ADMIN), async (req, res) => {
-    await validateConfirmReturn(req.body)
+    await confirmReturnSchema.validateAsync(req.body)
     const order = await updateOrderStatus(req.params._id, OrderStatus.RETURN_ACCEPTED)
 
     // TODO PUSH NOTIFICATION
