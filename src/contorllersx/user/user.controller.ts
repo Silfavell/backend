@@ -1,14 +1,7 @@
 import { Router } from 'express'
 
-import { validateAuthority } from '../../middlewares/auth-middleware'
-import Authority from '../../enums/authority-enum'
-
 import {
-    handleError,
-    changePassword
-} from '../../services/unauthorized'
-
-import {
+    changePassword,
     updateUser,
     deleteAddress,
     getFavoriteProductsFromDatabase,
@@ -16,23 +9,26 @@ import {
     removeFavoriteProductFromDatabase,
     saveAddressToDatabase,
     updatePhoneNumber
-} from '../../services/user'
+} from './user.service'
 
 import {
     compareActivationCode,
     comparePasswords,
     getActivationCode,
     isUserExists
-} from '../../validators'
+} from '../auth/auth.validator'
 
 import {
-    validateUpdateProfileRequest,
-    validateSaveAddressRequest,
-    validateChangePasswordRequest,
-    validateUpdatePhoneNumberRequest,
-    validateFavoriteProductRequest
-} from '../../validators/user-validator'
+    updateProfileSchema,
+    saveAddressSchema,
+    changePasswordSchema,
+    updatePhoneNumberSchema,
+    favoriteProductSchema
+} from './user.validator'
 import ActivationCodes from '../../enums/activation-code-enum'
+
+import { validateAuthority } from '../../middlewares/auth-middleware'
+import Authority from '../../enums/authority-enum'
 
 const router = Router()
 
@@ -45,14 +41,14 @@ router.get('/profile', async (req, res) => {
 })
 
 router.put('/profile', async (req, res) => {
-    await validateUpdateProfileRequest(req.body)
+    await updateProfileSchema.validateAsync(req.body)
     const user = await updateUser(req.user._id, req.body)
 
     res.json(user)
 })
 
 router.post('/address', async (req, res) => {
-    await validateSaveAddressRequest(req.body)
+    await saveAddressSchema.validateAsync(req.body)
     const user = await saveAddressToDatabase(req.user._id, req.body)
 
     res.json(user)
@@ -65,14 +61,14 @@ router.get('/favorite-products', async (req, res) => {
 })
 
 router.post('/favorite-product', async (req, res) => {
-    await validateFavoriteProductRequest(req.body)
+    await favoriteProductSchema.validateAsync(req.body)
     const { favoriteProducts } = await saveFavoriteProductToDatabase(req.user._id, req.body)
 
     res.json(favoriteProducts)
 })
 
 router.delete('/favorite-product/:_id', async (req, res) => {
-    await validateFavoriteProductRequest(req.params)
+    await favoriteProductSchema.validateAsync(req.params)
     const { favoriteProducts } = await removeFavoriteProductFromDatabase(req.user._id, req.params._id)
 
     res.json(favoriteProducts)
@@ -85,7 +81,7 @@ router.delete('/address/:_id', async (req, res) => {
 })
 
 router.put('/change-password', async (req, res) => {
-    await Promise.all([validateChangePasswordRequest(req.body), comparePasswords(req.user.password, req.body.oldPassword)])
+    await Promise.all([changePasswordSchema.validateAsync(req.body), comparePasswords(req.user.password, req.body.oldPassword)])
     const user = await isUserExists(req.user.phoneNumber)
     await changePassword(user, req.body.newPassword)
 
@@ -93,7 +89,7 @@ router.put('/change-password', async (req, res) => {
 })
 
 router.put('/phone-number', async (req, res) => {
-    const { newPhoneNumber } = await validateUpdatePhoneNumberRequest(req.body)
+    const { newPhoneNumber } = await updatePhoneNumberSchema.validateAsync(req.body)
     const activationCode = await getActivationCode(newPhoneNumber, ActivationCodes.UPDATE_PHONE_NUMBER)
 
     await compareActivationCode(req.body.activationCode.toString(), activationCode.toString())
