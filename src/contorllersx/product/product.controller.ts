@@ -1,4 +1,3 @@
-import { validateAuthority } from '../../middlewares/auth-middleware';
 import { Router } from 'express'
 
 import {
@@ -7,7 +6,7 @@ import {
     getProductAndWithColorGroup,
     getRelatedProducts,
     getProducts,
-    getProductsWithCategories as getProductsInCategories, // TODO rename function remove as
+    getProductsInCategories,
     getBestSellerProducts,
     getBestSellerMobileProducts,
     getMostSearchedMobileProducts,
@@ -16,20 +15,29 @@ import {
     filterShop,
     getFilteredProductsWithCategories,
     productsFilterMobile,
-    validateObjectId,
     setProductToCart,
-    updateProductsSearchTimes
-} from '../../services/unauthorized'
+    updateProductsSearchTimes,
+    isProductSlugExists,
+    updateProduct,
+    indexProduct,
+    saveProductImages,
+    saveProductToDatabase,
+    updateCategoryOfProduct
+} from './product.service'
 
 import {
-    validateGetProductsFilterWithCategoriesRequest,
-    validateGetProductsFilterMobileRequest,
-    validateSetProductRequest,
-    validatePutDeductProduct
-} from '../../validators/unauthorized-validator'
-import Authority from '../../enums/authority-enum';
-import { getSeoUrl, isProductSlugExists, updateProduct, indexProduct, saveProductImages, saveProductToDatabase, updateCategoryOfProduct } from '../../services/admin';
-import { validatePostProduct, validateUpdateProduct } from '../../validators/admin-validator';
+    productsFilterWithCategoriesSchema,
+    productsFilterMobileSchema,
+    setProductSchema,
+    putDeductProductSchema,
+    saveProductSchema,
+    updateProductSchema
+} from './product.validator'
+
+import { validateAuthority } from '../../middlewares/auth-middleware'
+import Authority from '../../enums/authority-enum'
+import { validateObjectId } from '../../utils/validate-object-id'
+import { getSeoUrl } from '../../utils/seo-url'
 
 const router = Router()
 
@@ -75,7 +83,7 @@ router.get('/filter-shop/:category?/:subCategory?', async (req, res, next) => {
 
 // FOR MOBILE // TODO DELETE
 router.get('/filter-with-categories', async (req, res) => {
-    await Promise.all([validateObjectId(req.query.categoryId), validateGetProductsFilterWithCategoriesRequest(req.query)])
+    await Promise.all([validateObjectId(req.query.categoryId), productsFilterWithCategoriesSchema.validateAsync(req.query)])
     const response = (await getFilteredProductsWithCategories(req.query))[0]
 
     res.json(response)
@@ -83,7 +91,7 @@ router.get('/filter-with-categories', async (req, res) => {
 
 // FOR MOBILE
 router.get('/filter-mobile', async (req, res, next) => {
-    await validateGetProductsFilterMobileRequest(req.query)
+    await productsFilterMobileSchema.validateAsync(req.query)
     const response = await productsFilterMobile(req.query)
 
     res.json(response)
@@ -98,7 +106,7 @@ router.put('/add-product/:_id', async (req, res, next) => {
 })
 
 router.put('/deduct-product/:_id', async (req, res) => {
-    await Promise.all([validateObjectId(req.params._id), validatePutDeductProduct(req.body)])
+    await Promise.all([validateObjectId(req.params._id), putDeductProductSchema.validateAsync(req.body)])
     const { product, cart } = await getSingleProduct(req.params._id, req.user)
     const response = await takeOffProductFromCart(product, cart || null, req.user, req.body.quantity)
 
@@ -106,7 +114,7 @@ router.put('/deduct-product/:_id', async (req, res) => {
 })
 
 router.put('/set-product/:_id', async (req, res) => {
-    await Promise.all([validateObjectId(req.params._id), validateSetProductRequest(req.body)])
+    await Promise.all([validateObjectId(req.params._id), setProductSchema.validateAsync(req.body)])
     const { product, cart } = await getSingleProduct(req.params._id, req.user)
     const response = await setProductToCart(product, cart || null, req.user, req.body.quantity)
 
@@ -157,7 +165,7 @@ router.post('/', async (req, res) => {
         }))
     }
 
-    await validatePostProduct(req.body)
+    await saveProductSchema.validateAsync(req.body)
     const slug = getSeoUrl(req.body.name)
     await isProductSlugExists(slug)
     const product = await saveProductToDatabase({ ...req.body, slug })
@@ -197,7 +205,7 @@ router.put('/:_id', validateAuthority(Authority.ADMIN), async (req, res) => {
         }))
     }
 
-    await validateUpdateProduct(req.body)
+    await updateProductSchema.validateAsync(req.body)
     const slug = getSeoUrl(req.body.name)
     await isProductSlugExists(slug, req.params._id)
     const product = await updateProduct(req.params._id, req.body, slug)
@@ -211,17 +219,17 @@ router.put('/:_id', validateAuthority(Authority.ADMIN), async (req, res) => {
 })
 
 /*
-	router.delete('/product/:_id', (req, res, next) => {
-		validateObjectId(req.params._id)
-			.then(() => deleteProductFromDatabase(req.params._id))
-			.then((product) => removeProductFromSearch(product))
-			.then(() => {
-				res.json()
-			})
-			.catch((reason) => {
-				next(handleError(reason, 'DELETE /admin/product/:_id'))
-			})
-	})
+    router.delete('/product/:_id', (req, res, next) => {
+        validateObjectId(req.params._id)
+            .then(() => deleteProductFromDatabase(req.params._id))
+            .then((product) => removeProductFromSearch(product))
+            .then(() => {
+                res.json()
+            })
+            .catch((reason) => {
+                next(handleError(reason, 'DELETE /admin/product/:_id'))
+            })
+    })
 */
 
 export default router
