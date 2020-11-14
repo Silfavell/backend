@@ -6,13 +6,13 @@ import {
 
 import { validateAuthority } from '../../middlewares/auth-middleware'
 import Authority from '../../enums/authority-enum'
-import { createToken } from '../../services/unauthorized'
+import { createToken } from '../auth/auth.service'
 
 const router = Router()
 
 router.use(validateAuthority(Authority.ADMIN))
 
-router.get('/test', (req, res) => {
+router.get('/test', (_, res) => {
 	res.json({ status: true })
 })
 

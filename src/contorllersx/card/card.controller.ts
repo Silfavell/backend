@@ -7,12 +7,12 @@ import {
     listCards,
     addCardToUser,
     deleteCard
-} from '../../services/user'
+} from './card.service'
 
 import {
-    validatePostPaymentCardRequest,
-    validateDeletePaymentCardRequest
-} from '../../validators/user-validator'
+    postPaymentCardSchema,
+    deletePaymentCardSchema
+} from './card.validator'
 
 const router = Router()
 
@@ -25,14 +25,14 @@ router.get('/list-cards', async (req, res) => {
 })
 
 router.post('/payment-card', async (req, res) => {
-    await validatePostPaymentCardRequest(req.body.card)
+    await postPaymentCardSchema.validateAsync(req.body.card)
     const response = await addCardToUser(req.user, req.body.card)
 
     res.json(response)
 })
 
 router.put('/payment-card', async (req, res) => {
-    await validateDeletePaymentCardRequest(req.body)
+    await deletePaymentCardSchema.validateAsync(req.body)
     const response = await deleteCard(req.user, req.body.cardToken)
 
     res.json(response)
