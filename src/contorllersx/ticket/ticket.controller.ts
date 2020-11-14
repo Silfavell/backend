@@ -1,18 +1,18 @@
 import { Router } from 'express'
-import { getTickets } from '../../services/admin'
 
 import {
+    getTickets,
     saveTicket
-} from '../../services/unauthorized'
+} from './ticket.service'
 
 import {
-    validatePostTicketRequest
-} from '../../validators/unauthorized-validator'
+    postTicketSchema
+} from './ticket.validator'
 
 const router = Router()
 
 router.post('/', async (req, res) => {
-    await validatePostTicketRequest(req.body)
+    await postTicketSchema.validateAsync(req.body)
     const ticket = await saveTicket(req.body)
 
     res.json(ticket)
