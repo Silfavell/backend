@@ -1,13 +1,13 @@
 import { Router } from 'express'
-import { getTickets } from '../services/admin'
+import { getTickets } from '../../services/admin'
 
 import {
     saveTicket
-} from '../services/unauthorized'
+} from '../../services/unauthorized'
 
 import {
     validatePostTicketRequest
-} from '../validators/unauthorized-validator'
+} from '../../validators/unauthorized-validator'
 
 const router = Router()
 

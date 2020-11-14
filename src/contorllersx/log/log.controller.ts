@@ -1,8 +1,8 @@
 import { Router } from 'express'
 import path from 'path'
 
-import { validateAuthority } from '../middlewares/auth-middleware'
-import Authority from '../enums/authority-enum'
+import { validateAuthority } from '../../middlewares/auth-middleware'
+import Authority from '../../enums/authority-enum'
 
 const router = Router()
 

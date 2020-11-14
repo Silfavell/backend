@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { verifyComment, deleteComment, getWaitingComments } from '../services/admin'
+import { verifyComment, deleteComment, getWaitingComments } from '../../services/admin'
 
 import {
     saveComment,
@@ -7,12 +7,12 @@ import {
     dislikeComment,
     removeLikeComment,
     removeDislikeComment
-} from '../services/user'
+} from '../../services/user'
 
 import {
     validateSaveComment,
     validateLike
-} from '../validators/user-validator'
+} from '../../validators/user-validator'
 
 const router = Router()
 

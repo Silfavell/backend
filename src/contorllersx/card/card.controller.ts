@@ -1,18 +1,18 @@
 import { Router } from 'express'
 
-import { validateAuthority } from '../middlewares/auth-middleware'
-import Authority from '../enums/authority-enum'
+import { validateAuthority } from '../../middlewares/auth-middleware'
+import Authority from '../../enums/authority-enum'
 
 import {
     listCards,
     addCardToUser,
     deleteCard
-} from '../services/user'
+} from '../../services/user'
 
 import {
     validatePostPaymentCardRequest,
     validateDeletePaymentCardRequest
-} from '../validators/user-validator'
+} from '../../validators/user-validator'
 
 const router = Router()
 

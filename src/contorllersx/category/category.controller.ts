@@ -1,10 +1,10 @@
 import { Router } from 'express'
-import { validateDeleteSubCategory, validatePostCategory, validatePostSubCategory, validateUpdateCategory, validateUpdateSubCategory } from '../validators/admin-validator'
-import { deleteCategoryFromDatabase, deleteSubCategoryFromDatabase, getSeoUrl, isCategorySlugExists, isSubCategorySlugExists, saveCategoryToDatabase, saveSubCategoryToDatabase, updateCategory, updateSubCategory } from '../services/admin'
+import { validateDeleteSubCategory, validatePostCategory, validatePostSubCategory, validateUpdateCategory, validateUpdateSubCategory } from '../../validators/admin-validator'
+import { deleteCategoryFromDatabase, deleteSubCategoryFromDatabase, getSeoUrl, isCategorySlugExists, isSubCategorySlugExists, saveCategoryToDatabase, saveSubCategoryToDatabase, updateCategory, updateSubCategory } from '../../services/admin'
 
 import {
     getCategories
-} from '../services/unauthorized'
+} from '../../services/unauthorized'
 
 const router = Router()
 
@@ -47,8 +47,8 @@ router.post('/sub-category', async (req, res) => {
     res.json(category)
 })
 
-router.delete('/sub-category', async (req, res) => {
-    await validateDeleteSubCategory(req.query)
+router.delete('/sub-category/:parentCategoryId/:_id', async (req, res) => {
+    await validateDeleteSubCategory(req.params)
     const category = await deleteSubCategoryFromDatabase(req.query)
 
     res.json(category)

@@ -4,8 +4,8 @@
 
 import { Router } from 'express'
 
-import { validateAuthority } from '../middlewares/auth-middleware'
-import Authority from '../enums/authority-enum'
+import { validateAuthority } from '../../middlewares/auth-middleware'
+import Authority from '../../enums/authority-enum'
 
 import {
     saveOrderToDatabase,
@@ -16,25 +16,25 @@ import {
     clearCart,
     getOrderById,
     returnItems
-} from '../services/user'
+} from '../../services/user'
 
-import { updateOrderStatus } from '../services/manager'
-import { handleError, sendSms } from '../services/unauthorized'
+import { updateOrderStatus } from '../../services/manager'
+import { handleError, sendSms } from '../../services/unauthorized'
 
 import {
     validateMakeOrderRequest,
     validatePostReturnItems
-} from '../validators/user-validator'
+} from '../../validators/user-validator'
 
 import {
     validateCancelOrder,
     validateConfirmOrder,
     validateCancelReturn,
     validateConfirmReturn
-} from '../validators/manager-validator'
+} from '../../validators/manager-validator'
 
-import { Order } from '../models'
-import OrderStatus from '../enums/order-status-enum'
+import { Order } from '../../models'
+import OrderStatus from '../../enums/order-status-enum'
 
 const router = Router()
 

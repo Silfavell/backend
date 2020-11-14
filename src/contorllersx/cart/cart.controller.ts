@@ -4,19 +4,19 @@
 
 import { Router } from 'express'
 
-import { validateAuthority } from '../middlewares/auth-middleware'
-import Authority from '../enums/authority-enum'
+import { validateAuthority } from '../../middlewares/auth-middleware'
+import Authority from '../../enums/authority-enum'
 
 import {
     saveCart,
     clearCart,
     getCart,
     validateSaveCartProducts
-} from '../services/user'
+} from '../../services/user'
 
 import {
     validateSaveCartRequest
-} from '../validators/user-validator'
+} from '../../validators/user-validator'
 
 const router = Router()
 

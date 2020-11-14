@@ -2,7 +2,7 @@ import { Router } from 'express'
 import HttpStatusCodes from 'http-status-codes'
 import rateLimit from 'express-rate-limit'
 
-import { validatePhone } from '../middlewares/auth-middleware'
+import { validatePhone } from '../../middlewares/auth-middleware'
 
 import {
     registerUser,
@@ -11,9 +11,8 @@ import {
     login,
     isManagerVerified,
     checkConvenientOfActivationCodeRequest,
-    createToken,
-    saveTicket
-} from '../services/unauthorized'
+    createToken
+} from './auth.service'
 
 import {
     isUserNonExists,
@@ -21,19 +20,16 @@ import {
     getActivationCode,
     compareActivationCode,
     isManagerNonExists,
-    isManagerExists
-} from '../validators'
+    isManagerExists,
 
-import {
-    validateSendActivationCodeRequest,
-    validateRegisterRequest,
-    validateRegisterManagerRequest,
-    validateLoginRequest,
-    validateResetPasswordRequest,
-    validatePostTicketRequest
-} from '../validators/unauthorized-validator'
+    sendActivationCodeSchema,
+    registerSchema,
+    registerManagerSchema,
+    loginSchema,
+    resetPasswordSchema
+} from './auth.validator'
 
-import ActivationCodes from '../enums/activation-code-enum'
+import ActivationCodes from '../../enums/activation-code-enum'
 
 const apiLimiter = rateLimit({
     windowMs: 6 * 60 * 60 * 1000, // 6 Hours
@@ -46,7 +42,7 @@ router.use(validatePhone())
 
 router.post('/send-activation-code', async (req, res) => {
     await Promise.all([
-        validateSendActivationCodeRequest({ phoneNumber: req.body.phoneNumber, activationCodeType: req.body.activationCodeType }),
+        sendActivationCodeSchema.validateAsync({ phoneNumber: req.body.phoneNumber, activationCodeType: req.body.activationCodeType }),
         checkConvenientOfActivationCodeRequest(req.body.phoneNumber, req.body.activationCodeType)
     ])
     await createActivationCode(req.body.phoneNumber, req.body.activationCodeType)
@@ -55,7 +51,7 @@ router.post('/send-activation-code', async (req, res) => {
 })
 
 router.post('/register', async (req, res) => {
-    await Promise.all([validateRegisterRequest(req.body), isUserNonExists(req.body.phoneNumber)])
+    await Promise.all([registerSchema.validateAsync(req.body), isUserNonExists(req.body.phoneNumber)])
     const activationCode = getActivationCode(req.body.phoneNumber, ActivationCodes.REGISTER_USER)
     await compareActivationCode(req.body.activationCode, activationCode.toString())
     const user = await registerUser(req.body)
@@ -65,7 +61,7 @@ router.post('/register', async (req, res) => {
 })
 
 router.post('/register-manager', async (req, res) => {
-    await Promise.all([validateRegisterManagerRequest(req.body), isManagerNonExists(req.body.phoneNumber)])
+    await Promise.all([registerManagerSchema.validateAsync(req.body), isManagerNonExists(req.body.phoneNumber)])
     const activationCode = await getActivationCode(req.body.phoneNumber, ActivationCodes.REGISTER_MANAGER)
     await compareActivationCode(req.body.activationCode, activationCode.toString())
     await registerManager({ ...req.body, ...{ verified: false } })
@@ -74,7 +70,7 @@ router.post('/register-manager', async (req, res) => {
 })
 
 router.post('/login-manager', apiLimiter, async (req, res) => {
-    await validateLoginRequest(req.body)
+    await loginSchema.validateAsync(req.body)
     const manager = await isManagerExists(req.body.phoneNumber)
     await login(manager, req.body.password)
     await isManagerVerified(manager)
@@ -84,7 +80,7 @@ router.post('/login-manager', apiLimiter, async (req, res) => {
 })
 
 router.post('/login', async (req, res) => {
-    await validateLoginRequest(req.body)
+    await loginSchema.validateAsync(req.body)
     const user = await isUserExists(req.body.phoneNumber)
     await login(user, req.body.password)
     const token = await createToken(user)
@@ -93,21 +89,13 @@ router.post('/login', async (req, res) => {
 })
 
 router.put('/reset-password', async (req, res) => {
-    await validateResetPasswordRequest(req.body)
+    await resetPasswordSchema.validateAsync(req.body)
     await isUserExists(req.body.phoneNumber)
     const activationCode = await getActivationCode(req.body.phoneNumber, ActivationCodes.RESET_PASSWORD)
     await compareActivationCode(req.body.activationCode, activationCode.toString())
-    const user = await isUserExists(req.body.phoneNumber)
     await isUserExists(req.body.phoneNumber)
 
     res.json()
-})
-
-router.post('/ticket', async (req, res) => {
-    await validatePostTicketRequest(req.body)
-    const ticket = await saveTicket(req.body)
-
-    res.json(ticket)
 })
 
 export default router

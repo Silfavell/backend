@@ -1,12 +1,12 @@
 import { Router } from 'express'
 
-import { validateAuthority } from '../middlewares/auth-middleware'
-import Authority from '../enums/authority-enum'
+import { validateAuthority } from '../../middlewares/auth-middleware'
+import Authority from '../../enums/authority-enum'
 
 import {
     handleError,
     changePassword
-} from '../services/unauthorized'
+} from '../../services/unauthorized'
 
 import {
     updateUser,
@@ -16,14 +16,14 @@ import {
     removeFavoriteProductFromDatabase,
     saveAddressToDatabase,
     updatePhoneNumber
-} from '../services/user'
+} from '../../services/user'
 
 import {
     compareActivationCode,
     comparePasswords,
     getActivationCode,
     isUserExists
-} from '../validators'
+} from '../../validators'
 
 import {
     validateUpdateProfileRequest,
@@ -31,8 +31,8 @@ import {
     validateChangePasswordRequest,
     validateUpdatePhoneNumberRequest,
     validateFavoriteProductRequest
-} from '../validators/user-validator'
-import ActivationCodes from '../enums/activation-code-enum'
+} from '../../validators/user-validator'
+import ActivationCodes from '../../enums/activation-code-enum'
 
 const router = Router()
 

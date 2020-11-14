@@ -2,15 +2,15 @@ import { Router } from 'express'
 
 import {
     Manager
-} from '../models'
+} from '../../models'
 
-import { validateAuthority } from '../middlewares/auth-middleware'
-import Authority from '../enums/authority-enum'
+import { validateAuthority } from '../../middlewares/auth-middleware'
+import Authority from '../../enums/authority-enum'
 import {
     verifyManager,
     unverifyManager,
     deleteManager
-} from '../services/admin'
+} from '../../services/admin'
 
 const router = Router()
 

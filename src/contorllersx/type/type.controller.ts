@@ -8,7 +8,7 @@ import {
     validateSaveTypeRequest,
     validateUpdateTypeRequest,
     validateDeleteTypeRequest
-} from '../validators/admin-validator'
+} from '../../validators/admin-validator'
 
 import {
     getSeoUrl,
@@ -17,9 +17,9 @@ import {
     deleteType,
     getTypes,
     isTypeSlugExists
-} from '../services/admin'
-import { validateAuthority } from '../middlewares/auth-middleware'
-import Authority from '../enums/authority-enum'
+} from '../../services/admin'
+import { validateAuthority } from '../../middlewares/auth-middleware'
+import Authority from '../../enums/authority-enum'
 
 const router = Router()
 

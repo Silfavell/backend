@@ -1,4 +1,4 @@
-import { validateAuthority } from './../middlewares/auth-middleware';
+import { validateAuthority } from '../../middlewares/auth-middleware';
 import { Router } from 'express'
 
 import {
@@ -19,17 +19,17 @@ import {
     validateObjectId,
     setProductToCart,
     updateProductsSearchTimes
-} from '../services/unauthorized'
+} from '../../services/unauthorized'
 
 import {
     validateGetProductsFilterWithCategoriesRequest,
     validateGetProductsFilterMobileRequest,
     validateSetProductRequest,
     validatePutDeductProduct
-} from '../validators/unauthorized-validator'
-import Authority from '../enums/authority-enum';
-import { getSeoUrl, isProductSlugExists, updateProduct, indexProduct, saveProductImages, saveProductToDatabase, updateCategoryOfProduct } from '../services/admin';
-import { validatePostProduct, validateUpdateProduct } from '../validators/admin-validator';
+} from '../../validators/unauthorized-validator'
+import Authority from '../../enums/authority-enum';
+import { getSeoUrl, isProductSlugExists, updateProduct, indexProduct, saveProductImages, saveProductToDatabase, updateCategoryOfProduct } from '../../services/admin';
+import { validatePostProduct, validateUpdateProduct } from '../../validators/admin-validator';
 
 const router = Router()
 

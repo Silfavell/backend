@@ -2,11 +2,11 @@ import { Router } from 'express'
 
 import {
     Admin
-} from '../models'
+} from '../../models'
 
-import { validateAuthority } from '../middlewares/auth-middleware'
-import Authority from '../enums/authority-enum'
-import { createToken } from '../services/unauthorized'
+import { validateAuthority } from '../../middlewares/auth-middleware'
+import Authority from '../../enums/authority-enum'
+import { createToken } from '../../services/unauthorized'
 
 const router = Router()
 
