@@ -10,20 +10,20 @@ import Authority from '../../enums/authority-enum'
 import {
     saveCart,
     clearCart,
-    getCart,
-    validateSaveCartProducts
-} from '../../services/user'
+    getCart
+} from './cart.service'
 
 import {
-    validateSaveCartRequest
-} from '../../validators/user-validator'
+    validateProductIds,
+    validateProducts
+} from './cart.validator'
 
 const router = Router()
 
 router.use(validateAuthority(Authority.USER))
 
 router.post('/', async (req, res) => {
-    await Promise.all([validateSaveCartRequest(req.body), validateSaveCartProducts(req.body)])
+    await Promise.all([validateProducts(req.body), validateProductIds(req.body)])
     const response = await saveCart(req.user._id, req.body)
 
     res.json(response)
