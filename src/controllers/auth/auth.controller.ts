@@ -33,6 +33,8 @@ const apiLimiter = rateLimit({
 
 const router = Router()
 
+router.use(apiLimiter)
+
 router.post('/send-activation-code', async (req, res, next) => {
     try {
         await Promise.all([
@@ -61,7 +63,7 @@ router.post('/register', async (req, res, next) => {
     }
 })
 
-router.post('/login-admin', apiLimiter, async (req, res, next) => {
+router.post('/login-admin', async (req, res, next) => {
     try {
         await loginSchema.validateAsync(req.body)
         const admin = await isAdminExists(req.body.phoneNumber)
