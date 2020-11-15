@@ -25,6 +25,7 @@ import {
 
 import ActivationCodes from '../../enums/activation-code-enum'
 import { handleError } from '../../utils/handle-error'
+import { sendSms } from '../../utils/send-sms'
 
 const apiLimiter = rateLimit({
     windowMs: 6 * 60 * 60 * 1000, // 6 Hours
@@ -41,7 +42,8 @@ router.post('/send-activation-code', async (req, res, next) => {
             sendActivationCodeSchema.validateAsync({ phoneNumber: req.body.phoneNumber, activationCodeType: req.body.activationCodeType }),
             checkConvenientOfActivationCodeRequest(req.body.phoneNumber, req.body.activationCodeType)
         ])
-        await createActivationCode(req.body.phoneNumber, req.body.activationCodeType)
+        const activationCode = await createActivationCode(req.body.phoneNumber, req.body.activationCodeType)
+        sendSms(`9${req.body.phoneNumber.split(' ').join('')}`, `Silfavell Onay kodunuz: ${activationCode}`)
 
         res.status(HttpStatusCodes.ACCEPTED).json()
     } catch (error) {
