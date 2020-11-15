@@ -31,9 +31,9 @@ router.post('/payment-card', async (req, res) => {
     res.json(response)
 })
 
-router.put('/payment-card', async (req, res) => {
-    await deletePaymentCardSchema.validateAsync(req.body)
-    const response = await deleteCard(req.user, req.body.cardToken)
+router.delete('/payment-card/:cardToken', async (req, res) => {
+    await deletePaymentCardSchema.validateAsync(req.params)
+    const response = await deleteCard(req.user, req.params.cardToken)
 
     res.json(response)
 })

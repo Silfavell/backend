@@ -665,116 +665,108 @@ export const getFilteredProductsWithCategories = (query: any) => {
 	])
 }
 
-export const addProductToCart = (product: ProductDocument, cartObj: CartDocument, user: UserDocument, quantity: number) => (
-	new Promise((resolve) => {
-		if (user?._id.toString()) {
-			if (cartObj && cartObj.cart) {
-				const foundCartProduct = cartObj.cart.find((cartProduct => cartProduct._id === product._id.toString()))
+export const addProductToCart = async (product: ProductDocument, cartObj: CartDocument, user: UserDocument, quantity: number) => {
+	if (user?._id.toString()) {
+		if (cartObj && cartObj.cart) {
+			const foundCartProduct = cartObj.cart.find((cartProduct => cartProduct._id === product._id.toString()))
 
-				if (foundCartProduct) {
-					foundCartProduct.quantity += quantity
+			if (foundCartProduct) {
+				foundCartProduct.quantity += quantity
 
-					cartObj.save().then(() => {
-						resolve(Object.assign(product.toObject(), { quantity: foundCartProduct.quantity }))
-					})
-				} else {
-					Cart.findOneAndUpdate({ userId: user._id.toString() }, {
-						$push: {
-							cart: {
-								_id: product._id.toString(),
-								quantity
-							}
-						}
-					}, { new: true }).then(() => {
-						resolve(Object.assign(product.toObject(), { quantity }))
-					})
-				}
+				await cartObj.save()
+
+				Object.assign(product.toObject(), { quantity: foundCartProduct.quantity })
 			} else {
-				new Cart({
-					userId: user._id.toString(),
-					cart: [{
-						_id: product._id.toString(),
-						quantity
-					}]
-				}).save().then((x) => {
-					resolve(Object.assign(product.toObject(), { quantity }))
-				})
-			}
-		} else {
-			resolve(product)
-		}
-	})
-)
-
-export const setProductToCart = (product: ProductDocument, cartObj: CartDocument, user: UserDocument, quantity: number) => (
-	new Promise((resolve) => {
-		if (user?._id.toString()) {
-			if (quantity === 0) {
-				Cart.findOneAndUpdate({ userId: user._id.toString() }, {
-					$pull: {
+				await Cart.findOneAndUpdate({ userId: user._id.toString() }, {
+					$push: {
 						cart: {
-							_id: product._id
+							_id: product._id.toString(),
+							quantity
 						}
 					}
-				}, { new: true }).then(() => {
-					resolve(product)
-				})
-			} else {
-				const foundProduct = cartObj.cart.find((cartProduct) => cartProduct._id.toString() === product._id.toString())
-				if (foundProduct) {
-					foundProduct.quantity = quantity
-				} else {
-					cartObj.cart.push({
-						_id: product._id,
-						quantity
-					})
-				}
+				}, { new: true })
 
-				cartObj.save().then(() => {
-					resolve(Object.assign(product.toObject(), { quantity }))
-				})
+				return Object.assign(product.toObject(), { quantity })
 			}
 		} else {
-			resolve(product)
+			await new Cart({
+				userId: user._id.toString(),
+				cart: [{
+					_id: product._id.toString(),
+					quantity
+				}]
+			}).save()
+
+			return Object.assign(product.toObject(), { quantity })
 		}
-	})
-)
+	}
+	return product
+}
 
-export const takeOffProductFromCart = (product: ProductDocument, cartObj: CartDocument, user: UserDocument, quantity: number) => (
-	new Promise((resolve, reject) => {
-		if (user?._id.toString()) {
-			if (cartObj && cartObj.cart) {
-				const foundCartProduct = cartObj.cart.find((cartProduct => cartProduct._id === product._id.toString()))
-
-				if (foundCartProduct) {
-					if (foundCartProduct.quantity > quantity) {
-						foundCartProduct.quantity -= quantity
-
-						cartObj.save().then(() => {
-							resolve(Object.assign(product.toObject(), { quantity: foundCartProduct.quantity }))
-						})
-					} else {
-						Cart.findOneAndUpdate({ userId: user._id.toString() }, {
-							$pull: {
-								cart: {
-									_id: product._id.toString()
-								}
-							}
-						}, { new: true }).then(() => {
-							resolve(Object.assign(product.toObject(), { quantity: 0 }))
-						})
+export const setProductToCart = async (product: ProductDocument, cartObj: CartDocument, user: UserDocument, quantity: number) => {
+	if (user?._id.toString()) {
+		if (quantity === 0) {
+			await Cart.findOneAndUpdate({ userId: user._id.toString() }, {
+				$pull: {
+					cart: {
+						_id: product._id
 					}
+				}
+			}, { new: true })
+
+			return product
+		} else {
+			const foundProduct = cartObj.cart.find((cartProduct) => cartProduct._id.toString() === product._id.toString())
+			if (foundProduct) {
+				foundProduct.quantity = quantity
+			} else {
+				cartObj.cart.push({
+					_id: product._id,
+					quantity
+				})
+			}
+
+			await cartObj.save()
+			return Object.assign(product.toObject(), { quantity })
+		}
+	}
+
+	return product
+}
+
+export const takeOffProductFromCart = async (product: ProductDocument, cartObj: CartDocument, user: UserDocument, quantity: number) => {
+	if (user?._id.toString()) {
+		if (cartObj && cartObj.cart) {
+			const foundCartProduct = cartObj.cart.find((cartProduct => cartProduct._id === product._id.toString()))
+
+			if (foundCartProduct) {
+				if (foundCartProduct.quantity > quantity) {
+					foundCartProduct.quantity -= quantity
+
+					await cartObj.save()
+
+					Object.assign(product.toObject(), { quantity: foundCartProduct.quantity })
 				} else {
-					reject(new ServerError(ErrorMessages.NON_EXISTS_PRODUCT_IN_CART, HttpStatusCodes.BAD_REQUEST, ErrorMessages.NON_EXISTS_PRODUCT_IN_CART, false))
+					await Cart.findOneAndUpdate({ userId: user._id.toString() }, {
+						$pull: {
+							cart: {
+								_id: product._id.toString()
+							}
+						}
+					}, { new: true })
+
+					return Object.assign(product.toObject(), { quantity: 0 })
 				}
 			} else {
-				reject(new ServerError(ErrorMessages.EMPTY_CART, HttpStatusCodes.BAD_REQUEST, ErrorMessages.EMPTY_CART, false))
+				throw new ServerError(ErrorMessages.NON_EXISTS_PRODUCT_IN_CART, HttpStatusCodes.BAD_REQUEST, ErrorMessages.NON_EXISTS_PRODUCT_IN_CART, false)
 			}
 		} else {
-			resolve(product)
+			throw new ServerError(ErrorMessages.EMPTY_CART, HttpStatusCodes.BAD_REQUEST, ErrorMessages.EMPTY_CART, false)
 		}
-	})
-)
+	}
+
+	return product
+}
 
 const getBlackList = () => {
 	return [

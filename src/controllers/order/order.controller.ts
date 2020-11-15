@@ -46,7 +46,7 @@ const getLocalDate = (date: Date) => (
     })
 )
 
-router.post('/own', validateAuthority(Authority.USER), async (req, res) => {
+router.post('/', validateAuthority(Authority.USER), async (req, res) => {
     await makeOrderSchema.validateAsync(req.body)
     const { cart, card, selectedAddress } = await checkMakeOrderValues(req.user, req.body)
     const result = await completePayment(req.user, cart, selectedAddress.openAddress, card)
