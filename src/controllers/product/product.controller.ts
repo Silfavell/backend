@@ -130,7 +130,7 @@ router.get('/filter-mobile', async (req, res, next) => {
     }
 })
 
-router.put('/add-product/:_id', async (req, res, next) => {
+router.put('/add-quantity/:_id', async (req, res, next) => {
     try {
         await validateObjectId(req.params._id)
         const { product, cart } = await getSingleProduct(req.params._id, req.user)
@@ -142,7 +142,7 @@ router.put('/add-product/:_id', async (req, res, next) => {
     }
 })
 
-router.put('/deduct-product/:_id', async (req, res, next) => {
+router.put('/deduct-quantity/:_id', async (req, res, next) => {
     try {
         await Promise.all([validateObjectId(req.params._id), putDeductProductSchema.validateAsync(req.body)])
         const { product, cart } = await getSingleProduct(req.params._id, req.user)
@@ -154,7 +154,7 @@ router.put('/deduct-product/:_id', async (req, res, next) => {
     }
 })
 
-router.put('/set-product/:_id', async (req, res, next) => {
+router.put('/set-quantity/:_id', async (req, res, next) => {
     try {
         await Promise.all([validateObjectId(req.params._id), setProductSchema.validateAsync(req.body)])
         const { product, cart } = await getSingleProduct(req.params._id, req.user)
@@ -166,7 +166,7 @@ router.put('/set-product/:_id', async (req, res, next) => {
     }
 })
 
-router.get('/product/:slug', async (req, res, next) => {
+router.get('/:slug', async (req, res, next) => {
     try {
         const productWithColorGroup = (await getProductAndWithColorGroup(req.params.slug))[0]
         await updateProductsSearchTimes(productWithColorGroup?._id, req.query.fromSearch)
@@ -177,7 +177,7 @@ router.get('/product/:slug', async (req, res, next) => {
     }
 })
 
-router.get('/related-products/:slug', async (req, res, next) => {
+router.get('/:slug/related-products', async (req, res, next) => {
     try {
         const relatedProducts = await getRelatedProducts(req.params.slug)
 
@@ -187,7 +187,7 @@ router.get('/related-products/:slug', async (req, res, next) => {
     }
 })
 
-router.get('/search-product', async (req, res, next) => {
+router.get('/search', async (req, res, next) => {
     try {
         const result = await search(req.query.name)
 

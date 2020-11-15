@@ -54,13 +54,13 @@ router.post('/address', async (req, res, next) => {
     res.json(user)
 })
 
-router.get('/favorite-products', async (req, res, next) => {
+router.get('/favorites', async (req, res, next) => {
     const favoriteProducts = (await getFavoriteProductsFromDatabase(req.user._id))[0]
 
     res.json(favoriteProducts)
 })
 
-router.post('/favorite-product', async (req, res, next) => {
+router.post('/favorites', async (req, res, next) => {
     await favoriteProductSchema.validateAsync(req.body)
     const { favoriteProducts } = await saveFavoriteProductToDatabase(req.user._id, req.body)
 

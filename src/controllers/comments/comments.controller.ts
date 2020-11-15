@@ -20,7 +20,7 @@ import { handleError } from '../../utils/handle-error'
 
 const router = Router()
 
-router.post('/save', async (req, res, next) => {
+router.post('/', async (req, res, next) => {
     try {
         await saveCommentSchema.validateAsync(req.body)
         const comment = await saveComment(req.user, req.body)

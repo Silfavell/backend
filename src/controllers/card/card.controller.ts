@@ -19,7 +19,7 @@ const router = Router()
 
 router.use(validateAuthority(Authority.USER))
 
-router.get('/list-cards', async (req, res, next) => {
+router.get('/', async (req, res, next) => {
     try {
         const cards = await listCards(req.user.cardUserKey)
 
@@ -29,7 +29,7 @@ router.get('/list-cards', async (req, res, next) => {
     }
 })
 
-router.post('/payment-card', async (req, res, next) => {
+router.post('/', async (req, res, next) => {
     try {
         await postPaymentCardSchema.validateAsync(req.body.card)
         const response = await addCardToUser(req.user, req.body.card)
@@ -40,7 +40,7 @@ router.post('/payment-card', async (req, res, next) => {
     }
 })
 
-router.delete('/payment-card/:cardToken', async (req, res, next) => {
+router.delete('/:cardToken', async (req, res, next) => {
     try {
         await deletePaymentCardSchema.validateAsync(req.params)
         const response = await deleteCard(req.user, req.params.cardToken)
