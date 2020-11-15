@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken'
 import HttpStatusCodes from 'http-status-codes'
 
 import Authority from '../enums/authority-enum'
-import { Manager, Admin, User } from '../models'
+import { Admin, User } from '../models'
 
 export const validateAuthority = (authority: Authority) => async (req: Request, res: Response, next: NextFunction) => {
 	try {
@@ -15,15 +15,6 @@ export const validateAuthority = (authority: Authority) => async (req: Request, 
 
 				if (user) {
 					req.user = user
-					next()
-				} else {
-					res.status(HttpStatusCodes.UNAUTHORIZED).end('Unauthorized')
-				}
-			} else if (authority === Authority.MANAGER) {
-				const manager = await Manager.findById(decoded.payload._id)
-
-				if (manager) {
-					req.manager = manager
 					next()
 				} else {
 					res.status(HttpStatusCodes.UNAUTHORIZED).end('Unauthorized')

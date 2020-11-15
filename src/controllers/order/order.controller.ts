@@ -11,6 +11,7 @@ import {
     saveOrderToDatabase,
     updateProductsSoldTimes,
     getOrders,
+    getAllOrders,
     completePayment,
     checkMakeOrderValues,
     clearCart,
@@ -73,14 +74,14 @@ router.post('/return-items/:orderId', validateAuthority(Authority.USER), async (
 })
 
 
-router.get('/', validateAuthority(Authority.ADMIN), async (req, res) => {
+router.get('/', validateAuthority(Authority.USER), async (req, res) => {
     const orders = await getOrders(req.user.phoneNumber)
 
     res.json(orders)
 })
 
 router.get('/all', validateAuthority(Authority.ADMIN), async (_, res) => {
-    const orders = await Order.find().sort({ _id: -1 })
+    const orders = getAllOrders()
 
     res.json(orders)
 })

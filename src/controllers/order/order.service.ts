@@ -236,133 +236,137 @@ export const completePayment = (user: UserDocument, cart: any, address: string, 
     )
 }
 
+export const getAllOrders = () => {
+    return Order.find().sort({ _id: -1 })
+}
+
 export const getOrders = (phoneNumber: string) => (
-	Order.aggregate([
-		{
-			$match: {
-				phoneNumber
-			}
-		},
-		{
-			$unwind: {
-				path: '$returnItems',
-				preserveNullAndEmptyArrays: true
-			}
-		},
-		{
-			$addFields: {
-				returnQuantity: '$returnItems.quantity'
-			}
-		},
-		{
-			$lookup: {
-				from: Product.collection.name,
-				localField: 'returnItems._id',
-				foreignField: '_id',
-				as: 'returnItems'
-			}
-		},
-		{
-			$addFields: {
-				returnItems: {
-					$arrayElemAt: ['$returnItems', 0]
-				}
-			}
-		},
-		{
-			$addFields: {
-				currentProduct: {
-					$filter: {
-						input: '$products',
-						as: 'product',
-						cond: {
-							$eq: ['$$product._id', '$returnItems._id']
-						}
-					}
-				}
-			}
-		},
-		{
-			$addFields: {
-				currentProduct: {
-					$arrayElemAt: ['$currentProduct', 0]
-				}
-			}
-		},
-		{
-			$addFields: {
-				returnItems: {
-					quantity: '$returnQuantity',
-					paidPrice: '$currentProduct.paidPrice'
-				}
-			}
-		},
-		{
-			$group: {
-				_id: '$_id',
-				status: { $first: '$status' },
-				date: { $first: '$date' },
-				message: { $first: '$message' },
-				paidPrice: { $first: '$paidPrice' },
-				cargoPrice: { $first: '$cargoPrice' },
-				products: { $first: '$products' },
-				returnItemsTotalPayback: {
-					$sum: {
-						$multiply: ['$returnItems.paidPrice', '$returnItems.quantity']
-					}
-				},
-				returnItems: {
-					$push: '$returnItems'
-				}
-			}
-		},
-		{
-			$addFields: {
-				returnItems: {
-					$filter: {
-						input: '$returnItems',
-						as: 'returnItem',
-						cond: {
-							$gt: ['$$returnItem._id', null]
-						}
-					}
-				}
-			}
-		},
-		{
-			$sort: {
-				_id: -1
-			}
-		}
-	])
+    Order.aggregate([
+        {
+            $match: {
+                phoneNumber
+            }
+        },
+        {
+            $unwind: {
+                path: '$returnItems',
+                preserveNullAndEmptyArrays: true
+            }
+        },
+        {
+            $addFields: {
+                returnQuantity: '$returnItems.quantity'
+            }
+        },
+        {
+            $lookup: {
+                from: Product.collection.name,
+                localField: 'returnItems._id',
+                foreignField: '_id',
+                as: 'returnItems'
+            }
+        },
+        {
+            $addFields: {
+                returnItems: {
+                    $arrayElemAt: ['$returnItems', 0]
+                }
+            }
+        },
+        {
+            $addFields: {
+                currentProduct: {
+                    $filter: {
+                        input: '$products',
+                        as: 'product',
+                        cond: {
+                            $eq: ['$$product._id', '$returnItems._id']
+                        }
+                    }
+                }
+            }
+        },
+        {
+            $addFields: {
+                currentProduct: {
+                    $arrayElemAt: ['$currentProduct', 0]
+                }
+            }
+        },
+        {
+            $addFields: {
+                returnItems: {
+                    quantity: '$returnQuantity',
+                    paidPrice: '$currentProduct.paidPrice'
+                }
+            }
+        },
+        {
+            $group: {
+                _id: '$_id',
+                status: { $first: '$status' },
+                date: { $first: '$date' },
+                message: { $first: '$message' },
+                paidPrice: { $first: '$paidPrice' },
+                cargoPrice: { $first: '$cargoPrice' },
+                products: { $first: '$products' },
+                returnItemsTotalPayback: {
+                    $sum: {
+                        $multiply: ['$returnItems.paidPrice', '$returnItems.quantity']
+                    }
+                },
+                returnItems: {
+                    $push: '$returnItems'
+                }
+            }
+        },
+        {
+            $addFields: {
+                returnItems: {
+                    $filter: {
+                        input: '$returnItems',
+                        as: 'returnItem',
+                        cond: {
+                            $gt: ['$$returnItem._id', null]
+                        }
+                    }
+                }
+            }
+        },
+        {
+            $sort: {
+                _id: -1
+            }
+        }
+    ])
 )
 
 export const saveOrderToDatabase = (user: UserDocument, cart: any, address: any) => {
-	const paidPrice = Object.values(cart).reduce((previousValue: number, currentValue: any) => previousValue + parseFloat(currentValue.discountedPrice || currentValue.price) * currentValue.quantity, 0) as number
+    const paidPrice = Object.values(cart).reduce((previousValue: number, currentValue: any) => previousValue + parseFloat(currentValue.discountedPrice || currentValue.price) * currentValue.quantity, 0) as number
 
-	return new Order({
-		customer: user.nameSurname,
-		phoneNumber: user.phoneNumber,
-		address: address.openAddress,
-		products: Object.values(cart),
-		paidPrice: paidPrice.toFixed(2),
-		cargoPrice: paidPrice < 85 ? 15 : 0
-	}).save()
+    return new Order({
+        customer: user.nameSurname,
+        phoneNumber: user.phoneNumber,
+        address: address.openAddress,
+        products: Object.values(cart),
+        paidPrice: paidPrice.toFixed(2),
+        cargoPrice: paidPrice < 85 ? 15 : 0
+    }).save()
 }
 
 export const updateProductsSoldTimes = (cart: any) => {
-	const updates = Object.values(cart).map((cartProduct: any) => (
-		ProductVariables.findOneAndUpdate({ productId: cartProduct._id }, { $inc: { timesSold: cartProduct.quantity } })
-	))
+    const updates = Object.values(cart).map((cartProduct: any) => (
+        ProductVariables.findOneAndUpdate({ productId: cartProduct._id }, { $inc: { timesSold: cartProduct.quantity } })
+    ))
 
-	return Promise.all(updates)
+    return Promise.all(updates)
 }
 
 export const updateOrderStatus = (orderId: string, status: number, message?: string) => {
-	switch (status) {
-		case OrderStatus.APPROVED:
-		case OrderStatus.CANCELED:
-		case OrderStatus.RETURN_DENIED: return Order.findByIdAndUpdate(orderId, { status, message }, { new: true })
-		default: return Order.findByIdAndUpdate(orderId, { status }, { new: true })
-	}
+    switch (status) {
+        case OrderStatus.APPROVED:
+        case OrderStatus.CANCELED:
+        case OrderStatus.RETURN_DENIED: return Order.findByIdAndUpdate(orderId, { status, message }, { new: true })
+        default: return Order.findByIdAndUpdate(orderId, { status }, { new: true })
+    }
 }

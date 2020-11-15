@@ -9,7 +9,6 @@ import comment from './comments/comments.controller'
 import order from './order/order.controller'
 import cart from './cart/cart.controller'
 import type from './type/type.controller'
-import manager from './manager/manager.controller'
 import admin from './admin/admin.controller'
 import log from './log/log.controller'
 import ticket from './ticket/ticket.controller'
@@ -24,7 +23,6 @@ router.use('/comments', comment)
 router.use('/orders', order)
 router.use('/cart', cart)
 router.use('/types', type)
-router.use('/managers', manager)
 router.use('/admins', admin)
 router.use('/logs', log)
 router.use('/tickets', ticket)

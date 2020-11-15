@@ -1,6 +1,5 @@
 enum Authority {
     USER,
-    MANAGER,
     ADMIN
 }
 

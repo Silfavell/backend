@@ -4,10 +4,8 @@ import rateLimit from 'express-rate-limit'
 
 import {
     registerUser,
-    registerManager,
     createActivationCode,
     login,
-    isManagerVerified,
     checkConvenientOfActivationCodeRequest,
     createToken
 } from './auth.service'
@@ -17,12 +15,10 @@ import {
     isUserExists,
     getActivationCode,
     compareActivationCode,
-    isManagerNonExists,
-    isManagerExists,
+    isAdminExists,
 
     sendActivationCodeSchema,
     registerSchema,
-    registerManagerSchema,
     loginSchema,
     resetPasswordSchema
 } from './auth.validator'
@@ -56,23 +52,13 @@ router.post('/register', async (req, res) => {
     res.json({ user, token })
 })
 
-router.post('/register-manager', async (req, res) => {
-    await Promise.all([registerManagerSchema.validateAsync(req.body), isManagerNonExists(req.body.phoneNumber)])
-    const activationCode = await getActivationCode(req.body.phoneNumber, ActivationCodes.REGISTER_MANAGER)
-    await compareActivationCode(req.body.activationCode, activationCode.toString())
-    await registerManager({ ...req.body, ...{ verified: false } })
-
-    res.json()
-})
-
-router.post('/login-manager', apiLimiter, async (req, res) => {
+router.post('/login-admin', apiLimiter, async (req, res) => {
     await loginSchema.validateAsync(req.body)
-    const manager = await isManagerExists(req.body.phoneNumber)
-    await login(manager, req.body.password)
-    await isManagerVerified(manager)
-    const token = await createToken(manager)
+    const admin = await isAdminExists(req.body.phoneNumber)
+    await login(admin, req.body.password)
+    const token = await createToken(admin)
 
-    res.json({ manager, token })
+    res.json({ admin, token })
 })
 
 router.post('/login', async (req, res) => {

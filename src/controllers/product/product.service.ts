@@ -11,7 +11,6 @@ import {
 	ProductType,
 	ProductVariables,
 	Comment,
-	Manager,
 	Ticket,
 	ProductTypeDocument,
 	CategoryDocument,
@@ -2190,18 +2189,6 @@ const replaceProductId = (product: ProductDocument) => (
 
 export const getTickets = () => (
 	Ticket.find()
-)
-
-export const verifyManager = (managerId: string) => (
-	Manager.findByIdAndUpdate(managerId, { verified: true }, { new: true })
-)
-
-export const unverifyManager = (managerId: string) => (
-	Manager.findByIdAndUpdate(managerId, { verified: false }, { new: true })
-)
-
-export const deleteManager = (managerId: string) => (
-	Manager.findByIdAndDelete(managerId)
 )
 
 export const saveCategoryToDatabase = (categoryContext: CategoryDocument) => (

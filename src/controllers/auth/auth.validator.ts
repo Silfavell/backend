@@ -3,7 +3,7 @@ import HttpStatusCodes from 'http-status-codes'
 import JoiBase from '@hapi/joi'
 import JoiPhoneNumber from 'joi-phone-number'
 
-import { User, Manager } from '../../models'
+import { User, Admin } from '../../models'
 import ServerError from '../../errors/ServerError'
 import ErrorMessages from '../../errors/ErrorMessages'
 import ActivationCodes from '../../enums/activation-code-enum'
@@ -21,26 +21,15 @@ export const comparePasswords = async (oldPassword: string, newPassword: string)
 	return
 }
 
-/** If User exists, throws Error. */
-export const isManagerNonExists = async (phoneNumber: string) => {
-	const manager = await Manager.findOne({ phoneNumber })
-
-	if (manager) {
-		throw new ServerError(ErrorMessages.MANAGER_ALREADY_EXISTS, HttpStatusCodes.BAD_REQUEST, ErrorMessages.MANAGER_ALREADY_EXISTS, false)
-	}
-
-	return
-}
-
 /** If User not exists, throws Error. */
-export const isManagerExists = async (phoneNumber: string) => {
-	const manager = await Manager.findOne({ phoneNumber })
+export const isAdminExists = async (phoneNumber: string) => {
+	const admin = await Admin.findOne({ phoneNumber })
 
-	if (!manager) {
-		throw new ServerError(ErrorMessages.MANAGER_IS_NOT_EXISTS, HttpStatusCodes.UNAUTHORIZED, ErrorMessages.MANAGER_IS_NOT_EXISTS, false)
+	if (!admin) {
+		throw new ServerError(ErrorMessages.UNEXPECTED_ERROR, HttpStatusCodes.UNAUTHORIZED, ErrorMessages.UNEXPECTED_ERROR, false)
 	}
 
-	return manager
+	return admin
 }
 
 /** If User exists, throws Error. */
@@ -58,7 +47,7 @@ export const isUserNonExists = async (phoneNumber: string) => {
 export const isUserExists = async (phoneNumber: string) => {
 	const user = await User.findOne({ phoneNumber })
 	if (!user) {
-		throw new ServerError(ErrorMessages.USER_IS_NOT_EXISTS, HttpStatusCodes.UNAUTHORIZED, null, false)
+		throw new ServerError(ErrorMessages.USER_IS_NOT_EXISTS, HttpStatusCodes.UNAUTHORIZED, phoneNumber, false)
 	}
 
 	return user
@@ -93,14 +82,6 @@ export const sendActivationCodeSchema = Joi.object({
 })
 
 export const registerSchema = Joi.object({
-	phoneNumber: Joi.string().phoneNumber({ defaultCountry: 'TR', format: 'national', strict: true }).required(),
-	nameSurname: Joi.string().required(),
-	email: Joi.string().email().required(),
-	password: Joi.string().min(4).required(),
-	activationCode: Joi.number().min(1000).max(9999).required()
-})
-
-export const registerManagerSchema = Joi.object({
 	phoneNumber: Joi.string().phoneNumber({ defaultCountry: 'TR', format: 'national', strict: true }).required(),
 	nameSurname: Joi.string().required(),
 	email: Joi.string().email().required(),

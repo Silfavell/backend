@@ -38,13 +38,6 @@ class ErrorMessages {
     static ANOTHER_TYPE_WITH_THE_SAME_NAME = 'Aynı isimde başka bir ürün tipi var! Lütfen tekil bir isim kullanınız.'
 
 
-    static MANAGER_ALREADY_EXISTS = 'Telefon numarasına ait yönetici var'
-
-    static MANAGER_IS_NOT_EXISTS = 'Telefon numarasına ait yönetici bulunamadı'
-
-    static MANAGER_IS_NOT_VERIFIED = 'Yönetici henüz onaylanmamış'
-
-
     static CATEGORY_IS_NOT_EXISTS = 'Kategori mevcut değil.'
 
     static CAN_NOT_DELETE_CATEGORY = 'This Category can not be deletable since there are SubCategories belongs to this Category.'
