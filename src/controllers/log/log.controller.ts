@@ -8,7 +8,7 @@ const router = Router()
 
 router.use(validateAuthority(Authority.ADMIN))
 
-router.get('/log', (_, res) => {
+router.get('/log', (req, res, next) => {
 	if (process.platform === 'win32') {
 		const date = new Date().toLocaleDateString('tr', { day: '2-digit', month: '2-digit', year: 'numeric' })
 		const file = path.join(__dirname, `../../logs/info/${date}.log`)
@@ -24,7 +24,7 @@ router.get('/log', (_, res) => {
 	}
 })
 
-router.get('/error-log', (_, res) => {
+router.get('/error-log', (req, res, next) => {
 	if (process.platform === 'win32') {
 		const date = new Date().toLocaleDateString('tr', { day: '2-digit', month: '2-digit', year: 'numeric' })
 		const file = path.join(__dirname, `../../logs/error/${date}.log`)

@@ -4,9 +4,6 @@
 
 import { Router } from 'express'
 
-import { validateAuthority } from '../../middlewares/auth-middleware'
-import Authority from '../../enums/authority-enum'
-
 import {
     saveCart,
     clearCart,
@@ -18,27 +15,43 @@ import {
     validateProducts
 } from './cart.validator'
 
+import { validateAuthority } from '../../middlewares/auth-middleware'
+import Authority from '../../enums/authority-enum'
+import { handleError } from '../../utils/handle-error'
+
 const router = Router()
 
 router.use(validateAuthority(Authority.USER))
 
-router.post('/', async (req, res) => {
-    await Promise.all([validateProducts(req.body), validateProductIds(req.body)])
-    const response = await saveCart(req.user._id, req.body)
+router.post('/', async (req, res, next) => {
+    try {
+        await Promise.all([validateProducts(req.body), validateProductIds(req.body)])
+        const response = await saveCart(req.user._id, req.body)
 
-    res.json(response)
+        res.json(response)
+    } catch (error) {
+        next(handleError(error, req.protocol + '://' + req.get('host') + req.originalUrl))
+    }
 })
 
-router.delete('/', async (req, res) => {
-    await clearCart(req.user._id.toString())
+router.delete('/', async (req, res, next) => {
+    try {
+        await clearCart(req.user._id.toString())
 
-    res.json()
+        res.json()
+    } catch (error) {
+        next(handleError(error, req.protocol + '://' + req.get('host') + req.originalUrl))
+    }
 })
 
-router.get('/', async (req, res) => {
-    const cart = await getCart(req.user._id.toString())
+router.get('/', async (req, res, next) => {
+    try {
+        const cart = await getCart(req.user._id.toString())
 
-    res.json({ cart })
+        res.json({ cart })
+    } catch (error) {
+        next(handleError(error, req.protocol + '://' + req.get('host') + req.originalUrl))
+    }
 })
 
 

@@ -835,7 +835,7 @@ declare namespace Joi {
         bind(): this;
 
         /**
-         * Adds caching to the schema which will attempt to cache the validation results (success and failures) of incoming inputs.
+         * Adds caching to the schema which will attempt to cache the validation results (success and failures, next) of incoming inputs.
          * If no cache is passed, a default cache is provisioned by using `cache.provision()` internally.
          */
         cache(cache?: Cache): this;

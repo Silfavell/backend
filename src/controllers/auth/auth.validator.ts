@@ -47,7 +47,7 @@ export const isUserNonExists = async (phoneNumber: string) => {
 export const isUserExists = async (phoneNumber: string) => {
 	const user = await User.findOne({ phoneNumber })
 	if (!user) {
-		throw new ServerError(ErrorMessages.USER_IS_NOT_EXISTS, HttpStatusCodes.UNAUTHORIZED, phoneNumber, false)
+		throw new ServerError(ErrorMessages.USER_IS_NOT_EXISTS, HttpStatusCodes.UNAUTHORIZED, ErrorMessages.USER_IS_NOT_EXISTS, false)
 	}
 
 	return user

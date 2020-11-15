@@ -27,7 +27,7 @@ router.use('/admins', admin)
 router.use('/logs', log)
 router.use('/tickets', ticket)
 
-router.get('/static', (req, res) => {
+router.get('/static', (req, res, next) => {
     res.sendFile(path.join(__dirname, `../../public/assets/${req.query.folder}/${req.query.image}`))
 })
 

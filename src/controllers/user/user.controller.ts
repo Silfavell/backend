@@ -34,53 +34,53 @@ const router = Router()
 
 router.use(validateAuthority(Authority.USER))
 
-router.get('/profile', async (req, res) => {
+router.get('/profile', async (req, res, next) => {
     const user = await isUserExists(req.user.phoneNumber)
 
     res.json(user)
 })
 
-router.put('/profile', async (req, res) => {
+router.put('/profile', async (req, res, next) => {
     await updateProfileSchema.validateAsync(req.body)
     const user = await updateUser(req.user._id, req.body)
 
     res.json(user)
 })
 
-router.post('/address', async (req, res) => {
+router.post('/address', async (req, res, next) => {
     await saveAddressSchema.validateAsync(req.body)
     const user = await saveAddressToDatabase(req.user._id, req.body)
 
     res.json(user)
 })
 
-router.get('/favorite-products', async (req, res) => {
+router.get('/favorite-products', async (req, res, next) => {
     const favoriteProducts = (await getFavoriteProductsFromDatabase(req.user._id))[0]
 
     res.json(favoriteProducts)
 })
 
-router.post('/favorite-product', async (req, res) => {
+router.post('/favorite-product', async (req, res, next) => {
     await favoriteProductSchema.validateAsync(req.body)
     const { favoriteProducts } = await saveFavoriteProductToDatabase(req.user._id, req.body)
 
     res.json(favoriteProducts)
 })
 
-router.delete('/favorite-product/:_id', async (req, res) => {
+router.delete('/favorite-product/:_id', async (req, res, next) => {
     await favoriteProductSchema.validateAsync(req.params)
     const { favoriteProducts } = await removeFavoriteProductFromDatabase(req.user._id, req.params._id)
 
     res.json(favoriteProducts)
 })
 
-router.delete('/address/:_id', async (req, res) => {
+router.delete('/address/:_id', async (req, res, next) => {
     const user = await deleteAddress(req.user._id, req.params._id)
 
     res.json(user)
 })
 
-router.put('/change-password', async (req, res) => {
+router.put('/change-password', async (req, res, next) => {
     await Promise.all([changePasswordSchema.validateAsync(req.body), comparePasswords(req.user.password, req.body.oldPassword)])
     const user = await isUserExists(req.user.phoneNumber)
     await changePassword(user, req.body.newPassword)
@@ -88,7 +88,7 @@ router.put('/change-password', async (req, res) => {
     res.json()
 })
 
-router.put('/phone-number', async (req, res) => {
+router.put('/phone-number', async (req, res, next) => {
     const { newPhoneNumber } = await updatePhoneNumberSchema.validateAsync(req.body)
     const activationCode = await getActivationCode(newPhoneNumber, ActivationCodes.UPDATE_PHONE_NUMBER)
 

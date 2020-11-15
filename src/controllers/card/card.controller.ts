@@ -1,8 +1,5 @@
 import { Router } from 'express'
 
-import { validateAuthority } from '../../middlewares/auth-middleware'
-import Authority from '../../enums/authority-enum'
-
 import {
     listCards,
     addCardToUser,
@@ -14,28 +11,44 @@ import {
     deletePaymentCardSchema
 } from './card.validator'
 
+import { validateAuthority } from '../../middlewares/auth-middleware'
+import Authority from '../../enums/authority-enum'
+import { handleError } from '../../utils/handle-error'
+
 const router = Router()
 
 router.use(validateAuthority(Authority.USER))
 
-router.get('/list-cards', async (req, res) => {
-    const cards = await listCards(req.user.cardUserKey)
+router.get('/list-cards', async (req, res, next) => {
+    try {
+        const cards = await listCards(req.user.cardUserKey)
 
-    res.json(cards)
+        res.json(cards)
+    } catch (error) {
+        next(handleError(error, req.protocol + '://' + req.get('host') + req.originalUrl))
+    }
 })
 
-router.post('/payment-card', async (req, res) => {
-    await postPaymentCardSchema.validateAsync(req.body.card)
-    const response = await addCardToUser(req.user, req.body.card)
+router.post('/payment-card', async (req, res, next) => {
+    try {
+        await postPaymentCardSchema.validateAsync(req.body.card)
+        const response = await addCardToUser(req.user, req.body.card)
 
-    res.json(response)
+        res.json(response)
+    } catch (error) {
+        next(handleError(error, req.protocol + '://' + req.get('host') + req.originalUrl))
+    }
 })
 
-router.delete('/payment-card/:cardToken', async (req, res) => {
-    await deletePaymentCardSchema.validateAsync(req.params)
-    const response = await deleteCard(req.user, req.params.cardToken)
+router.delete('/payment-card/:cardToken', async (req, res, next) => {
+    try {
+        await deletePaymentCardSchema.validateAsync(req.params)
+        const response = await deleteCard(req.user, req.params.cardToken)
 
-    res.json(response)
+        res.json(response)
+    } catch (error) {
+        next(handleError(error, req.protocol + '://' + req.get('host') + req.originalUrl))
+    }
 })
 
 export default router
