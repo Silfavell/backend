@@ -1,8 +1,0 @@
-/products
-
-/products-with-categories -> /products/in-categories
-
-/best-seller -> /products/best-seller
-
-/best-seller-mobile -> /products/best-seller-mobile
-
