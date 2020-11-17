@@ -1,8 +1,6 @@
 enum Authority {
     USER,
-    MANAGER,
-    ADMIN,
-    ANONIM
+    ADMIN
 }
 
 export default Authority

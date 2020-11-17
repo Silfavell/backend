@@ -1,4 +1,6 @@
 class ErrorMessages {
+    static NO_PERMISSION = 'Bu veriye ulaşmak için yetkiniz yok'
+
     static WRONG_ACTIVATION_CODE = 'Hatalı aktivasyon kodu'
 
     static UNEXPECTED_ERROR = 'Beklenmedik bir hata oluştu, lütfen daha sonra tekrar deneyiniz'
@@ -34,13 +36,6 @@ class ErrorMessages {
     static ANOTHER_SUB_CATEGORY_WITH_THE_SAME_NAME = 'Aynı isimde başka bir alt kategori var! Lütfen tekil bir isim kullanınız.'
 
     static ANOTHER_TYPE_WITH_THE_SAME_NAME = 'Aynı isimde başka bir ürün tipi var! Lütfen tekil bir isim kullanınız.'
-
-
-    static MANAGER_ALREADY_EXISTS = 'Telefon numarasına ait yönetici var'
-
-    static MANAGER_IS_NOT_EXISTS = 'Telefon numarasına ait yönetici bulunamadı'
-
-    static MANAGER_IS_NOT_VERIFIED = 'Yönetici henüz onaylanmamış'
 
 
     static CATEGORY_IS_NOT_EXISTS = 'Kategori mevcut değil.'
