@@ -1454,7 +1454,7 @@ const setUnmatchedFilters = (res: any, query: any) => (
 			})
 		}
 
-		resolve(res, next)
+		resolve(res)
 	})
 )
 
@@ -1477,7 +1477,7 @@ const setUnmatchedBrands = (res: any, query: any, isMobile?: boolean) => (
 			})
 		}
 
-		resolve(res, next)
+		resolve(res)
 	})
 )
 
@@ -1879,8 +1879,8 @@ export const filterShop = (query: any, params: any) => {
 				productsLength: { $first: '$productsLength' }
 			}
 		}
-	]).then((res, next) => setUnmatchedFilters(res[0], query))
-		.then((res, next) => setUnmatchedBrands(res, query))
+	]).then((res) => setUnmatchedFilters(res[0], query))
+		.then((res) => setUnmatchedBrands(res, query))
 }
 
 export const productsFilterMobile = (query: any) => {
@@ -2165,7 +2165,7 @@ export const productsFilterMobile = (query: any) => {
 				maxPrice: { $first: '$maxPrice' }
 			}
 		}
-	]).then((res, next) => {
+	]).then((res) => {
 		const mobile = true
 		return setUnmatchedBrands(res[0], query, mobile)
 	})
