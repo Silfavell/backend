@@ -54,7 +54,7 @@ router.post('/send-activation-code', async (req, res, next) => {
 router.post('/register', async (req, res, next) => {
     try {
         await Promise.all([registerSchema.validateAsync(req.body), isUserNonExists(req.body.phoneNumber)])
-        const activationCode = getActivationCode(req.body.phoneNumber, ActivationCodes.REGISTER_USER)
+        const activationCode = await getActivationCode(req.body.phoneNumber, ActivationCodes.REGISTER_USER)
         await compareActivationCode(req.body.activationCode, activationCode.toString())
         const user = await registerUser(req.body)
         const token = await createToken(user)
