@@ -1,4 +1,4 @@
-import HttpStatusCodes from 'http-status-codes';
+import HttpStatusCodes from 'http-status-codes'
 import mongoose, { Document, Schema } from 'mongoose'
 
 import Product from './Product'
@@ -6,9 +6,9 @@ import ServerError from '../errors/ServerError'
 import ErrorMessages from '../errors/ErrorMessages'
 
 export type ProductTypeDocument = Document & {
-	name: string,
-	slug: string,
-	specifications: [string]
+	name: string;
+	slug: string;
+	specifications: [string];
 }
 
 const productTypeSchema = new Schema({

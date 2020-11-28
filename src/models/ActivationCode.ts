@@ -1,9 +1,9 @@
 import mongoose, { Document, Schema } from 'mongoose'
 
 export type ActivationCodeDocument = Document & {
-	userPhoneNumber: string,
-	activationCodeType: number,
-	activationCode: number
+	userPhoneNumber: string;
+	activationCodeType: number;
+	activationCode: number;
 }
 
 const activationCodeSchema = new Schema({

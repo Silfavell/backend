@@ -32,7 +32,7 @@ router.use('/tickets', ticket)
 router.use('/mobile', mobile)
 
 router.get('/static', (req, res, next) => {
-    res.sendFile(path.join(__dirname, `../../public/assets/${req.query.folder}/${req.query.image}`))
+	res.sendFile(path.join(__dirname, `../../public/assets/${req.query.folder}/${req.query.image}`))
 })
 
 export default router

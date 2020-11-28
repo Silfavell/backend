@@ -1,4 +1,4 @@
-import HttpStatusCodes from 'http-status-codes';
+import HttpStatusCodes from 'http-status-codes'
 import mongoose, { Document, Schema } from 'mongoose'
 
 import SubCategory, { SubCategoryDocument } from './SubCategory'
@@ -9,11 +9,11 @@ import ErrorMessages from '../errors/ErrorMessages'
 
 
 export type CategoryDocument = Document & {
-	name: string,
-	slug: string,
-	subCategories: [SubCategoryDocument],
-	brands: [BrandDocument],
-	imagePath: number
+	name: string;
+	slug: string;
+	subCategories: [SubCategoryDocument];
+	brands: [BrandDocument];
+	imagePath: number;
 }
 
 const categorySchema = new Schema({

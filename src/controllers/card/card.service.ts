@@ -6,7 +6,7 @@ import ServerError from '../../errors/ServerError'
 
 import PaymentProvider from './utils/payment-provider'
 import {
-    User,
+	User,
 	UserDocument
 } from '../../models'
 

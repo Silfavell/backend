@@ -11,8 +11,6 @@ export const isOrderBelongsToUser = async (orderId: string, userPhone: string) =
 	if (phoneNumber !== userPhone) {
 		throw new ServerError(ErrorMessages.NO_PERMISSION, HttpStatusCodes.FORBIDDEN, ErrorMessages.NO_PERMISSION, false)
 	}
-
-	return
 }
 
 export const confirmOrderSchema = Joi.object({
@@ -41,4 +39,5 @@ export const returnItemsSchema = Joi.array().min(1).items(
 		_id: Joi.string().required(),
 		quantity: Joi.number().positive().required()
 	})
-).sparse(false).required()
+).sparse(false)
+	.required()

@@ -17,8 +17,6 @@ export const comparePasswords = async (oldPassword: string, newPassword: string)
 	if (!validPassword) {
 		throw new ServerError(ErrorMessages.WRONG_PHONE_OR_PASSWORD, HttpStatusCodes.UNAUTHORIZED, null, false)
 	}
-
-	return
 }
 
 /** If User not exists, throws Error. */
@@ -39,8 +37,6 @@ export const isUserNonExists = async (phoneNumber: string) => {
 	if (user) {
 		throw new ServerError(ErrorMessages.USER_ALREADY_EXISTS, HttpStatusCodes.BAD_REQUEST, null, false)
 	}
-
-	return
 }
 
 /** If User exists, returns It else throws Error. */
@@ -72,8 +68,6 @@ export const compareActivationCode = async (activationCodeFromRequest: string, c
 	if (activationCodeFromRequest !== correctActivationCode) {
 		throw new ServerError(ErrorMessages.WRONG_ACTIVATION_CODE, HttpStatusCodes.BAD_REQUEST, ErrorMessages.WRONG_ACTIVATION_CODE, false)
 	}
-
-	return
 }
 
 export const sendActivationCodeSchema = Joi.object({

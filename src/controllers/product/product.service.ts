@@ -16,7 +16,8 @@ import {
 	CategoryDocument,
 	Cart,
 	Brand,
-	CartDocument
+	CartDocument,
+	User
 } from '../../models'
 import ServerError from '../../errors/ServerError'
 import ErrorMessages from '../../errors/ErrorMessages'
@@ -179,7 +180,7 @@ export const getProductAndWithColorGroup = (slug: string) => (
 						}
 					},
 					{
-						'groupSize': {
+						groupSize: {
 							$eq: 0
 						}
 					}
@@ -667,7 +668,7 @@ export const getFilteredProductsWithCategories = (query: any) => {
 export const addProductToCart = async (product: ProductDocument, cartObj: CartDocument, user: UserDocument, quantity: number) => {
 	if (user?._id.toString()) {
 		if (cartObj && cartObj.cart) {
-			const foundCartProduct = cartObj.cart.find((cartProduct => cartProduct._id === product._id.toString()))
+			const foundCartProduct = cartObj.cart.find(((cartProduct) => cartProduct._id === product._id.toString()))
 
 			if (foundCartProduct) {
 				foundCartProduct.quantity += quantity
@@ -714,20 +715,19 @@ export const setProductToCart = async (product: ProductDocument, cartObj: CartDo
 			}, { new: true })
 
 			return product
-		} else {
-			const foundProduct = cartObj.cart.find((cartProduct) => cartProduct._id.toString() === product._id.toString())
-			if (foundProduct) {
-				foundProduct.quantity = quantity
-			} else {
-				cartObj.cart.push({
-					_id: product._id,
-					quantity
-				})
-			}
-
-			await cartObj.save()
-			return Object.assign(product.toObject(), { quantity })
 		}
+		const foundProduct = cartObj.cart.find((cartProduct) => cartProduct._id.toString() === product._id.toString())
+		if (foundProduct) {
+			foundProduct.quantity = quantity
+		} else {
+			cartObj.cart.push({
+				_id: product._id,
+				quantity
+			})
+		}
+
+		await cartObj.save()
+		return Object.assign(product.toObject(), { quantity })
 	}
 
 	return product
@@ -736,7 +736,7 @@ export const setProductToCart = async (product: ProductDocument, cartObj: CartDo
 export const takeOffProductFromCart = async (product: ProductDocument, cartObj: CartDocument, user: UserDocument, quantity: number) => {
 	if (user?._id.toString()) {
 		if (cartObj && cartObj.cart) {
-			const foundCartProduct = cartObj.cart.find((cartProduct => cartProduct._id === product._id.toString()))
+			const foundCartProduct = cartObj.cart.find(((cartProduct) => cartProduct._id === product._id.toString()))
 
 			if (foundCartProduct) {
 				if (foundCartProduct.quantity > quantity) {
@@ -767,21 +767,19 @@ export const takeOffProductFromCart = async (product: ProductDocument, cartObj: 
 	return product
 }
 
-const getBlackList = () => {
-	return [
-		'category',
-		'type',
-		'categoryId',
-		'subCategoryId',
-		'brands',
-		'productIds',
-		'start',
-		'quantity',
-		'sortType',
-		'minPrice',
-		'maxPrice'
-	]
-}
+const getBlackList = () => [
+	'category',
+	'type',
+	'categoryId',
+	'subCategoryId',
+	'brands',
+	'productIds',
+	'start',
+	'quantity',
+	'sortType',
+	'minPrice',
+	'maxPrice'
+]
 
 const getSpecificationFilterStages = (query: any) => {
 	const specificationKeys = Object.keys(query).filter((key) => !getBlackList().includes(key))
@@ -800,18 +798,16 @@ const getSpecificationFilterStages = (query: any) => {
 				$match: {
 					$expr: {
 						$or: (
-							specificationKeys.reduce((prevVal: any, curVal) => {
-								return [...prevVal, {
-									$and: [
-										{
-											$eq: ['$specs.slug', curVal],
-										},
-										{
-											$in: ['$specs.value', (typeof query[curVal] === 'string' ? [query[curVal]] : query[curVal])]
-										}
-									]
-								}]
-							}, [])
+							specificationKeys.reduce((prevVal: any, curVal) => [...prevVal, {
+								$and: [
+									{
+										$eq: ['$specs.slug', curVal],
+									},
+									{
+										$in: ['$specs.value', (typeof query[curVal] === 'string' ? [query[curVal]] : query[curVal])]
+									}
+								]
+							}], [])
 						)
 					}
 				}
@@ -1025,7 +1021,7 @@ const getListSpecificationsStages = (query: any) => {
 			}
 		},
 
-		/****/
+		/** * */
 		{
 			$unwind: '$products'
 		},
@@ -1058,18 +1054,16 @@ const getListSpecificationsStages = (query: any) => {
 							as: 'specification',
 							cond: {
 								$or: (
-									specificationKeys.reduce((prevVal: any, curVal) => {
-										return [...prevVal, {
-											$and: [
-												{
-													$eq: ['$$specification.slug', curVal],
-												},
-												{
-													$in: ['$$specification.value', (typeof query[curVal] === 'string' ? [query[curVal]] : query[curVal])]
-												}
-											]
-										}]
-									}, [])
+									specificationKeys.reduce((prevVal: any, curVal) => [...prevVal, {
+										$and: [
+											{
+												$eq: ['$$specification.slug', curVal],
+											},
+											{
+												$in: ['$$specification.value', (typeof query[curVal] === 'string' ? [query[curVal]] : query[curVal])]
+											}
+										]
+									}], [])
 								)
 							}
 						}
@@ -1436,7 +1430,7 @@ const getBrandsStages = (filterStages: any[], query: any): any[] => {
 const setUnmatchedFilters = (res: any, query: any) => (
 	new Promise((resolve, reject) => {
 		if (res?.specifications) {
-			res.specifications.map((specification: { name: string, slug: string, values: { value: string, count: number }[] }) => {
+			res.specifications.map((specification: { name: string; slug: string; values: { value: string; count: number }[] }) => {
 				if (query[specification.slug]) {
 					query[specification.slug] = typeof query[specification.slug] === 'string' ? [query[specification.slug]] : query[specification.slug]
 
@@ -1465,7 +1459,7 @@ const setUnmatchedBrands = (res: any, query: any, isMobile?: boolean) => (
 		if (query.brands && res?.brands) {
 			query.brands = typeof query.brands === 'string' ? [query.brands] : query.brands
 
-			res.brands.map((brand: { name: string, count: number }) => {
+			res.brands.map((brand: { name: string; count: number }) => {
 				query.brands.splice(query.brands.indexOf(brand.name), 1)
 			})
 
@@ -2218,9 +2212,8 @@ export const deleteCategoryFromDatabase = async (categoryId: string) => {
 
 	if (category) {
 		return await category.remove()
-	} else {
-		throw new ServerError(ErrorMessages.CATEGORY_IS_NOT_EXISTS, HttpStatusCodes.BAD_REQUEST, ErrorMessages.CATEGORY_IS_NOT_EXISTS, false)
 	}
+	throw new ServerError(ErrorMessages.CATEGORY_IS_NOT_EXISTS, HttpStatusCodes.BAD_REQUEST, ErrorMessages.CATEGORY_IS_NOT_EXISTS, false)
 }
 
 export const updateCategory = (categoryId: string, categoryContext: CategoryDocument) => (
@@ -2380,4 +2373,71 @@ export const verifyComment = (_id: string) => (
 
 export const deleteComment = (_id: string) => (
 	Comment.findByIdAndDelete(_id)
+)
+
+
+export const saveFavoriteProductToDatabase = (userId: string, { _id }: any) => (
+	User.findByIdAndUpdate(userId, {
+		$addToSet: {
+			favoriteProducts: _id
+		}
+	}, {
+		new: true,
+		fields: { favoriteProducts: 1 }
+	})
+)
+
+export const removeFavoriteProductFromDatabase = (userId: string, _id: string) => (
+	User.findByIdAndUpdate(userId, {
+		$pull: {
+			favoriteProducts: _id
+		}
+	}, {
+		new: true,
+		fields: { favoriteProducts: 1 }
+	})
+)
+
+export const getFavoriteProductsFromDatabase = (userId: string) => (
+	User.aggregate([
+		{
+			$match: {
+				_id: userId
+			}
+		},
+		{
+			$project: {
+				favoriteProducts: 1
+			}
+		},
+		{
+			$unwind: '$favoriteProducts'
+		},
+		{
+			$project: {
+				favoriteProducts: {
+					$toObjectId: '$favoriteProducts'
+				}
+			}
+		},
+		{
+			$lookup: {
+				from: Product.collection.name,
+				localField: 'favoriteProducts',
+				foreignField: '_id',
+				as: 'favoriteProducts'
+			}
+		},
+		{
+			$unwind: '$favoriteProducts'
+		},
+		{
+			$group: {
+				_id: '$_id',
+				favoriteProducts: {
+					$push: '$favoriteProducts'
+				}
+			}
+		}
+	])
 )

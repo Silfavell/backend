@@ -4,7 +4,7 @@ import {
 	Category,
 	ProductDocument,
 	CategoryDocument,
-    ProductType,
+	ProductType,
 } from '../../models'
 import Brand from '../../models/Brand'
 import ServerError from '../../errors/ServerError'
@@ -74,27 +74,21 @@ export const getCategories = () => (
 )
 
 
-export const saveCategoryToDatabase = (categoryContext: CategoryDocument) => {
-	return new Category(categoryContext).save()
-}
+export const saveCategoryToDatabase = (categoryContext: CategoryDocument) => new Category(categoryContext).save()
 
-export const saveSubCategoryToDatabase = (body: any) => {
-	return Category.findByIdAndUpdate(body.parentCategoryId, {
-		$push: {
-			subCategories: body
-		}
-	}, { new: true })
-}
+export const saveSubCategoryToDatabase = (body: any) => Category.findByIdAndUpdate(body.parentCategoryId, {
+	$push: {
+		subCategories: body
+	}
+}, { new: true })
 
-export const deleteSubCategoryFromDatabase = (body: any) => {
-	return Category.findByIdAndUpdate(body.parentCategoryId, {
-		$pull: {
-			subCategories: {
-				_id: body._id
-			}
+export const deleteSubCategoryFromDatabase = (body: any) => Category.findByIdAndUpdate(body.parentCategoryId, {
+	$pull: {
+		subCategories: {
+			_id: body._id
 		}
-	}, { new: true })
-}
+	}
+}, { new: true })
 
 export const deleteCategoryFromDatabase = async (categoryId: string) => {
 	const category = await Category.findById(categoryId)
@@ -106,9 +100,7 @@ export const deleteCategoryFromDatabase = async (categoryId: string) => {
 	return await category.remove()
 }
 
-export const updateCategory = (categoryId: string, categoryContext: CategoryDocument) => {
-	return Category.findByIdAndUpdate(categoryId, categoryContext)
-}
+export const updateCategory = (categoryId: string, categoryContext: CategoryDocument) => Category.findByIdAndUpdate(categoryId, categoryContext)
 
 export const isSubCategorySlugExists = async (body: any, slug: string) => { // is category exists ? isSubCategoryExists ? test. // TODO
 	const parentCategory = await Category.findById(body.parentCategoryId)

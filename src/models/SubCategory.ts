@@ -2,10 +2,10 @@ import mongoose, { Document, Schema } from 'mongoose'
 import Brand, { BrandDocument } from './Brand'
 
 export type SubCategoryDocument = Document & {
-	name: string,
-	slug: string,
-	types: [Schema.Types.ObjectId],
-	brands: [BrandDocument]
+	name: string;
+	slug: string;
+	types: [Schema.Types.ObjectId];
+	brands: [BrandDocument];
 }
 
 const subCategorySchema = new Schema({

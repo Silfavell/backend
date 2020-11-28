@@ -1,8 +1,8 @@
 import mongoose, { Document, Schema } from 'mongoose'
 
 export type BrandDocument = Document & {
-	name: string,
-	productQuantity: number
+	name: string;
+	productQuantity: number;
 }
 
 const brandSchema = new Schema({

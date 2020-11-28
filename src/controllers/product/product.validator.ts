@@ -50,7 +50,8 @@ export const saveProductSchema = Joi.object({
 	name: Joi.string().required(),
 	details: Joi.string().allow(null, ''),
 	type: Joi.string().required(),
-	specifications: Joi.array().min(1).items(productSpecificationsSchema).sparse(false).allow(null),
+	specifications: Joi.array().min(1).items(productSpecificationsSchema).sparse(false)
+		.allow(null),
 	price: Joi.number().positive().required(),
 	discountedPrice: Joi.number().positive().less(Joi.ref('price')).allow(null),
 	imageCount: Joi.number().min(0).default(0),
@@ -68,7 +69,8 @@ export const updateProductSchema = Joi.object({
 	name: Joi.string().allow(null),
 	details: Joi.string().allow(null, ''),
 	type: Joi.string(),
-	specifications: Joi.array().min(1).items(productSpecificationsSchema).sparse(false).allow(null),
+	specifications: Joi.array().min(1).items(productSpecificationsSchema).sparse(false)
+		.allow(null),
 	price: Joi.number().positive().allow(null),
 	discountedPrice: Joi.number().positive().less(Joi.ref('price')).allow(null),
 	imageCount: Joi.number().min(0).default(0).allow(null),
@@ -77,3 +79,7 @@ export const updateProductSchema = Joi.object({
 	color: colorSchema.allow(null)
 }).with('discountedPrice', ['price'])
 	.required()
+
+export const favoriteProductSchema = Joi.object({
+	_id: Joi.string().required()
+})

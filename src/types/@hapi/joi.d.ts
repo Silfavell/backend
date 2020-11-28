@@ -388,9 +388,9 @@ declare namespace Joi {
     }
 
     interface PhoneOptions {
-        defaultCountry?: 'TR' | 'EN',
-        strict?: boolean,
-        format?: 'national'
+        defaultCountry?: 'TR' | 'EN';
+        strict?: boolean;
+        format?: 'national';
     }
 
     interface SwitchCases {
@@ -2192,5 +2192,5 @@ declare namespace Joi {
     }
 }
 
-declare const Joi: Joi.Root;
+declare const Joi: Joi.Root
 export = Joi;

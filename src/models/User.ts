@@ -4,14 +4,14 @@ import bcrypt from 'bcrypt'
 import Address, { AddressDocument } from './Address'
 
 export type UserDocument = Document & {
-	phoneNumber: string,
-	nameSurname: string,
-	alias?: string,
-	email: string,
-	password: string,
-	favoriteProducts: string[],
-	addresses: AddressDocument[],
-	cardUserKey: string
+	phoneNumber: string;
+	nameSurname: string;
+	alias?: string;
+	email: string;
+	password: string;
+	favoriteProducts: string[];
+	addresses: AddressDocument[];
+	cardUserKey: string;
 }
 
 const userSchema = new Schema({

@@ -2,7 +2,7 @@ import request from 'supertest'
 import { expect } from 'chai'
 
 import {
-		AddressDocument
+	AddressDocument
 } from '../../src/models'
 import app from '../../src/app'
 

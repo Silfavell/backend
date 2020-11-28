@@ -5,7 +5,6 @@ import app from '../../src/app'
 import { isTextContainsAllKeys } from '../tools/index'
 
 export default () => describe('POST /user/payment-card', () => {
-
 	it('with 15 character card', (done) => (
 		request(app)
 			.post('/api/user/payment-card')

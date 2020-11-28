@@ -16,8 +16,8 @@ router.get('/log', (req, res, next) => {
 	} else {
 		const date = new Date()
 		const year = date.getFullYear().toString()
-		const month = ('0' + (date.getMonth() + 1)).slice(-2)
-		const day = ('0' + date.getDate()).slice(-2)
+		const month = (`0${date.getMonth() + 1}`).slice(-2)
+		const day = (`0${date.getDate()}`).slice(-2)
 
 		const file = path.join(__dirname, `../../logs/info/${year}-${month}-${day}.log`)
 		res.download(file)
@@ -32,8 +32,8 @@ router.get('/error-log', (req, res, next) => {
 	} else {
 		const date = new Date()
 		const year = date.getFullYear().toString()
-		const month = ('0' + (date.getMonth() + 1)).slice(-2)
-		const day = ('0' + date.getDate()).slice(-2)
+		const month = (`0${date.getMonth() + 1}`).slice(-2)
+		const day = (`0${date.getDate()}`).slice(-2)
 
 		const file = path.join(__dirname, `../../logs/error/${year}-${month}-${day}.log`)
 		res.download(file)

@@ -18,39 +18,36 @@ export const deleteComment = (_id: string) => (
 )
 
 export const saveComment = (user: UserDocument, body: {
-	ownerAlias?: string,
-	productId: string,
-	comment: string,
-	title: string,
-	generalRate: number,
-	qualityRate: number,
-	priceRate: number
+	ownerAlias?: string;
+	productId: string;
+	comment: string;
+	title: string;
+	generalRate: number;
+	qualityRate: number;
+	priceRate: number;
 }) => {
 	if (body.ownerAlias) {
-		return User.findByIdAndUpdate(user._id, { alias: body.ownerAlias }).then(() => {
-			return new Comment({
-				productId: body.productId,
-				ownerId: user._id,
-				ownerAlias: body.ownerAlias,
-				title: body.title,
-				comment: body.comment,
-				generalRate: body.generalRate,
-				qualityRate: body.qualityRate,
-				priceRate: body.priceRate
-			}).save()
-		})
-	} else {
-		return new Comment({
+		return User.findByIdAndUpdate(user._id, { alias: body.ownerAlias }).then(() => new Comment({
 			productId: body.productId,
 			ownerId: user._id,
-			ownerAlias: user.alias,
+			ownerAlias: body.ownerAlias,
 			title: body.title,
 			comment: body.comment,
 			generalRate: body.generalRate,
 			qualityRate: body.qualityRate,
 			priceRate: body.priceRate
-		}).save()
+		}).save())
 	}
+	return new Comment({
+		productId: body.productId,
+		ownerId: user._id,
+		ownerAlias: user.alias,
+		title: body.title,
+		comment: body.comment,
+		generalRate: body.generalRate,
+		qualityRate: body.qualityRate,
+		priceRate: body.priceRate
+	}).save()
 }
 
 export const likeComment = (user: UserDocument, commentId: string) => (
