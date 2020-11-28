@@ -18,6 +18,6 @@ export const validateProducts = (products: ProductDocument[]) => Joi.array().min
 	.validateAsync(products)
 
 export const productSchema = Joi.object({
-	_id: Joi.string().required(),
+	_id: Joi.string().regex(/^[0-9a-fA-F]{24}$/).required(),
 	quantity: Joi.number().min(1).required()
 })

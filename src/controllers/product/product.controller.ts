@@ -287,38 +287,50 @@ router.put('/:_id', validateAuthority(Authority.ADMIN), async (req, res, next) =
 	}
 })
 
-router.get('/favorites', async (req, res, next) => {
-	const favoriteProducts = (await getFavoriteProductsFromDatabase(req.user._id))[0]
+router.get('/favorites', validateAuthority(Authority.USER), async (req, res, next) => {
+	try {
+		const favoriteProducts = (await getFavoriteProductsFromDatabase(req.user._id))[0]
 
-	res.json(favoriteProducts)
+		res.json(favoriteProducts)
+	} catch (error) {
+		next(handleError(error, `${req.protocol}://${req.get('host')}${req.originalUrl}`))
+	}
 })
 
-router.post('/favorites', async (req, res, next) => {
-	await favoriteProductSchema.validateAsync(req.body)
-	const { favoriteProducts } = await saveFavoriteProductToDatabase(req.user._id, req.body)
+router.post('/favorites', validateAuthority(Authority.USER), async (req, res, next) => {
+	try {
+		await favoriteProductSchema.validateAsync(req.body)
+		const { favoriteProducts } = await saveFavoriteProductToDatabase(req.user._id, req.body)
 
-	res.json(favoriteProducts)
+		res.json(favoriteProducts)
+	} catch (error) {
+		next(handleError(error, `${req.protocol}://${req.get('host')}${req.originalUrl}`))
+	}
 })
 
-router.delete('/favorites/:_id', async (req, res, next) => {
-	await favoriteProductSchema.validateAsync(req.params)
-	const { favoriteProducts } = await removeFavoriteProductFromDatabase(req.user._id, req.params._id)
+router.delete('/favorites/:_id', validateAuthority(Authority.USER), async (req, res, next) => {
+	try {
+		await favoriteProductSchema.validateAsync(req.params)
+		const { favoriteProducts } = await removeFavoriteProductFromDatabase(req.user._id, req.params._id)
 
-	res.json(favoriteProducts)
+		res.json(favoriteProducts)
+	} catch (error) {
+		next(handleError(error, `${req.protocol}://${req.get('host')}${req.originalUrl}`))
+	}
 })
 
 /*
-    router.delete('/product/:_id', (req, res, next) => {
-        validateObjectId(req.params._id)
-            .then(() => deleteProductFromDatabase(req.params._id))
-            .then((product) => removeProductFromSearch(product))
-            .then(() => {
-                res.json()
-            })
-            .catch((reason) => {
-                next(handleError(reason, 'DELETE /admin/product/:_id'))
-            })
-    })
+	router.delete('/product/:_id', (req, res, next) => {
+		validateObjectId(req.params._id)
+			.then(() => deleteProductFromDatabase(req.params._id))
+			.then((product) => removeProductFromSearch(product))
+			.then(() => {
+				res.json()
+			})
+			.catch((reason) => {
+				next(handleError(reason, 'DELETE /admin/product/:_id'))
+			})
+	})
 */
 
 export default router

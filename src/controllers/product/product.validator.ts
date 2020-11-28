@@ -15,7 +15,7 @@ const productSpecificationsSchema = Joi.object({
 })
 
 export const productsFilterWithCategoriesSchema = Joi.object({
-	categoryId: Joi.string().length(24).required(),
+	categoryId: Joi.string().regex(/^[0-9a-fA-F]{24}$/).required(),
 	brands: Joi.string().allow('', null),
 	sortType: Joi.string().allow('', null)
 })
@@ -42,10 +42,9 @@ export const putDeductProductSchema = Joi.object({
 	quantity: Joi.number().min(1).required()
 })
 
-
 export const saveProductSchema = Joi.object({
-	categoryId: Joi.string().required(),
-	subCategoryId: Joi.string().required(),
+	categoryId: Joi.string().regex(/^[0-9a-fA-F]{24}$/).required(),
+	subCategoryId: Joi.string().regex(/^[0-9a-fA-F]{24}$/).required(),
 	brand: Joi.string().required(),
 	name: Joi.string().required(),
 	details: Joi.string().allow(null, ''),
@@ -63,8 +62,8 @@ export const saveProductSchema = Joi.object({
 	.required()
 
 export const updateProductSchema = Joi.object({
-	categoryId: Joi.string().allow(null),
-	subCategoryId: Joi.string().allow(null),
+	categoryId: Joi.string().regex(/^[0-9a-fA-F]{24}$/).allow(null),
+	subCategoryId: Joi.string().regex(/^[0-9a-fA-F]{24}$/).allow(null),
 	brand: Joi.string().allow(null),
 	name: Joi.string().allow(null),
 	details: Joi.string().allow(null, ''),
@@ -81,5 +80,5 @@ export const updateProductSchema = Joi.object({
 	.required()
 
 export const favoriteProductSchema = Joi.object({
-	_id: Joi.string().required()
+	_id: Joi.string().regex(/^[0-9a-fA-F]{24}$/).required()
 })

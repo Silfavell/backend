@@ -36,7 +36,7 @@ export const makeOrderSchema = Joi.object({
 
 export const returnItemsSchema = Joi.array().min(1).items(
 	Joi.object({
-		_id: Joi.string().required(),
+		_id: Joi.string().regex(/^[0-9a-fA-F]{24}$/).required(),
 		quantity: Joi.number().positive().required()
 	})
 ).sparse(false)

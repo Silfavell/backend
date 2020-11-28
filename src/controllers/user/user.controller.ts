@@ -25,52 +25,77 @@ import ActivationCodes from '../../enums/activation-code-enum'
 
 import { validateAuthority } from '../../middlewares/auth-middleware'
 import Authority from '../../enums/authority-enum'
+import { handleError } from '../../utils/handle-error'
 
 const router = Router()
 
 router.use(validateAuthority(Authority.USER))
 
 router.get('/profile', async (req, res, next) => {
-	const user = await isUserExists(req.user.phoneNumber)
+	try {
+		const user = await isUserExists(req.user.phoneNumber)
 
-	res.json(user)
+		res.json(user)
+	} catch (error) {
+		next(handleError(error, `${req.protocol}://${req.get('host')}${req.originalUrl}`))
+	}
 })
 
 router.put('/profile', async (req, res, next) => {
-	await updateProfileSchema.validateAsync(req.body)
-	const user = await updateUser(req.user._id, req.body)
+	try {
+		await updateProfileSchema.validateAsync(req.body)
+		const user = await updateUser(req.user._id, req.body)
 
-	res.json(user)
+		res.json(user)
+	} catch (error) {
+			next(handleError(error, `${req.protocol}://${req.get('host')}${req.originalUrl}`))
+		}
 })
 
 router.post('/address', async (req, res, next) => {
-	await saveAddressSchema.validateAsync(req.body)
-	const user = await saveAddressToDatabase(req.user._id, req.body)
+	try {
+		await saveAddressSchema.validateAsync(req.body)
+		const user = await saveAddressToDatabase(req.user._id, req.body)
 
-	res.json(user)
+		res.json(user)
+	} catch (error) {
+		next(handleError(error, `${req.protocol}://${req.get('host')}${req.originalUrl}`))
+	}
 })
 
 router.delete('/address/:_id', async (req, res, next) => {
-	const user = await deleteAddress(req.user._id, req.params._id)
+	try {
+		const user = await deleteAddress(req.user._id, req.params._id)
 
-	res.json(user)
+		res.json(user)
+	} catch (error) {
+		next(handleError(error, `${req.protocol}://${req.get('host')}${req.originalUrl}`))
+	}
 })
 
 router.put('/change-password', async (req, res, next) => {
-	await Promise.all([changePasswordSchema.validateAsync(req.body), comparePasswords(req.user.password, req.body.oldPassword)])
-	const user = await isUserExists(req.user.phoneNumber)
-	await changePassword(user, req.body.newPassword)
+	try {
+		await Promise.all([changePasswordSchema.validateAsync(req.body), comparePasswords(req.user.password, req.body.oldPassword)])
+		const user = await isUserExists(req.user.phoneNumber)
+		await changePassword(user, req.body.newPassword)
 
-	res.json()
+		res.json()
+	} catch (error) {
+		next(handleError(error, `${req.protocol}://${req.get('host')}${req.originalUrl}`))
+	}
 })
 
 router.put('/phone-number', async (req, res, next) => {
-	const { newPhoneNumber } = await updatePhoneNumberSchema.validateAsync(req.body)
-	const activationCode = await getActivationCode(newPhoneNumber, ActivationCodes.UPDATE_PHONE_NUMBER)
+	try {
+		const { newPhoneNumber } = await updatePhoneNumberSchema.validateAsync(req.body)
+		const activationCode = await getActivationCode(newPhoneNumber, ActivationCodes.UPDATE_PHONE_NUMBER)
 
-	await compareActivationCode(req.body.activationCode.toString(), activationCode.toString())
-	await updatePhoneNumber(req.user.phoneNumber, newPhoneNumber)
-	res.json()
+		await compareActivationCode(req.body.activationCode.toString(), activationCode.toString())
+		await updatePhoneNumber(req.user.phoneNumber, newPhoneNumber)
+		res.json()
+	} catch (error) {
+		next(handleError(error, `${req.protocol}://${req.get('host')}${req.originalUrl}`))
+	}
 })
 
 export default router
