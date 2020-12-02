@@ -64,10 +64,10 @@ router.post('/', validateAuthority(Authority.USER), async (req, res, next) => {
 
 router.get('/:orderId', validateAuthority(Authority.USER), async (req, res, next) => {
 	try {
-		const order = (await getOrderById(req.params.orderId))[0]
+		const order = await getOrderById(req.params.orderId)
 		await isOrderBelongsToUser(req.params.orderId, req.user.phoneNumber)
 
-		res.json(order)
+		res.json(order[0])
 	} catch (error) {
 		next(handleError(error, `${req.protocol}://${req.get('host')}${req.originalUrl}`))
 	}
@@ -108,9 +108,9 @@ router.get('/all', validateAuthority(Authority.ADMIN), async (req, res, next) =>
 
 router.get('/:orderId', validateAuthority(Authority.ADMIN), async (req, res, next) => {
 	try {
-		const order = (await getOrderById(req.params.orderId))[0]
+		const order = await getOrderById(req.params.orderId)
 
-		res.json(order)
+		res.json(order[0])
 	} catch (error) {
 		next(handleError(error, `${req.protocol}://${req.get('host')}${req.originalUrl}`))
 	}

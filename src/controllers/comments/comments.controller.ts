@@ -9,12 +9,12 @@ import {
 	dislikeComment,
 	removeLikeComment,
 	removeDislikeComment
-} from './comment.service'
+} from './comments.service'
 
 import {
 	saveCommentSchema,
 	likeSchema
-} from './comment.validator'
+} from './comments.validator'
 
 import { handleError } from '../../utils/handle-error'
 

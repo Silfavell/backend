@@ -114,9 +114,9 @@ router.get('/filter-shop/:category?/:subCategory?', async (req, res, next) => {
 router.get('/filter-with-categories', async (req, res, next) => {
 	try {
 		await Promise.all([validateObjectId(req.query.categoryId), productsFilterWithCategoriesSchema.validateAsync(req.query)])
-		const response = (await getFilteredProductsWithCategories(req.query))[0]
+		const response = await getFilteredProductsWithCategories(req.query)
 
-		res.json(response)
+		res.json(response[0])
 	} catch (error) {
 		next(handleError(error, `${req.protocol}://${req.get('host')}${req.originalUrl}`))
 	}
@@ -172,10 +172,10 @@ router.put('/set-quantity/:_id', async (req, res, next) => {
 
 router.get('/:slug', async (req, res, next) => {
 	try {
-		const productWithColorGroup = (await getProductAndWithColorGroup(req.params.slug))[0]
-		await updateProductsSearchTimes(productWithColorGroup?._id, req.query.fromSearch)
+		const productWithColorGroup = await getProductAndWithColorGroup(req.params.slug)
+		await updateProductsSearchTimes(productWithColorGroup[0]?._id, req.query.fromSearch)
 
-		res.json(productWithColorGroup)
+		res.json(productWithColorGroup[0])
 	} catch (error) {
 		next(handleError(error, `${req.protocol}://${req.get('host')}${req.originalUrl}`))
 	}
@@ -289,9 +289,9 @@ router.put('/:_id', validateAuthority(Authority.ADMIN), async (req, res, next) =
 
 router.get('/favorites', validateAuthority(Authority.USER), async (req, res, next) => {
 	try {
-		const favoriteProducts = (await getFavoriteProductsFromDatabase(req.user._id))[0]
+		const favoriteProducts = await getFavoriteProductsFromDatabase(req.user._id)
 
-		res.json(favoriteProducts)
+		res.json(favoriteProducts[0])
 	} catch (error) {
 		next(handleError(error, `${req.protocol}://${req.get('host')}${req.originalUrl}`))
 	}
