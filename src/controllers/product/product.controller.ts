@@ -170,27 +170,6 @@ router.put('/set-quantity/:_id', async (req, res, next) => {
 	}
 })
 
-router.get('/:slug', async (req, res, next) => {
-	try {
-		const productWithColorGroup = await getProductAndWithColorGroup(req.params.slug)
-		await updateProductsSearchTimes(productWithColorGroup[0]?._id, req.query.fromSearch)
-
-		res.json(productWithColorGroup[0])
-	} catch (error) {
-		next(handleError(error, `${req.protocol}://${req.get('host')}${req.originalUrl}`))
-	}
-})
-
-router.get('/:slug/related-products', async (req, res, next) => {
-	try {
-		const relatedProducts = await getRelatedProducts(req.params.slug)
-
-		res.json(relatedProducts)
-	} catch (error) {
-		next(handleError(error, `${req.protocol}://${req.get('host')}${req.originalUrl}`))
-	}
-})
-
 router.get('/search', async (req, res, next) => {
 	try {
 		const result = await search(req.query.name)
@@ -314,6 +293,29 @@ router.delete('/favorites/:_id', validateAuthority(Authority.USER), async (req, 
 		const { favoriteProducts } = await removeFavoriteProductFromDatabase(req.user._id, req.params._id)
 
 		res.json(favoriteProducts)
+	} catch (error) {
+		next(handleError(error, `${req.protocol}://${req.get('host')}${req.originalUrl}`))
+	}
+})
+
+router.get('/:slug', async (req, res, next) => {
+	try {
+		const productWithColorGroup = await getProductAndWithColorGroup(req.params.slug)
+		if(productWithColorGroup[0]){
+			await updateProductsSearchTimes(productWithColorGroup[0]._id, req.query.fromSearch)
+		}
+
+		res.json(productWithColorGroup[0])
+	} catch (error) {
+		next(handleError(error, `${req.protocol}://${req.get('host')}${req.originalUrl}`))
+	}
+})
+
+router.get('/:slug/related-products', async (req, res, next) => {
+	try {
+		const relatedProducts = await getRelatedProducts(req.params.slug)
+
+		res.json(relatedProducts)
 	} catch (error) {
 		next(handleError(error, `${req.protocol}://${req.get('host')}${req.originalUrl}`))
 	}
