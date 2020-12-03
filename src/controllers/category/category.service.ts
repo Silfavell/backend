@@ -17,10 +17,20 @@ export const getCategories = () => (
 				path: '$subCategories',
 				preserveNullAndEmptyArrays: true
 			}
-		},
+		},/*
 		{
 			$addFields: {
 				subCategories: { $ifNull: ['$subCategories', { types: [] }] }
+			}
+		},*/
+		{
+			$match: {
+				'subCategories.brands': {
+					$exists: true,
+					$not: {
+						$size: 0
+					}
+				}
 			}
 		},
 		{
