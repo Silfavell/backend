@@ -9,11 +9,11 @@ import ErrorMessages from '../errors/ErrorMessages'
 
 
 export type CategoryDocument = Document & {
-	name: string
-	slug: string
-	subCategories: [SubCategoryDocument]
-	brands: [BrandDocument]
-	imagePath: number
+	name: string;
+	slug: string;
+	subCategories: [SubCategoryDocument];
+	brands: [BrandDocument];
+	imagePath: number;
 }
 
 const categorySchema = new Schema({

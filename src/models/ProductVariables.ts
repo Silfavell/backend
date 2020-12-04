@@ -1,9 +1,9 @@
 import mongoose, { Document, Schema } from 'mongoose'
 
 export type ProductVariablesDocument = Document & {
-    productId: mongoose.Types.ObjectId
-    timesSold: number
-    timesSearched: number
+    productId: mongoose.Types.ObjectId;
+    timesSold: number;
+    timesSearched: number;
 }
 
 const productVariables = new Schema({

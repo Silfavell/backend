@@ -1,11 +1,11 @@
 import mongoose, { Document, Schema } from 'mongoose'
 
 export type TicketDocument = Document & {
-    name?: string
-    surname?: string
-    email?: string
-    subject?: string
-    message: string
+    name?: string;
+    surname?: string;
+    email?: string;
+    subject?: string;
+    message: string;
 }
 
 const ticketSchema = new Schema({

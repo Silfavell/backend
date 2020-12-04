@@ -1,9 +1,9 @@
 import mongoose, { Document, Schema } from 'mongoose'
 
 export type CouponCodeDocument = Document & {
-    couponCode: number
-    isUsed: boolean
-    belongTo: mongoose.Types.ObjectId
+    couponCode: number;
+    isUsed: boolean;
+    belongTo: mongoose.Types.ObjectId;
 }
 
 const couponCodeSchema = new Schema({

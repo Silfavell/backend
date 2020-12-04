@@ -8,7 +8,7 @@ import { getCategories } from '../category/category.service'
 import { getCart } from '../cart/cart.service'
 import { listCards } from '../card/card.service'
 import { handleError } from '../../utils/handle-error'
-import { validateAuthority } from './../../middlewares/auth-middleware'
+import { validateAuthority } from './../../middlewares/auth-middleware';
 
 const router = Router()
 

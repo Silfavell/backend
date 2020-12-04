@@ -2,10 +2,10 @@ import mongoose, { Schema, Document } from 'mongoose'
 import bcrypt from 'bcrypt'
 
 export type AdminDocument = Document & {
-	phoneNumber: string
-	nameSurname: string
-	email: string
-	password: string
+	phoneNumber: string;
+	nameSurname: string;
+	email: string;
+	password: string;
 }
 
 const adminSchema = new Schema({

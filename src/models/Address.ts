@@ -1,8 +1,8 @@
 import mongoose, { Document, Schema } from 'mongoose'
 
 export type AddressDocument = Document & {
-	openAddress: string
-	addressTitle: string
+	openAddress: string;
+	addressTitle: string;
 }
 
 const addressSchema = new Schema({

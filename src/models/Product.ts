@@ -3,24 +3,24 @@ import ProductSpecification, { ProductSpecificationDocument } from './ProductSpe
 import ProductVariables from './ProductVariables'
 
 export type ProductDocument = Document & {
-	categoryId: string
-	subCategoryId: string
-	brand: string
-	name: string
-	slug: string
-	details: string
-	type: Schema.Types.ObjectId
-	specifications: [ProductSpecificationDocument]
-	price: number
-	discountedPrice: number
-	image: number
-	imageCount: number
-	purchasable: boolean
+	categoryId: string;
+	subCategoryId: string;
+	brand: string;
+	name: string;
+	slug: string;
+	details: string;
+	type: Schema.Types.ObjectId;
+	specifications: [ProductSpecificationDocument];
+	price: number;
+	discountedPrice: number;
+	image: number;
+	imageCount: number;
+	purchasable: boolean;
 	color: {
-		name: string
-		code: string
-	}
-	colorGroup: Schema.Types.ObjectId
+		name: string;
+		code: string;
+	};
+	colorGroup: Schema.Types.ObjectId;
 }
 
 const productSchema = new Schema({
