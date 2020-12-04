@@ -5,21 +5,12 @@ import HttpStatusCodes from 'http-status-codes'
 import Authority from '../enums/authority-enum'
 import { Admin, User } from '../models'
 
-export const validateAuthority = (authority: Authority) => async (req: Request, res: Response, next: NextFunction) => {
+export const validateAuthority = (authority?: Authority) => async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const decoded: any = jwt.verify(req.headers.authorization, process.env.SECRET)
 
 		if (decoded) {
-			if (authority === Authority.USER) {
-				const user = await User.findOne({ phoneNumber: decoded.payload.phoneNumber })
-
-				if (user) {
-					req.user = user
-					next()
-				} else {
-					res.status(HttpStatusCodes.UNAUTHORIZED).end('Unauthorized')
-				}
-			} else if (authority === Authority.ADMIN) {
+			if (authority === Authority.ADMIN) {
 				const admin = await Admin.findById(decoded.payload._id)
 
 				if (admin) {
@@ -29,6 +20,15 @@ export const validateAuthority = (authority: Authority) => async (req: Request, 
 					res.status(HttpStatusCodes.UNAUTHORIZED).end('Unauthorized')
 				}
 			}
+
+			const user = await User.findOne({ phoneNumber: decoded.payload.phoneNumber })
+			req.user = user
+
+			if (authority === Authority.USER && !user) {
+				res.status(HttpStatusCodes.UNAUTHORIZED).end('Unauthorized')
+			}
+
+			next()
 		} else {
 			res.status(HttpStatusCodes.UNAUTHORIZED).end('Unauthorized')
 		}

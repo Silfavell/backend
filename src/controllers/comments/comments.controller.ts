@@ -17,10 +17,11 @@ import {
 } from './comments.validator'
 
 import { handleError } from '../../utils/handle-error'
+import { validateAuthority } from '../../middlewares/auth-middleware'
 
 const router = Router()
 
-router.post('/', async (req, res, next) => {
+router.post('/', validateAuthority(), async (req, res, next) => {
 	try {
 		await saveCommentSchema.validateAsync(req.body)
 		const comment = await saveComment(req.user, req.body)
@@ -31,7 +32,7 @@ router.post('/', async (req, res, next) => {
 	}
 })
 
-router.put('/like/:_id', async (req, res, next) => {
+router.put('/like/:_id', validateAuthority(), async (req, res, next) => {
 	try {
 		await likeSchema.validateAsync(req.params._id)
 		const response = await likeComment(req.user, req.params._id)
@@ -42,7 +43,7 @@ router.put('/like/:_id', async (req, res, next) => {
 	}
 })
 
-router.put('/remove-like/:_id', async (req, res, next) => {
+router.put('/remove-like/:_id', validateAuthority(), async (req, res, next) => {
 	try {
 		await likeSchema.validateAsync(req.params._id)
 		const response = await removeLikeComment(req.user, req.params._id)
@@ -53,7 +54,7 @@ router.put('/remove-like/:_id', async (req, res, next) => {
 	}
 })
 
-router.put('/dislike/:_id', async (req, res, next) => {
+router.put('/dislike/:_id', validateAuthority(), async (req, res, next) => {
 	try {
 		await likeSchema.validateAsync(req.params._id)
 		const response = await dislikeComment(req.user, req.params._id)
@@ -64,7 +65,7 @@ router.put('/dislike/:_id', async (req, res, next) => {
 	}
 })
 
-router.put('/remove-dislike/:_id', async (req, res, next) => {
+router.put('/remove-dislike/:_id', validateAuthority(), async (req, res, next) => {
 	try {
 		await likeSchema.validateAsync(req.params._id)
 		const response = await removeDislikeComment(req.user, req.params._id)
@@ -75,7 +76,7 @@ router.put('/remove-dislike/:_id', async (req, res, next) => {
 	}
 })
 
-router.get('/waiting-list', async (req, res, next) => {
+router.get('/waiting-list', validateAuthority(), async (req, res, next) => {
 	try {
 		const comments = await getWaitingComments()
 
@@ -85,7 +86,7 @@ router.get('/waiting-list', async (req, res, next) => {
 	}
 })
 
-router.put('/verify-comment/:_id', async (req, res, next) => {
+router.put('/verify-comment/:_id', validateAuthority(), async (req, res, next) => {
 	try {
 		const comment = await verifyComment(req.params._id)
 
@@ -95,7 +96,7 @@ router.put('/verify-comment/:_id', async (req, res, next) => {
 	}
 })
 
-router.delete('/delete-comment/:_id', async (req, res, next) => {
+router.delete('/delete-comment/:_id', validateAuthority(), async (req, res, next) => {
 	try {
 		const comment = await deleteComment(req.params._id)
 

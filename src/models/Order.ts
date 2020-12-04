@@ -4,24 +4,24 @@ import Product, { ProductDocument } from './Product'
 import OrderStatus from '../enums/order-status-enum'
 
 export type OrderDocument = Document & {
-	customer: string;
-	phoneNumber: string;
-	address: string;
-	date: Date;
+	customer: string
+	phoneNumber: string
+	address: string
+	date: Date
 	products: ProductDocument & {
-		slug: string;
-		image: number;
-		quantity: number;
-		paidPrice: number;
-	}[];
-	status: OrderStatus;
-	message: string;
-	paidPrice: number;
-	cargoPrice: number;
+		slug: string
+		image: number
+		quantity: number
+		paidPrice: number
+	}[]
+	status: OrderStatus
+	message: string
+	paidPrice: number
+	cargoPrice: number
 	returnItems: [{
-		_id: Schema.Types.ObjectId;
-		quantity: number;
-	}];
+		_id: Schema.Types.ObjectId
+		quantity: number
+	}]
 }
 
 const orderSchema = new Schema({

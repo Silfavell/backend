@@ -121,7 +121,7 @@ export const clearCart = (userId: string) => (
 	Cart.deleteOne({ userId })
 )
 
-export const createCart = (body: { _id: string; quantity: number }[]) => {
+export const createCart = (body: { _id: string; quantity: number; }[]) => {
 	const productIds = body.map((product) => product._id)
 
 	return Product.find().where('_id').in(productIds).then((products: ProductDocument[]) => (

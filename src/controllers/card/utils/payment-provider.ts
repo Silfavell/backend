@@ -3,7 +3,7 @@ import Iyzipay from 'iyzipay'
 class PaymentProvider {
 	private constructor() { }
 
-  private static client: any;
+  private static client: any
 
   static getClient() {
   	if (!this.client) {

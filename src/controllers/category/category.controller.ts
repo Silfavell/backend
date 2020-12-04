@@ -26,7 +26,7 @@ import { handleError } from '../../utils/handle-error'
 
 const router = Router()
 
-router.get('/', async (req, res, next) => {
+router.get('/', validateAuthority(), async (req, res, next) => {
 	try {
 		const categories = await getCategories()
 

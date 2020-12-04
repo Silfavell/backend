@@ -10,10 +10,11 @@ import {
 } from './ticket.validator'
 
 import { handleError } from '../../utils/handle-error'
+import { validateAuthority } from '../../middlewares/auth-middleware'
 
 const router = Router()
 
-router.post('/', async (req, res, next) => {
+router.post('/', validateAuthority(), async (req, res, next) => {
 	try {
 		await postTicketSchema.validateAsync(req.body)
 		const ticket = await saveTicket(req.body)
@@ -24,7 +25,7 @@ router.post('/', async (req, res, next) => {
 	}
 })
 
-router.get('/all', async (req, res, next) => {
+router.get('/all', validateAuthority(), async (req, res, next) => {
 	try {
 		const tickets = await getTickets()
 

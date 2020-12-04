@@ -24,6 +24,7 @@ import {
 } from './auth.validator'
 
 import ActivationCodes from '../../enums/activation-code-enum'
+import { validateAuthority } from '../../middlewares/auth-middleware'
 import { handleError } from '../../utils/handle-error'
 import { sendSms } from '../../utils/send-sms'
 
@@ -36,7 +37,7 @@ const router = Router()
 
 router.use(apiLimiter)
 
-router.post('/send-activation-code', async (req, res, next) => {
+router.post('/send-activation-code', validateAuthority(), async (req, res, next) => {
 	try {
 		await Promise.all([
 			sendActivationCodeSchema.validateAsync({ phoneNumber: req.body.phoneNumber, activationCodeType: req.body.activationCodeType }),
@@ -51,7 +52,7 @@ router.post('/send-activation-code', async (req, res, next) => {
 	}
 })
 
-router.post('/register', async (req, res, next) => {
+router.post('/register', validateAuthority(), async (req, res, next) => {
 	try {
 		await Promise.all([registerSchema.validateAsync(req.body), isUserNonExists(req.body.phoneNumber)])
 		const activationCode = await getActivationCode(req.body.phoneNumber, ActivationCodes.REGISTER_USER)
@@ -65,7 +66,7 @@ router.post('/register', async (req, res, next) => {
 	}
 })
 
-router.post('/login-admin', async (req, res, next) => {
+router.post('/login-admin', validateAuthority(), async (req, res, next) => {
 	try {
 		await loginSchema.validateAsync(req.body)
 		const admin = await isAdminExists(req.body.phoneNumber)
@@ -78,7 +79,7 @@ router.post('/login-admin', async (req, res, next) => {
 	}
 })
 
-router.post('/login', async (req, res, next) => {
+router.post('/login', validateAuthority(), async (req, res, next) => {
 	try {
 		await loginSchema.validateAsync(req.body)
 		const user = await isUserExists(req.body.phoneNumber)
@@ -91,7 +92,7 @@ router.post('/login', async (req, res, next) => {
 	}
 })
 
-router.put('/reset-password', async (req, res, next) => {
+router.put('/reset-password', validateAuthority(), async (req, res, next) => {
 	try {
 		await resetPasswordSchema.validateAsync(req.body)
 		await isUserExists(req.body.phoneNumber)

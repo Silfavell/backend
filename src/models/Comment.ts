@@ -1,18 +1,18 @@
 import mongoose, { Document, Schema } from 'mongoose'
 
 export type CommentDocument = Document & {
-    productId: mongoose.Types.ObjectId;
-    ownerId: mongoose.Types.ObjectId;
-    ownerAlias: string;
-    title: string;
-    comment: string;
-    generalRate: number;
-    qualityRate: number;
-    priceRate: number;
-    likes: [mongoose.Types.ObjectId];
-    dislikes: [mongoose.Types.ObjectId];
-    date: Date;
-    verified: boolean;
+    productId: mongoose.Types.ObjectId
+    ownerId: mongoose.Types.ObjectId
+    ownerAlias: string
+    title: string
+    comment: string
+    generalRate: number
+    qualityRate: number
+    priceRate: number
+    likes: [mongoose.Types.ObjectId]
+    dislikes: [mongoose.Types.ObjectId]
+    date: Date
+    verified: boolean
 }
 
 const commentSchema = new Schema({

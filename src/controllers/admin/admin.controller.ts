@@ -21,7 +21,7 @@ router.get('/test', (req, res, next) => {
 	}
 })
 
-router.post('/save', async (req, res, next) => {
+router.post('/save', validateAuthority(), async (req, res, next) => {
 	try {
 		const admin = await new Admin(req.body).save()
 		const token = await createToken(admin)

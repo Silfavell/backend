@@ -4,7 +4,7 @@ import ErrorMessages from '../../errors/ErrorMessages'
 import ServerError from '../../errors/ServerError'
 import { Product, Cart, ProductDocument } from '../../models'
 
-export const createCart = async (body: { _id: string; quantity: number }[]) => {
+export const createCart = async (body: { _id: string; quantity: number; }[]) => {
 	const productIds = body.map((product) => product._id)
 
 	const products = await Product.where('_id').in(productIds).find()

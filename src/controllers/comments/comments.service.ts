@@ -18,13 +18,13 @@ export const deleteComment = (_id: string) => (
 )
 
 export const saveComment = (user: UserDocument, body: {
-	ownerAlias?: string;
-	productId: string;
-	comment: string;
-	title: string;
-	generalRate: number;
-	qualityRate: number;
-	priceRate: number;
+	ownerAlias?: string
+	productId: string
+	comment: string
+	title: string
+	generalRate: number
+	qualityRate: number
+	priceRate: number
 }) => {
 	if (body.ownerAlias) {
 		return User.findByIdAndUpdate(user._id, { alias: body.ownerAlias }).then(() => new Comment({

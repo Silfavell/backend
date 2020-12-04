@@ -8,6 +8,7 @@ import { getCategories } from '../category/category.service'
 import { getCart } from '../cart/cart.service'
 import { listCards } from '../card/card.service'
 import { handleError } from '../../utils/handle-error'
+import { validateAuthority } from './../../middlewares/auth-middleware'
 
 const router = Router()
 
@@ -15,7 +16,7 @@ router.get('/version', (req, res, next) => {
 	res.json('1.0.1')
 })
 
-router.get('/initialize', async (req, res, next) => {
+router.get('/initialize', validateAuthority(), async (req, res, next) => {
 	try {
 		const arr: any = [getCategories(), getProductsInCategories(), getBestSellerMobileProducts(), getMostSearchedMobileProducts()]
 

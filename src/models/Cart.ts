@@ -1,11 +1,11 @@
 import mongoose, { Document, Schema } from 'mongoose'
 
 export type CartDocument = Document & {
-	userId: string;
+	userId: string
 	cart: [{
-		_id: string;
-		quantity: number;
-	}];
+		_id: string
+		quantity: number
+	}]
 }
 
 const cartSchema = new Schema({
