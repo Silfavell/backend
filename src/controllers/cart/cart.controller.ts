@@ -23,7 +23,7 @@ const router = Router()
 
 router.use(validateAuthority(Authority.USER))
 
-router.post('/', validateAuthority(), async (req, res, next) => {
+router.post('/', async (req, res, next) => {
 	try {
 		await Promise.all([validateProducts(req.body), validateProductIds(req.body)])
 		const response = await saveCart(req.user._id, req.body)
@@ -34,7 +34,7 @@ router.post('/', validateAuthority(), async (req, res, next) => {
 	}
 })
 
-router.delete('/', validateAuthority(), async (req, res, next) => {
+router.delete('/', async (req, res, next) => {
 	try {
 		await clearCart(req.user._id.toString())
 
@@ -44,7 +44,7 @@ router.delete('/', validateAuthority(), async (req, res, next) => {
 	}
 })
 
-router.get('/', validateAuthority(), async (req, res, next) => {
+router.get('/', async (req, res, next) => {
 	try {
 		const cart = await getCart(req.user._id.toString())
 

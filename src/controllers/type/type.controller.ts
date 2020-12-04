@@ -27,7 +27,7 @@ const router = Router()
 
 router.use(validateAuthority(Authority.ADMIN))
 
-router.get('/', validateAuthority(), async (req, res, next) => {
+router.get('/', async (req, res, next) => {
 	try {
 		const types = await getTypes()
 
@@ -37,7 +37,7 @@ router.get('/', validateAuthority(), async (req, res, next) => {
 	}
 })
 
-router.post('/', validateAuthority(), async (req, res, next) => {
+router.post('/', async (req, res, next) => {
 	try {
 		await saveTypeSchema.validateAsync(req.body)
 		const slug = await getSeoUrl(req.body.name)
@@ -50,7 +50,7 @@ router.post('/', validateAuthority(), async (req, res, next) => {
 	}
 })
 
-router.put('/:_id', validateAuthority(), async (req, res, next) => {
+router.put('/:_id', async (req, res, next) => {
 	try {
 		await updateTypeSchema.validateAsync(req.body)
 		const slug = await getSeoUrl(req.body.name)
@@ -63,7 +63,7 @@ router.put('/:_id', validateAuthority(), async (req, res, next) => {
 	}
 })
 
-router.delete('/:_id', validateAuthority(), async (req, res, next) => {
+router.delete('/:_id', async (req, res, next) => {
 	try {
 		await deleteTypeSchema.validateAsync(req.params)
 		const type = await deleteType(req.params._id)

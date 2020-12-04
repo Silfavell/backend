@@ -11,10 +11,11 @@ import {
 
 import { handleError } from '../../utils/handle-error'
 import { validateAuthority } from '../../middlewares/auth-middleware'
+import Authority from '../../enums/authority-enum'
 
 const router = Router()
 
-router.post('/', validateAuthority(), async (req, res, next) => {
+router.post('/', async (req, res, next) => {
 	try {
 		await postTicketSchema.validateAsync(req.body)
 		const ticket = await saveTicket(req.body)
@@ -25,7 +26,7 @@ router.post('/', validateAuthority(), async (req, res, next) => {
 	}
 })
 
-router.get('/all', validateAuthority(), async (req, res, next) => {
+router.get('/all', validateAuthority(Authority.ADMIN), async (req, res, next) => {
 	try {
 		const tickets = await getTickets()
 

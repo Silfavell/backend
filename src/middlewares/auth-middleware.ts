@@ -19,16 +19,17 @@ export const validateAuthority = (authority?: Authority) => async (req: Request,
 				} else {
 					res.status(HttpStatusCodes.UNAUTHORIZED).end('Unauthorized')
 				}
+			} else {
+				const user = await User.findOne({ phoneNumber: decoded.payload.phoneNumber })
+				req.user = user
+
+				if (authority === Authority.USER && !user) {
+					console.log('here')
+					res.status(HttpStatusCodes.UNAUTHORIZED).end('Unauthorized')
+				}
+
+				next()
 			}
-
-			const user = await User.findOne({ phoneNumber: decoded.payload.phoneNumber })
-			req.user = user
-
-			if (authority === Authority.USER && !user) {
-				res.status(HttpStatusCodes.UNAUTHORIZED).end('Unauthorized')
-			}
-
-			next()
 		} else {
 			res.status(HttpStatusCodes.UNAUTHORIZED).end('Unauthorized')
 		}

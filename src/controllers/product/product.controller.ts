@@ -46,7 +46,7 @@ import { handleError } from '../../utils/handle-error'
 
 const router = Router()
 
-router.get('/', validateAuthority(), async (req, res, next) => {
+router.get('/', async (req, res, next) => {
 	try {
 		const products = await getProducts()
 
@@ -56,7 +56,7 @@ router.get('/', validateAuthority(), async (req, res, next) => {
 	}
 })
 
-router.get('/in-categories', validateAuthority(), async (req, res, next) => {
+router.get('/in-categories', async (req, res, next) => {
 	try {
 		const result = await getProductsInCategories()
 
@@ -67,7 +67,7 @@ router.get('/in-categories', validateAuthority(), async (req, res, next) => {
 })
 
 // FOR WEB
-router.get('/best-seller', validateAuthority(), async (req, res, next) => {
+router.get('/best-seller', async (req, res, next) => {
 	try {
 		const products = await getBestSellerProducts()
 
@@ -78,7 +78,7 @@ router.get('/best-seller', validateAuthority(), async (req, res, next) => {
 })
 
 // FOR MOBILE
-router.get('/best-seller-mobile', validateAuthority(), async (req, res, next) => {
+router.get('/best-seller-mobile', async (req, res, next) => {
 	try {
 		const bestSeller = await getBestSellerMobileProducts()
 
@@ -89,7 +89,7 @@ router.get('/best-seller-mobile', validateAuthority(), async (req, res, next) =>
 })
 
 // FOR MOBILE
-router.get('/most-searched-mobile', validateAuthority(), async (req, res, next) => {
+router.get('/most-searched-mobile', async (req, res, next) => {
 	try {
 		const products = await getMostSearchedMobileProducts()
 
@@ -100,7 +100,7 @@ router.get('/most-searched-mobile', validateAuthority(), async (req, res, next) 
 })
 
 // FOR WEB
-router.get('/filter-shop/:category?/:subCategory?', validateAuthority(), async (req, res, next) => {
+router.get('/filter-shop/:category?/:subCategory?', async (req, res, next) => {
 	try {
 		const shop = await filterShop(req.query, req.params)
 
@@ -111,7 +111,7 @@ router.get('/filter-shop/:category?/:subCategory?', validateAuthority(), async (
 })
 
 // FOR MOBILE // TODO DELETE
-router.get('/filter-with-categories', validateAuthority(), async (req, res, next) => {
+router.get('/filter-with-categories', async (req, res, next) => {
 	try {
 		await Promise.all([validateObjectId(req.query.categoryId), productsFilterWithCategoriesSchema.validateAsync(req.query)])
 		const response = await getFilteredProductsWithCategories(req.query)
@@ -123,7 +123,7 @@ router.get('/filter-with-categories', validateAuthority(), async (req, res, next
 })
 
 // FOR MOBILE
-router.get('/filter-mobile', validateAuthority(), async (req, res, next) => {
+router.get('/filter-mobile', async (req, res, next) => {
 	try {
 		await productsFilterMobileSchema.validateAsync(req.query)
 		const response = await productsFilterMobile(req.query)
@@ -170,7 +170,7 @@ router.put('/set-quantity/:_id', validateAuthority(), async (req, res, next) => 
 	}
 })
 
-router.get('/search', validateAuthority(), async (req, res, next) => {
+router.get('/search', async (req, res, next) => {
 	try {
 		const result = await search(req.query.name)
 
@@ -298,7 +298,7 @@ router.delete('/favorites/:_id', validateAuthority(Authority.USER), async (req, 
 	}
 })
 
-router.get('/:slug', validateAuthority(), async (req, res, next) => {
+router.get('/:slug', async (req, res, next) => {
 	try {
 		const productWithColorGroup = await getProductAndWithColorGroup(req.params.slug)
 		if(productWithColorGroup[0]){
@@ -311,7 +311,7 @@ router.get('/:slug', validateAuthority(), async (req, res, next) => {
 	}
 })
 
-router.get('/:slug/related-products', validateAuthority(), async (req, res, next) => {
+router.get('/:slug/related-products', async (req, res, next) => {
 	try {
 		const relatedProducts = await getRelatedProducts(req.params.slug)
 

@@ -31,7 +31,7 @@ const router = Router()
 
 router.use(validateAuthority(Authority.USER))
 
-router.get('/profile', validateAuthority(), async (req, res, next) => {
+router.get('/profile', async (req, res, next) => {
 	try {
 		const user = await isUserExists(req.user.phoneNumber)
 
@@ -41,7 +41,7 @@ router.get('/profile', validateAuthority(), async (req, res, next) => {
 	}
 })
 
-router.put('/profile', validateAuthority(), async (req, res, next) => {
+router.put('/profile', async (req, res, next) => {
 	try {
 		await updateProfileSchema.validateAsync(req.body)
 		const user = await updateUser(req.user._id, req.body)
@@ -52,7 +52,7 @@ router.put('/profile', validateAuthority(), async (req, res, next) => {
 		}
 })
 
-router.post('/address', validateAuthority(), async (req, res, next) => {
+router.post('/address', async (req, res, next) => {
 	try {
 		await saveAddressSchema.validateAsync(req.body)
 		const user = await saveAddressToDatabase(req.user._id, req.body)
@@ -63,7 +63,7 @@ router.post('/address', validateAuthority(), async (req, res, next) => {
 	}
 })
 
-router.delete('/address/:_id', validateAuthority(), async (req, res, next) => {
+router.delete('/address/:_id', async (req, res, next) => {
 	try {
 		const user = await deleteAddress(req.user._id, req.params._id)
 
@@ -73,7 +73,7 @@ router.delete('/address/:_id', validateAuthority(), async (req, res, next) => {
 	}
 })
 
-router.put('/change-password', validateAuthority(), async (req, res, next) => {
+router.put('/change-password', async (req, res, next) => {
 	try {
 		await Promise.all([changePasswordSchema.validateAsync(req.body), comparePasswords(req.user.password, req.body.oldPassword)])
 		const user = await isUserExists(req.user.phoneNumber)
@@ -85,7 +85,7 @@ router.put('/change-password', validateAuthority(), async (req, res, next) => {
 	}
 })
 
-router.put('/phone-number', validateAuthority(), async (req, res, next) => {
+router.put('/phone-number', async (req, res, next) => {
 	try {
 		const { newPhoneNumber } = await updatePhoneNumberSchema.validateAsync(req.body)
 		const activationCode = await getActivationCode(newPhoneNumber, ActivationCodes.UPDATE_PHONE_NUMBER)
