@@ -7,14 +7,18 @@ import helmet from 'helmet'
 import compression from 'compression'
 import path from 'path'
 import 'winston-daily-rotate-file'
+import multer from 'multer'
 
 export default (app: Application) => {
+	const upload = multer()
+
 	app.use('/api', express.static(path.join(__dirname, '../../public')))
 	app.use(cors({}))
 	app.use(helmet())
 	app.use(compression())
 	app.use(bodyParser.json())
-	app.use(bodyParser.urlencoded({ extended: true }))
+	app.use(bodyParser.urlencoded({ extended: false }))
+	app.use(upload.any())
 
 	const options = {
 		file: {

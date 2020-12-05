@@ -10,8 +10,27 @@ import Brand from '../../models/Brand'
 import ServerError from '../../errors/ServerError'
 import ErrorMessages from '../../errors/ErrorMessages'
 
-export const getCategories = () => (
-	Category.aggregate([
+export const getCategories = () => Category.find()
+
+
+
+export const getCategoriesAsMap = (filter: any) => {
+	const filterCatogoriesHaveNoBrand = []
+
+	if(filter){
+		filterCatogoriesHaveNoBrand.push({
+			$match: {
+				'subCategories.brands': {
+					$exists: true,
+					$not: {
+						$size: 0
+					}
+				}
+			}
+		})
+	}
+
+	const aggregations = [
 		{
 			$unwind: {
 				path: '$subCategories',
@@ -23,16 +42,7 @@ export const getCategories = () => (
 				subCategories: { $ifNull: ['$subCategories', { types: [] }] }
 			}
 		},*/
-		{
-			$match: {
-				'subCategories.brands': {
-					$exists: true,
-					$not: {
-						$size: 0
-					}
-				}
-			}
-		},
+		...filterCatogoriesHaveNoBrand,
 		{
 			$lookup: {
 				from: ProductType.collection.name,
@@ -80,8 +90,10 @@ export const getCategories = () => (
 				imagePath: 1
 			}
 		}
-	])
-)
+	]
+
+	return Category.aggregate(aggregations)
+}
 
 
 export const saveCategoryToDatabase = (categoryContext: CategoryDocument) => new Category(categoryContext).save()
