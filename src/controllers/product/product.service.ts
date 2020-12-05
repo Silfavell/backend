@@ -2289,11 +2289,14 @@ export const updateCategoryOfProduct = (product: ProductDocument) => (
 	})
 )
 
-export const saveProductImages = (product: ProductDocument, images: any[]) => {
-	sharp(images[0].data).resize(300, 300).toFile(`./public/assets/products/${product.slug}_300x300.webp`)
+export const saveProductImages = (
+	product: ProductDocument,
+	images: Express.Multer.File[]
+) => {
+	sharp(images[0].buffer).resize(300, 300).toFile(`./public/assets/products/${product.slug}_300x300.webp`)
 
 	images.map((image, index) => {
-		sharp(image.data).toFile(`./public/assets/products/${product.slug}_${index}_940x940.webp`)
+		sharp(images[0].buffer).toFile(`./public/assets/products/${product.slug}_${index}_940x940.webp`)
 	})
 }
 

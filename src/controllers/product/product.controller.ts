@@ -182,11 +182,8 @@ router.get('/search', async (req, res, next) => {
 
 router.post('/', validateAuthority(Authority.ADMIN), async (req, res, next) => {
 	try {
-		if (req.files?.images) {
-			if (!Array.isArray(req.files.images)) {
-				req.files.images = [req.files.images]
-			}
-			req.body.imageCount = Object.keys(req.files.images).length
+		if (req.files) {
+			req.body.imageCount = req.files.length
 		}
 
 		if (req.body.color) {
@@ -213,8 +210,8 @@ router.post('/', validateAuthority(Authority.ADMIN), async (req, res, next) => {
 		await updateCategoryOfProduct(product)
 		await indexProduct(product)
 
-		if (req.files?.images) {
-			saveProductImages(product, Object.values(req.files.images))
+		if (req.files) {
+			saveProductImages(product, req.files as Express.Multer.File[])
 		}
 
 		res.json(product)
@@ -226,11 +223,8 @@ router.post('/', validateAuthority(Authority.ADMIN), async (req, res, next) => {
 
 router.put('/:_id', validateAuthority(Authority.ADMIN), async (req, res, next) => {
 	try {
-		if (req.files?.images) {
-			if (!Array.isArray(req.files.images)) {
-				req.files.images = [req.files.images]
-			}
-			req.body.imageCount = Object.keys(req.files.images).length
+		if (req.files) {
+			req.body.imageCount = req.files.length
 		}
 
 		if (req.body.color) {
@@ -257,7 +251,7 @@ router.put('/:_id', validateAuthority(Authority.ADMIN), async (req, res, next) =
 		await indexProduct(product)
 
 		if (req.files) {
-			saveProductImages(product, Object.values(req.files))
+			saveProductImages(product, req.files as Express.Multer.File[])
 		}
 
 		res.json(product)
