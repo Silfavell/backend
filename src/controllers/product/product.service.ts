@@ -2296,7 +2296,7 @@ export const saveProductImages = (
 	sharp(images[0].buffer).resize(300, 300).toFile(`./public/assets/products/${product.slug}_300x300.webp`)
 
 	images.map((image, index) => {
-		sharp(images[0].buffer).toFile(`./public/assets/products/${product.slug}_${index}_940x940.webp`)
+		sharp(image.buffer).toFile(`./public/assets/products/${product.slug}_${index}_940x940.webp`)
 	})
 }
 

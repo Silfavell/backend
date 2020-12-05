@@ -210,7 +210,7 @@ router.post('/', validateAuthority(Authority.ADMIN), async (req, res, next) => {
 		await updateCategoryOfProduct(product)
 		await indexProduct(product)
 
-		if (req.files) {
+		if (req.files.length > 0) {
 			saveProductImages(product, req.files as Express.Multer.File[])
 		}
 
@@ -250,7 +250,7 @@ router.put('/:_id', validateAuthority(Authority.ADMIN), async (req, res, next) =
 		const product = await updateProduct(req.params._id, req.body, slug)
 		await indexProduct(product)
 
-		if (req.files) {
+		if (req.files.length > 0) {
 			saveProductImages(product, req.files as Express.Multer.File[])
 		}
 
@@ -295,7 +295,7 @@ router.delete('/favorites/:_id', validateAuthority(Authority.USER), async (req, 
 router.get('/:slug', async (req, res, next) => {
 	try {
 		const productWithColorGroup = await getProductAndWithColorGroup(req.params.slug)
-		if(productWithColorGroup[0]){
+		if (productWithColorGroup[0]) {
 			await updateProductsSearchTimes(productWithColorGroup[0]._id, req.query.fromSearch)
 		}
 
