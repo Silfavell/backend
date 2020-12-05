@@ -16,7 +16,6 @@ import {
 	getActivationCode,
 	compareActivationCode,
 	isAdminExists,
-
 	sendActivationCodeSchema,
 	registerSchema,
 	loginSchema,
@@ -24,9 +23,9 @@ import {
 } from './auth.validator'
 
 import ActivationCodes from '../../enums/activation-code-enum'
-import { validateAuthority } from '../../middlewares/auth-middleware'
 import { handleError } from '../../utils/handle-error'
 import { sendSms } from '../../utils/send-sms'
+import { changePassword } from '../user/user.service'
 
 const apiLimiter = rateLimit({
 	windowMs: 6 * 60 * 60 * 1000, // 6 Hours
@@ -98,7 +97,8 @@ router.put('/reset-password', async (req, res, next) => {
 		await isUserExists(req.body.phoneNumber)
 		const activationCode = await getActivationCode(req.body.phoneNumber, ActivationCodes.RESET_PASSWORD)
 		await compareActivationCode(req.body.activationCode, activationCode.toString())
-		await isUserExists(req.body.phoneNumber)
+		const user = await isUserExists(req.body.phoneNumber)
+		await changePassword(user, req.body.newPassword)
 
 		res.json()
 	} catch (error) {

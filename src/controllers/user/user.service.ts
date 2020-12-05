@@ -1,6 +1,8 @@
 import ActivationCodes from '../../enums/activation-code-enum'
 import {
-	Product, User, ActivationCode, UserDocument
+	User,
+	ActivationCode,
+	UserDocument
 } from '../../models'
 
 export const changePassword = (user: UserDocument, newPassword: string) => {
