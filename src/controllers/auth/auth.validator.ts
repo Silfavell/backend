@@ -24,7 +24,7 @@ export const isAdminExists = async (phoneNumber: string) => {
 	const admin = await Admin.findOne({ phoneNumber })
 
 	if (!admin) {
-		throw new ServerError(ErrorMessages.UNEXPECTED_ERROR, HttpStatusCodes.UNAUTHORIZED, ErrorMessages.UNEXPECTED_ERROR, false)
+		throw new ServerError(ErrorMessages.ADMIN_IS_NOT_EXISTS, HttpStatusCodes.UNAUTHORIZED, ErrorMessages.ADMIN_IS_NOT_EXISTS, false)
 	}
 
 	return admin

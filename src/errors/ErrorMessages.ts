@@ -9,6 +9,8 @@ class ErrorMessages {
 
     static USER_IS_NOT_EXISTS = 'Telefon numarasına ait kullanıcı bulunamadı'
 
+    static ADMIN_IS_NOT_EXISTS = 'Telefon numarasına ait admin bulunamadı'
+
     static NON_EXISTS_PRODUCT = 'Ürün bulunamadı'
 
     static NON_EXISTS_PRODUCT_IN_CART = 'Ürün sepette bulunamadı'
