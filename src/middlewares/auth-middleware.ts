@@ -24,16 +24,23 @@ export const validateAuthority = (authority?: Authority) => async (req: Request,
 				req.user = user
 
 				if (authority === Authority.USER && !user) {
-					console.log('here')
 					res.status(HttpStatusCodes.UNAUTHORIZED).end('Unauthorized')
 				}
 
 				next()
 			}
 		} else {
-			res.status(HttpStatusCodes.UNAUTHORIZED).end('Unauthorized')
+			if (authority) {
+				res.status(HttpStatusCodes.UNAUTHORIZED).end('Unauthorized')
+			}
+
+			next()
 		}
 	} catch (error) {
-		res.status(HttpStatusCodes.UNAUTHORIZED).end('Unauthorized')
+		if (authority) {
+			res.status(HttpStatusCodes.UNAUTHORIZED).end('Unauthorized')
+		}
+
+		next()
 	}
 }
