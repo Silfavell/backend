@@ -2309,9 +2309,9 @@ export const saveProductImages = (
 	})
 }
 
-export const indexProduct = (product: ProductDocument) => {
+export const indexProduct = async (product: ProductDocument) => {
 	if (product.purchasable) {
-		return Elasticsearch.getClient.index({
+		return await Elasticsearch.getClient.index({
 			index: 'doc',
 			type: 'doc',
 			id: product._id,
@@ -2320,11 +2320,10 @@ export const indexProduct = (product: ProductDocument) => {
 		})
 	}
 
-	return search(product.name).then((result) => {
-		if (result.body.hits.total > 0) {
-			return removeProductFromSearch(product)
-		}
-	})
+	const result = await search(product.name)
+	if (result.body.hits.total > 0) {
+		return removeProductFromSearch(product)
+	}
 }
 
 export const removeProductFromSearch = (product: ProductDocument) => (

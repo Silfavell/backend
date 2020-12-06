@@ -89,7 +89,7 @@ class ElasticSearch {
 			.then(ElasticSearch.openIndex)
 			.catch((reason) => {
 				winston.loggers.get('error-logger').error('ElasticSearch: Error', reason)
-				// process.exit(2)
+				process.exit(2)
 			})
 	}
 
