@@ -176,6 +176,7 @@ router.get('/search', async (req, res, next) => {
 
 		res.json(result.body.hits.hits)
 	} catch (error) {
+		// console.log(error.meta.body.error)
 		next(handleError(error, `${req.protocol}://${req.get('host')}${req.originalUrl}`))
 	}
 })

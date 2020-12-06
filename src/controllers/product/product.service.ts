@@ -26,7 +26,7 @@ import ProductSort from '../../enums/product-sort-enum'
 export const search = (name: string) => (
 	Elasticsearch.getClient.search({
 		index: 'doc',
-		type: 'doc',
+		// type: 'doc',
 		body: {
 			query: {
 				bool: {
