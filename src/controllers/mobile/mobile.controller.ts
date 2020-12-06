@@ -13,7 +13,7 @@ import { validateAuthority } from './../../middlewares/auth-middleware';
 const router = Router()
 
 router.get('/version', (req, res, next) => {
-	res.json('1.0.1')
+	res.json('1.1.0')
 })
 
 router.get('/initialize', validateAuthority(), async (req, res, next) => {
