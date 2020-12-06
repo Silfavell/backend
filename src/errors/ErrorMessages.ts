@@ -42,6 +42,8 @@ class ErrorMessages {
 
     static CATEGORY_IS_NOT_EXISTS = 'Kategori mevcut değil.'
 
+    static SUB_CATEGORY_IS_NOT_EXISTS = 'Alt kategori mevcut değil.'
+
     static CAN_NOT_DELETE_CATEGORY = 'This Category can not be deletable since there are SubCategories belongs to this Category.'
 
     static CAN_NOT_DELETE_SUB_CATEGORY = 'This SubCategory can not be deletable since there are products belongs to this SubCategory.'

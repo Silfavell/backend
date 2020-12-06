@@ -2268,8 +2268,17 @@ export const saveProductToDatabase = (productBody: ProductDocument) => (
 
 export const updateCategoryOfProduct = (product: ProductDocument) => (
 	Category.findById(product.categoryId.toString()).then((category) => {
+		if (!category) {
+			throw new ServerError(ErrorMessages.CATEGORY_IS_NOT_EXISTS, HttpStatusCodes.BAD_REQUEST, ErrorMessages.CATEGORY_IS_NOT_EXISTS, false)
+		}
+
 		const productCategoryBrand = category.brands.find((brand) => brand.name === product.brand)
 		const productSubCategory = category.subCategories.find((subCategory) => subCategory._id.toString() === product.subCategoryId.toString())
+
+		if (!productSubCategory) {
+			throw new ServerError(ErrorMessages.SUB_CATEGORY_IS_NOT_EXISTS, HttpStatusCodes.BAD_REQUEST, ErrorMessages.SUB_CATEGORY_IS_NOT_EXISTS, false)
+		}
+
 		const productSubCategoryBrand = productSubCategory.brands.find((brand) => brand.name === product.brand)
 		if (productCategoryBrand) {
 			// eslint-disable-next-line no-param-reassign

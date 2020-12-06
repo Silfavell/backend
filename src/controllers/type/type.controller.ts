@@ -40,7 +40,7 @@ router.get('/', async (req, res, next) => {
 router.post('/', async (req, res, next) => {
 	try {
 		await saveTypeSchema.validateAsync(req.body)
-		const slug = await getSeoUrl(req.body.name)
+		const slug = getSeoUrl(req.body.name)
 		await isTypeSlugExists(slug)
 		const type = await saveType({ ...req.body, slug })
 
@@ -53,8 +53,8 @@ router.post('/', async (req, res, next) => {
 router.put('/:_id', async (req, res, next) => {
 	try {
 		await updateTypeSchema.validateAsync(req.body)
-		const slug = await getSeoUrl(req.body.name)
-		await isTypeSlugExists(slug)
+		const slug = getSeoUrl(req.body.name)
+		await isTypeSlugExists(slug, req.params._id)
 		const type = await updateType(req.params._id, { ...req.body, slug })
 
 		res.json(type)

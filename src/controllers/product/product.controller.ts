@@ -202,15 +202,15 @@ router.post('/', validateAuthority(Authority.ADMIN), async (req, res, next) => {
 				slug: getSeoUrl(spec.name)
 			}))
 		}
-
+		
 		await saveProductSchema.validateAsync(req.body)
 		const slug = getSeoUrl(req.body.name)
 		await isProductSlugExists(slug)
+		await updateCategoryOfProduct(req.body)
 		const product = await saveProductToDatabase({ ...req.body, slug })
-		await updateCategoryOfProduct(product)
 		await indexProduct(product)
 
-		if (req.files.length > 0) {
+		if (req.files?.length > 0) {
 			saveProductImages(product, req.files as Express.Multer.File[])
 		}
 
@@ -250,7 +250,7 @@ router.put('/:_id', validateAuthority(Authority.ADMIN), async (req, res, next) =
 		const product = await updateProduct(req.params._id, req.body, slug)
 		await indexProduct(product)
 
-		if (req.files.length > 0) {
+		if (req.files?.length > 0) {
 			saveProductImages(product, req.files as Express.Multer.File[])
 		}
 
