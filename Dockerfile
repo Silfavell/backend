@@ -2,7 +2,7 @@ FROM node:10
 
 COPY package*.json ./
 
-RUN npm ci
+RUN npm i
 
 COPY . .
 
